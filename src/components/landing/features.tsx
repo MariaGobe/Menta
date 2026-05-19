@@ -42,7 +42,7 @@ const features = [
     icon: Building2,
     title: "Pensado para empresas",
     description:
-      "Optimizado para empresas que reciben alumnos en prácticas, no para centros educativos.",
+      "Optimizado para empresas que reciben alumnos en prácticas, o que quieren realizar formaciones internas: onboarding, herramientas nuevas, formación de equipos…",
   },
 ];
 

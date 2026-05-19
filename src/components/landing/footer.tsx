@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Sprout } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 export function Footer() {
   return (
@@ -8,9 +8,7 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-4">
           <div>
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-mint text-white">
-                <Sprout className="h-5 w-5" />
-              </div>
+              <Logo size={36} />
               <span className="text-xl font-bold">Menta</span>
             </Link>
             <p className="mt-3 text-sm text-muted-foreground">

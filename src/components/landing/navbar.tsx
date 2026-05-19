@@ -1,15 +1,13 @@
 import Link from "next/link";
-import { Sprout } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/logo";
 
 export function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-mint text-white">
-            <Sprout className="h-5 w-5" />
-          </div>
+          <Logo size={36} />
           <span className="text-xl font-bold tracking-tight">Menta</span>
         </Link>
 

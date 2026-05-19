@@ -9,9 +9,9 @@ import {
   ClipboardCheck,
   CreditCard,
   Settings,
-  Sprout,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/ui/logo";
 
 const items = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -28,9 +28,7 @@ export function Sidebar() {
   return (
     <aside className="hidden w-64 shrink-0 border-r bg-card md:flex md:flex-col">
       <div className="flex h-16 items-center gap-2 border-b px-6">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-mint text-white">
-          <Sprout className="h-5 w-5" />
-        </div>
+        <Logo size={36} />
         <span className="text-xl font-bold">Menta</span>
       </div>
 

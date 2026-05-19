@@ -2,60 +2,65 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =====================================================
+   PALETA MENTA — basada en el verde oficial #62A691
+   hsl(162 28% 52%)
+   ===================================================== */
+
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 160 25% 12%;
+    --foreground: 162 25% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 160 25% 12%;
+    --card-foreground: 162 25% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 160 25% 12%;
+    --popover-foreground: 162 25% 12%;
 
-    /* Mint primary */
-    --primary: 158 64% 38%;
+    /* Primary = verde oficial Menta #62A691 */
+    --primary: 162 28% 52%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 156 60% 96%;
-    --secondary-foreground: 158 64% 22%;
+    --secondary: 162 28% 96%;
+    --secondary-foreground: 162 28% 22%;
 
-    --muted: 160 20% 96%;
-    --muted-foreground: 160 10% 45%;
+    --muted: 162 15% 96%;
+    --muted-foreground: 162 8% 45%;
 
-    --accent: 156 60% 94%;
-    --accent-foreground: 158 64% 22%;
+    --accent: 162 28% 94%;
+    --accent-foreground: 162 28% 22%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 160 16% 90%;
-    --input: 160 16% 90%;
-    --ring: 158 64% 38%;
+    --border: 162 15% 90%;
+    --input: 162 15% 90%;
+    --ring: 162 28% 52%;
 
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 160 25% 6%;
+    --background: 162 25% 6%;
     --foreground: 0 0% 100%;
-    --card: 160 25% 9%;
+    --card: 162 25% 9%;
     --card-foreground: 0 0% 100%;
-    --popover: 160 25% 9%;
+    --popover: 162 25% 9%;
     --popover-foreground: 0 0% 100%;
-    --primary: 158 64% 48%;
-    --primary-foreground: 160 25% 6%;
-    --secondary: 160 25% 14%;
+    --primary: 162 30% 55%;
+    --primary-foreground: 162 25% 6%;
+    --secondary: 162 25% 14%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 160 25% 14%;
-    --muted-foreground: 160 10% 60%;
-    --accent: 160 25% 14%;
+    --muted: 162 25% 14%;
+    --muted-foreground: 162 10% 60%;
+    --accent: 162 25% 14%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 160 25% 16%;
-    --input: 160 25% 16%;
-    --ring: 158 64% 48%;
+    --border: 162 25% 16%;
+    --input: 162 25% 16%;
+    --ring: 162 30% 55%;
   }
 }
 
@@ -71,13 +76,13 @@
 
 @layer utilities {
   .gradient-mint {
-    background: linear-gradient(135deg, hsl(158 64% 38%) 0%, hsl(178 64% 42%) 100%);
+    background: linear-gradient(135deg, hsl(162 28% 52%) 0%, hsl(175 28% 56%) 100%);
   }
   .gradient-mint-soft {
-    background: linear-gradient(135deg, hsl(156 60% 96%) 0%, hsl(178 60% 96%) 100%);
+    background: linear-gradient(135deg, hsl(162 28% 96%) 0%, hsl(175 28% 96%) 100%);
   }
   .text-gradient-mint {
-    background: linear-gradient(135deg, hsl(158 64% 38%) 0%, hsl(178 64% 42%) 100%);
+    background: linear-gradient(135deg, hsl(162 32% 42%) 0%, hsl(175 32% 46%) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;

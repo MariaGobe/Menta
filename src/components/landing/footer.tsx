@@ -42,7 +42,7 @@ export function Footer() {
           <div>
             <h4 className="text-sm font-semibold">Contacto</h4>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li><a href="mailto:hola@menta.app" className="hover:text-foreground">hola@menta.app</a></li>
+              <li><a href="mailto:menta@gobesoluciones.com" className="hover:text-foreground">menta@gobesoluciones.com</a></li>
               <li>
                 <a href="https://gobesoluciones.com" target="_blank" rel="noreferrer" className="hover:text-foreground">
                   gobesoluciones.com

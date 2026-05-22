@@ -139,7 +139,7 @@ export function Pricing() {
 
       <p className="mt-10 text-center text-sm text-muted-foreground">
         ¿Necesitas más de 20 alumnos o funcionalidades específicas?{" "}
-        <Link href="mailto:hola@menta.app" className="font-medium text-primary hover:underline">
+        <Link href="mailto:menta@gobesoluciones.com" className="font-medium text-primary hover:underline">
           Contáctanos
         </Link>
         .

@@ -26,6 +26,28 @@ export type CalendarEventType =
   | "deliverable"
   | "final_presentation";
 export type MentorRole = "user" | "assistant";
+export type MentorTone = "cercano" | "formal" | "profesional" | "didactico";
+
+export interface MentorConfig {
+  id: string;
+  organization_id: string;
+  company_description: string | null;
+  industry: string | null;
+  tone: MentorTone | null;
+  mentor_personality: string | null;
+  knowledge_base: string | null;
+  resources: { label: string; url: string }[] | null;
+  custom_instructions: string | null;
+  updated_at: string;
+  updated_by: string | null;
+}
+
+export const MENTOR_TONE_LABELS: Record<MentorTone, string> = {
+  cercano: "Cercano",
+  formal: "Formal",
+  profesional: "Profesional",
+  didactico: "Didáctico",
+};
 
 export interface Organization {
   id: string;

@@ -36,6 +36,7 @@ export function GeneratePlanWizard({ students }: Props) {
   const [studentId, setStudentId] = useState<string>("");
   const [objectives, setObjectives] = useState<string>("");
   const [companyContext, setCompanyContext] = useState<string>("");
+  const [projectTasksText, setProjectTasksText] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +52,20 @@ export function GeneratePlanWizard({ students }: Props) {
     }
     setError(null);
     setLoading(true);
+    // Parsear "tareas del proyecto": formato libre tipo
+    //   "Implementar pantalla X · 8h"
+    //   "Conectar API Y (12 h)"
+    //   "Tests" (sin horas)
+    const projectTasks = projectTasksText
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const m = line.match(/^(.+?)[·\-–—\(:]\s*(\d+(?:\.\d+)?)\s*h?\)?\s*$/i);
+        if (m) return { title: m[1].trim(), hours: Number(m[2]) };
+        return { title: line };
+      });
+
     const res = await fetch("/api/plans/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -64,6 +79,7 @@ export function GeneratePlanWizard({ students }: Props) {
               .filter(Boolean)
           : undefined,
         companyContext: companyContext || undefined,
+        projectTasks: projectTasks.length > 0 ? projectTasks : undefined,
       }),
     });
     setLoading(false);
@@ -168,6 +184,25 @@ export function GeneratePlanWizard({ students }: Props) {
           rows={3}
           placeholder="Describe brevemente el área en la que trabajará el alumno y el proyecto principal"
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="project_tasks">
+          Tareas del proyecto / reto (opcional, una por línea)
+        </Label>
+        <Textarea
+          id="project_tasks"
+          value={projectTasksText}
+          onChange={(e) => setProjectTasksText(e.target.value)}
+          rows={5}
+          placeholder={`Implementar pantalla de login · 8h\nConectar con API de pagos · 12h\nDiseñar dashboard de admin · 10h\nPruebas y QA · 6h`}
+        />
+        <p className="text-xs text-muted-foreground">
+          Si lo rellenas, sustituiremos la tarea genérica "Desarrollo del
+          proyecto" por estas tareas concretas. Puedes indicar horas con
+          formato <code>· 8h</code> o <code>(8 h)</code>. Si no las indicas,
+          repartiremos las horas equitativamente.
+        </p>
       </div>
 
       {error && (

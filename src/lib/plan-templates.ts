@@ -278,6 +278,12 @@ interface GenerateInput {
   totalHours: number;
   customObjectives?: string[];
   companyContext?: string;
+  /**
+   * Tareas concretas del proyecto principal. Si se proporcionan, sustituyen
+   * la tarea genérica "Desarrollo del proyecto" repartiendo proporcionalmente
+   * las horas y deadlines.
+   */
+  projectTasks?: { title: string; hours?: number }[];
 }
 
 function addDays(dateStr: string, days: number): string {
@@ -318,7 +324,7 @@ export function generatePlanFromTemplate(input: GenerateInput): GeneratedPlan {
       Math.round((phaseEndPct / 100) * totalDays),
     );
 
-    const tasks: GeneratedTask[] = p.tasks.map((t, tIdx) => ({
+    let tasks: GeneratedTask[] = p.tasks.map((t, tIdx) => ({
       title: t.title,
       description: t.description ?? null,
       estimated_hours: t.estimated_hours,
@@ -326,6 +332,68 @@ export function generatePlanFromTemplate(input: GenerateInput): GeneratedPlan {
       due_date: addDays(input.startDate, Math.round(t.due_day_offset * scaleFactor)),
       order_index: tIdx,
     }));
+
+    // Si se proporcionan tareas de proyecto y esta fase parece la del proyecto
+    // principal (la que más peso tiene, o cuyo nombre contiene "Proyecto"/"Desarrollo"),
+    // sustituimos la tarea genérica por las concretas del usuario.
+    const isProjectPhase =
+      /proyecto|desarrollo|reto|aplicaci/i.test(p.name) &&
+      p.weight_pct >= 30;
+    if (
+      isProjectPhase &&
+      input.projectTasks &&
+      input.projectTasks.length > 0
+    ) {
+      const phaseStartDay = Math.round((phaseStartPct / 100) * totalDays);
+      const phaseEndDay = Math.round((phaseEndPct / 100) * totalDays);
+      const phaseSpan = Math.max(1, phaseEndDay - phaseStartDay);
+
+      // Conservamos tareas de la fase que NO sean "Desarrollo del proyecto"
+      // (típicamente revisiones intermedias, definición, etc.)
+      const preserved = tasks.filter(
+        (t) =>
+          !/desarrollo del proyecto|proyecto aplicado/i.test(t.title),
+      );
+
+      // Calculamos horas totales para el proyecto: por defecto 80% de las horas
+      // de plan dedicadas a la fase, o suma de las horas indicadas si las hay.
+      const provided = input.projectTasks.filter(
+        (pt) => pt.hours && pt.hours > 0,
+      );
+      const explicitTotal = provided.reduce(
+        (sum, pt) => sum + (pt.hours ?? 0),
+        0,
+      );
+      const fallbackTotalHours = Math.round(
+        (input.totalHours * p.weight_pct) / 100,
+      );
+      const totalProjectHours =
+        explicitTotal > 0 ? explicitTotal : fallbackTotalHours;
+
+      const projectTasks: GeneratedTask[] = input.projectTasks.map(
+        (pt, ptIdx) => {
+          const fraction = (ptIdx + 1) / input.projectTasks!.length;
+          const dueOffset = Math.round(phaseStartDay + phaseSpan * fraction);
+          const hours =
+            pt.hours && pt.hours > 0
+              ? pt.hours
+              : Math.round(totalProjectHours / input.projectTasks!.length);
+          return {
+            title: pt.title,
+            description: null,
+            estimated_hours: hours,
+            deliverable_required: true,
+            due_date: addDays(input.startDate, dueOffset),
+            order_index: preserved.length + ptIdx,
+          };
+        },
+      );
+
+      tasks = [...preserved, ...projectTasks].map((t, i) => ({
+        ...t,
+        order_index: i,
+      }));
+    }
 
     return {
       name: p.name,

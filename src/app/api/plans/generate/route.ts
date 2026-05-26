@@ -25,6 +25,7 @@ export async function POST(request: Request) {
     studentId?: string;
     customObjectives?: string[];
     companyContext?: string;
+    projectTasks?: { title: string; hours?: number }[];
     useAi?: boolean;
   };
 
@@ -58,6 +59,7 @@ export async function POST(request: Request) {
     totalHours: student.total_hours ?? 400,
     customObjectives: body.customObjectives,
     companyContext: body.companyContext,
+    projectTasks: body.projectTasks,
   });
 
   // TODO: si body.useAi === true y existe una clave de LLM configurada,

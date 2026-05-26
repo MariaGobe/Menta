@@ -1,18 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar as CalIcon, Target } from "lucide-react";
+import { ArrowLeft, Target } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { formatDate } from "@/lib/utils";
-import {
-  PLAN_STATUS_LABELS,
-  TASK_STATUS_LABELS,
-  type PlanStatus,
-  type TaskStatus,
-} from "@/types/database";
+import { PLAN_STATUS_LABELS, type PlanStatus, type TaskStatus } from "@/types/database";
 import { ApprovePlanButton } from "./approve-button";
+import { PlanTasksSection } from "./plan-tasks-section";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +37,9 @@ export default async function PlanDetailPage({
 
   const { data: tasks } = await supabase
     .from("practice_tasks")
-    .select("id, phase_id, title, description, due_date, status, estimated_hours, deliverable_required")
+    .select(
+      "id, phase_id, title, description, due_date, status, estimated_hours, deliverable_required, order_index",
+    )
     .eq("plan_id", plan.id)
     .order("order_index");
 
@@ -82,9 +80,7 @@ export default async function PlanDetailPage({
             {plan.end_date && formatDate(plan.end_date)} · {plan.total_hours}h
           </p>
         </div>
-        {plan.status === "draft" && (
-          <ApprovePlanButton planId={plan.id} />
-        )}
+        {plan.status === "draft" && <ApprovePlanButton planId={plan.id} />}
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
@@ -118,66 +114,46 @@ export default async function PlanDetailPage({
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Progreso</CardTitle>
-            <CardDescription>{completed} / {totalTasks} tareas</CardDescription>
+            <CardDescription>
+              {completed} / {totalTasks} tareas
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{progress}%</p>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
-              <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
+              <div
+                className="h-full bg-primary"
+                style={{ width: `${progress}%` }}
+              />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="space-y-3">
-        {tasksByPhase.map((ph) => (
-          <Card key={ph.id}>
-            <CardHeader>
-              <CardTitle className="text-base">{ph.name}</CardTitle>
-              <CardDescription className="flex items-center gap-1">
-                <CalIcon className="h-3 w-3" />
-                {formatDate(ph.start_date)} – {formatDate(ph.end_date)}
-                {ph.description && <span> · {ph.description}</span>}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {ph.tasks.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Esta fase no tiene tareas.
-                </p>
-              ) : (
-                <ul className="divide-y">
-                  {ph.tasks.map((t) => (
-                    <li
-                      key={t.id}
-                      className="flex items-center justify-between gap-3 py-3"
-                    >
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{t.title}</p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          Vence {formatDate(t.due_date)} · {t.estimated_hours} h
-                          {t.deliverable_required && " · con entregable"}
-                        </p>
-                      </div>
-                      <Badge
-                        variant={
-                          t.status === "completed"
-                            ? "success"
-                            : t.status === "blocked"
-                              ? "destructive"
-                              : "secondary"
-                        }
-                      >
-                        {TASK_STATUS_LABELS[t.status as TaskStatus]}
-                      </Badge>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <PlanTasksSection
+        planId={plan.id}
+        organizationId={plan.organization_id}
+        studentId={plan.student_id}
+        phases={tasksByPhase.map((ph) => ({
+          id: ph.id,
+          name: ph.name,
+          description: ph.description,
+          start_date: ph.start_date,
+          end_date: ph.end_date,
+          order_index: ph.order_index,
+          tasks: ph.tasks.map((t) => ({
+            id: t.id,
+            phase_id: t.phase_id,
+            title: t.title,
+            description: t.description,
+            due_date: t.due_date,
+            status: t.status as TaskStatus,
+            estimated_hours: t.estimated_hours,
+            deliverable_required: t.deliverable_required,
+            order_index: t.order_index ?? 0,
+          })),
+        }))}
+      />
     </div>
   );
 }

@@ -4,27 +4,28 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  Users,
+  Calendar,
   ClipboardList,
-  FileText,
-  ClipboardCheck,
-  CreditCard,
-  Settings,
+  BookOpen,
+  Sparkles,
+  Upload,
+  Presentation,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 
 const items = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/alumnos", icon: Users, label: "Alumnos" },
-  { href: "/planes", icon: ClipboardList, label: "Planes" },
-  { href: "/seguimiento", icon: ClipboardCheck, label: "Seguimiento" },
-  { href: "/documentos", icon: FileText, label: "Documentos" },
-  { href: "/facturacion", icon: CreditCard, label: "Facturación" },
-  { href: "/configuracion", icon: Settings, label: "Configuración" },
+  { href: "/student/dashboard", icon: LayoutDashboard, label: "Inicio" },
+  { href: "/student/mi-plan", icon: ClipboardList, label: "Mi plan" },
+  { href: "/student/calendario", icon: Calendar, label: "Mi calendario" },
+  { href: "/student/tareas", icon: ClipboardList, label: "Tareas de hoy" },
+  { href: "/student/diario", icon: BookOpen, label: "Diario" },
+  { href: "/student/mentor", icon: Sparkles, label: "Mentor virtual" },
+  { href: "/student/entregables", icon: Upload, label: "Entregables" },
+  { href: "/student/presentacion", icon: Presentation, label: "Presentación" },
 ];
 
-export function Sidebar() {
+export function StudentSidebar() {
   const pathname = usePathname();
 
   return (
@@ -36,10 +37,7 @@ export function Sidebar() {
 
       <nav className="flex-1 space-y-1 p-4">
         {items.map((item) => {
-          const active =
-            item.href === "/dashboard"
-              ? pathname === item.href
-              : pathname.startsWith(item.href);
+          const active = pathname.startsWith(item.href);
           return (
             <Link
               key={item.href}
@@ -59,13 +57,12 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t p-4">
-        <Link
-          href="/precios"
-          className="block rounded-lg bg-mint-50 p-3 text-xs"
-        >
-          <p className="font-semibold text-mint-800">Estás en período de prueba</p>
-          <p className="mt-1 text-mint-700">Activa tu suscripción cuando quieras.</p>
-        </Link>
+        <div className="rounded-lg bg-mint-50 p-3 text-xs">
+          <p className="font-semibold text-mint-800">Portal del alumno</p>
+          <p className="mt-1 text-mint-700">
+            Tu espacio personal de prácticas.
+          </p>
+        </div>
       </div>
     </aside>
   );

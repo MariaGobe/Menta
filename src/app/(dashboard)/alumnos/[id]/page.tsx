@@ -13,6 +13,7 @@ import {
   DOCUMENT_TYPE_LABELS,
 } from "@/types/database";
 import { formatDate } from "@/lib/utils";
+import { InviteStudentButton } from "./invite-button";
 
 export const dynamic = "force-dynamic";
 
@@ -57,7 +58,7 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
         <ArrowLeft className="h-4 w-4" /> Volver a alumnos
       </Link>
 
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold tracking-tight">{student.full_name}</h1>
@@ -69,6 +70,15 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
             {PRACTICE_TYPE_LABELS[student.practice_type]} ·{" "}
             {student.institution_name ?? "Sin centro"}
           </p>
+        </div>
+        <div className="flex items-start gap-2">
+          <Button variant="outline" asChild>
+            <Link href={`/planes/nuevo?student=${student.id}`}>Generar plan</Link>
+          </Button>
+          <InviteStudentButton
+            studentId={student.id}
+            studentEmail={student.email}
+          />
         </div>
       </div>
 

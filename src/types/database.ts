@@ -16,7 +16,16 @@ export type DocumentType =
   | "cv"
   | "otro";
 export type EvaluationType = "inicial" | "intermedia" | "final";
-export type UserRole = "owner" | "admin" | "member";
+export type UserRole = "owner" | "admin" | "member" | "student";
+export type PlanStatus = "draft" | "approved" | "in_progress" | "completed" | "archived";
+export type TaskStatus = "pending" | "in_progress" | "completed" | "blocked";
+export type CalendarEventType =
+  | "task"
+  | "milestone"
+  | "meeting"
+  | "deliverable"
+  | "final_presentation";
+export type MentorRole = "user" | "assistant";
 
 export interface Organization {
   id: string;
@@ -39,11 +48,147 @@ export interface Organization {
 export interface Profile {
   id: string;
   organization_id: string;
+  student_id: string | null;
   full_name: string | null;
   email: string | null;
   role: UserRole;
   avatar_url: string | null;
 }
+
+export interface PracticePlan {
+  id: string;
+  organization_id: string;
+  student_id: string;
+  title: string;
+  description: string | null;
+  objectives: string[] | null;
+  status: PlanStatus;
+  start_date: string | null;
+  end_date: string | null;
+  total_hours: number | null;
+  approved_at: string | null;
+  approved_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PracticePhase {
+  id: string;
+  plan_id: string;
+  organization_id: string;
+  name: string;
+  description: string | null;
+  order_index: number;
+  start_date: string | null;
+  end_date: string | null;
+}
+
+export interface PracticeTask {
+  id: string;
+  plan_id: string;
+  phase_id: string | null;
+  organization_id: string;
+  student_id: string | null;
+  title: string;
+  description: string | null;
+  due_date: string | null;
+  status: TaskStatus;
+  estimated_hours: number | null;
+  deliverable_required: boolean;
+  order_index: number;
+  completed_at: string | null;
+  completed_by: string | null;
+}
+
+export interface CalendarEvent {
+  id: string;
+  organization_id: string;
+  student_id: string;
+  task_id: string | null;
+  title: string;
+  description: string | null;
+  event_type: CalendarEventType;
+  event_date: string;
+  start_time: string | null;
+  end_time: string | null;
+}
+
+export interface DailyActivityLog {
+  id: string;
+  organization_id: string;
+  student_id: string;
+  log_date: string;
+  tasks_done: string | null;
+  hours_worked: number | null;
+  learnings: string | null;
+  difficulties: string | null;
+  next_steps: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Deliverable {
+  id: string;
+  organization_id: string;
+  student_id: string;
+  task_id: string | null;
+  title: string;
+  description: string | null;
+  storage_path: string | null;
+  file_size: number | null;
+  mime_type: string | null;
+  submitted_at: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  feedback: string | null;
+}
+
+export interface MentorMessage {
+  id: string;
+  student_id: string;
+  role: MentorRole;
+  content: string;
+  created_at: string;
+}
+
+export interface FinalPresentation {
+  id: string;
+  organization_id: string;
+  student_id: string;
+  title: string | null;
+  summary: string | null;
+  achievements: { title: string; detail?: string }[] | null;
+  competencies: { name: string; level?: string }[] | null;
+  highlights: Record<string, unknown> | null;
+  is_public: boolean;
+  public_slug: string | null;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const PLAN_STATUS_LABELS: Record<PlanStatus, string> = {
+  draft: "Borrador",
+  approved: "Aprobado",
+  in_progress: "En curso",
+  completed: "Completado",
+  archived: "Archivado",
+};
+
+export const TASK_STATUS_LABELS: Record<TaskStatus, string> = {
+  pending: "Pendiente",
+  in_progress: "En curso",
+  completed: "Completada",
+  blocked: "Bloqueada",
+};
+
+export const CALENDAR_EVENT_TYPE_LABELS: Record<CalendarEventType, string> = {
+  task: "Tarea",
+  milestone: "Hito",
+  meeting: "Reunión",
+  deliverable: "Entregable",
+  final_presentation: "Presentación final",
+};
 
 export interface Student {
   id: string;

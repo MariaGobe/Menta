@@ -9,7 +9,9 @@ const COMPANY_ROUTES = [
   "/facturacion",
   "/configuracion",
   "/planes",
+  "/calendario",
   "/informes",
+  "/evaluacion",
 ];
 
 const STUDENT_ROUTES = ["/student"];

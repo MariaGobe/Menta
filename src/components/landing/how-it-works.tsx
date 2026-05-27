@@ -1,52 +1,69 @@
 const steps = [
   {
     n: "01",
-    title: "Da de alta tu empresa",
+    title: "Configura tu mentor virtual",
     description:
-      "Crea tu cuenta y empieza tu prueba gratuita de 1 mes. Sin tarjeta de crédito.",
+      "Cuéntale al mentor de qué va tu empresa, qué herramientas usáis y cómo trabajáis. Una vez, y sirve para todos tus alumnos.",
   },
   {
     n: "02",
-    title: "Añade a tus alumnos",
+    title: "Da de alta a tus alumnos",
     description:
-      "Indica el tipo de práctica (FP, universidad o interna), datos del centro y tutores.",
+      "Tipo de práctica (FP, universidad o formación interna), fechas y datos del tutor. Menta se adapta a cada caso.",
   },
   {
     n: "03",
-    title: "Sube la documentación",
+    title: "Genera el plan de prácticas",
     description:
-      "Carga convenios, seguros y anexos. El PFI solo si tu alumno viene de FP.",
+      "Pulsa un botón. Menta crea fases, tareas y deadlines. Tú lo revisas, ajustas y apruebas.",
   },
   {
     n: "04",
-    title: "Haz el seguimiento",
+    title: "El alumno trabaja con el mentor",
     description:
-      "Registra horas, programa evaluaciones y genera el informe final cuando acabe.",
+      "Cada día el alumno consulta sus tareas, habla con el mentor cuando se atasca, sube entregables y registra su actividad.",
+  },
+  {
+    n: "05",
+    title: "Tú supervisas y firmas",
+    description:
+      "Menta te da una evaluación automática y los informes listos para la empresa, el centro educativo y la memoria del alumno.",
   },
 ];
 
 export function HowItWorks() {
   return (
-    <section id="como-funciona" className="bg-mint-50/50 py-20 md:py-28">
-      <div className="container">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-            Cómo funciona
-          </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
-            En 4 pasos tienes tus prácticas bajo control.
-          </p>
-        </div>
+    <section id="como-funciona" className="container py-20 md:py-28">
+      <div className="mx-auto max-w-2xl text-center">
+        <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+          Cómo funciona Menta
+        </h2>
+        <p className="mt-4 text-lg text-muted-foreground">
+          5 pasos para automatizar la gestión de prácticas en tu empresa.
+        </p>
+      </div>
 
-        <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {steps.map((s) => (
-            <div key={s.n} className="rounded-xl bg-white p-6 shadow-sm">
-              <span className="text-3xl font-bold text-mint-600">{s.n}</span>
-              <h3 className="mt-3 text-lg font-semibold">{s.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{s.description}</p>
-            </div>
+      <div className="mx-auto mt-16 max-w-4xl">
+        <ol className="space-y-4">
+          {steps.map((s, i) => (
+            <li key={s.n}>
+              <div className="group relative flex gap-5 rounded-2xl border bg-card p-6 transition hover:border-mint-300 hover:shadow-md">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-mint-100 text-mint-700">
+                  <span className="text-lg font-bold">{s.n}</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">{s.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {s.description}
+                  </p>
+                </div>
+              </div>
+              {i < steps.length - 1 && (
+                <div className="ml-11 h-4 w-px bg-mint-200" aria-hidden />
+              )}
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

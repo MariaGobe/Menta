@@ -1,48 +1,48 @@
 import {
-  Users,
-  FileText,
-  ClipboardCheck,
-  GraduationCap,
-  Building2,
+  Sparkles,
+  ClipboardList,
   Calendar,
+  BookOpen,
+  FileText,
+  TrendingUp,
 } from "lucide-react";
 
 const features = [
   {
-    icon: Users,
-    title: "Gestión de alumnos",
+    icon: Sparkles,
+    title: "Mentor virtual configurable",
     description:
-      "Da de alta alumnos de FP, universidad o formaciones internas. Asigna tutores y haz seguimiento.",
+      "Alimenta al mentor con la información de tu empresa, herramientas y procesos. Acompañará a los alumnos sin que tú tengas que hacerlo.",
   },
   {
-    icon: FileText,
-    title: "Documentación centralizada",
+    icon: ClipboardList,
+    title: "Plan de prácticas en un click",
     description:
-      "Convenios, seguros, anexos, evaluaciones... y el PFI cuando sea necesario. Todo en la nube.",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "Evaluaciones periódicas",
-    description:
-      "Registra evaluaciones iniciales, intermedias y finales con competencias y comentarios.",
+      "Menta genera fases, tareas y entregables a partir de la información del alumno. Tú revisas y apruebas.",
   },
   {
     icon: Calendar,
-    title: "Control de horas",
+    title: "Calendario compartido",
     description:
-      "Lleva el registro horario de cada alumno y aprueba las horas trabajadas.",
+      "Hitos, deadlines, reuniones y entregas aparecen en el calendario del alumno y en el tuyo.",
   },
   {
-    icon: GraduationCap,
-    title: "Multi-itinerario",
+    icon: BookOpen,
+    title: "Diario de prácticas",
     description:
-      "Un mismo flujo válido para prácticas de FP, universitarias o formaciones internas.",
+      "El alumno registra lo que hace cada día. Esa actividad alimenta evaluación, informes y memoria final automáticamente.",
   },
   {
-    icon: Building2,
-    title: "Pensado para empresas",
+    icon: TrendingUp,
+    title: "Evaluación automática",
     description:
-      "Optimizado para empresas que reciben alumnos en prácticas, o que quieren realizar formaciones internas: onboarding, herramientas nuevas, formación de equipos…",
+      "Menta detecta retrasos, calcula progreso y propone una evaluación basada en evidencias. Sin hojas de cálculo.",
+  },
+  {
+    icon: FileText,
+    title: "Informes listos para entregar",
+    description:
+      "Genera informes para la empresa, el centro educativo o la memoria del alumno. Listos para imprimir o guardar como PDF.",
   },
 ];
 
@@ -54,21 +54,21 @@ export function Features() {
           Todo lo que necesitas para gestionar prácticas
         </h2>
         <p className="mt-4 text-lg text-muted-foreground">
-          Una plataforma diseñada para que el responsable de prácticas dedique
-          su tiempo a formar, no a perseguir papeles.
+          Una plataforma diseñada para empresas que reciben alumnos en prácticas
+          o que quieren formar a su propio equipo internamente.
         </p>
       </div>
 
-      <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {features.map((f) => (
           <div
             key={f.title}
-            className="group rounded-xl border bg-card p-6 transition-shadow hover:shadow-lg"
+            className="group rounded-2xl border bg-card p-6 transition-all hover:-translate-y-0.5 hover:shadow-lg"
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-mint-100 text-mint-700">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-mint-100 text-mint-700 group-hover:bg-mint-200">
               <f.icon className="h-6 w-6" />
             </div>
-            <h3 className="mt-4 text-lg font-semibold">{f.title}</h3>
+            <h3 className="mt-5 text-lg font-semibold">{f.title}</h3>
             <p className="mt-2 text-sm text-muted-foreground">{f.description}</p>
           </div>
         ))}

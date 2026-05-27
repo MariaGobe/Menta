@@ -12,6 +12,9 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden gap-6 md:flex">
+          <Link href="/#mentor" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            Mentor virtual
+          </Link>
           <Link href="/#caracteristicas" className="text-sm font-medium text-muted-foreground hover:text-foreground">
             Características
           </Link>

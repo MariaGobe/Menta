@@ -1,15 +1,23 @@
 const faqs = [
   {
+    q: "¿Qué es exactamente el mentor virtual?",
+    a: "Es un asistente que acompaña al alumno día a día (dudas, planificación, desbloqueos). Lo configura la empresa una sola vez con su información (cómo trabajáis, herramientas, normas, recursos) y a partir de ahí atiende a todos vuestros alumnos sin que el tutor humano dedique tiempo.",
+  },
+  {
+    q: "¿Sustituye al tutor humano de la empresa?",
+    a: "No. El tutor sigue existiendo como referente final y firma documentos legales. Pero el día a día (preguntas, planificación, dudas técnicas) lo absorbe el mentor virtual. Tú decides qué temas se redirigen al humano.",
+  },
+  {
     q: "¿La plataforma sirve solo para prácticas de FP?",
-    a: "No. Menta está pensada para todo tipo de prácticas en empresa: alumnos de FP, alumnos universitarios e incluso formaciones internas dentro de la propia empresa. El flujo se adapta automáticamente al tipo de práctica.",
+    a: "No. Menta está pensada para prácticas en empresa: alumnos de FP, alumnos universitarios e incluso formaciones internas (onboarding, herramientas nuevas, formación de equipos). El flujo se adapta al tipo de práctica.",
   },
   {
     q: "¿El PFI es obligatorio?",
-    a: "Solo si el alumno proviene de un centro de FP. Para el resto de itinerarios el PFI no es requerido y la plataforma no lo solicita.",
+    a: "Solo si el alumno proviene de un centro de FP. Para el resto de itinerarios no se solicita.",
   },
   {
     q: "¿Cómo funciona la prueba gratuita?",
-    a: "Dispones de 1 mes con acceso completo a todas las funcionalidades. No te pedimos tarjeta de crédito. Al finalizar puedes contratar el plan anual o seguir consultando tus datos en modo lectura durante 30 días más.",
+    a: "1 mes con acceso completo a todas las funcionalidades, sin tarjeta de crédito. Al finalizar puedes contratar el plan anual o seguir consultando tus datos en modo lectura durante 30 días más.",
   },
   {
     q: "¿Qué incluye el precio?",
@@ -20,8 +28,8 @@ const faqs = [
     a: "Sí. Toda la información se aloja en servidores europeos cumpliendo el RGPD. Hacemos backups diarios y nunca compartimos tus datos con terceros.",
   },
   {
-    q: "¿Puedo migrar mis datos si dejo la plataforma?",
-    a: "Por supuesto. Puedes exportar en cualquier momento todos los datos de tus alumnos, documentos y evaluaciones en formato Excel y PDF.",
+    q: "¿Puedo exportar mis datos si dejo la plataforma?",
+    a: "Por supuesto. Puedes exportar en cualquier momento alumnos, documentos, evaluaciones e informes en formato PDF y Excel.",
   },
 ];
 
@@ -34,11 +42,17 @@ export function Faq() {
         </h2>
       </div>
 
-      <div className="mx-auto mt-12 grid max-w-3xl gap-6">
+      <div className="mx-auto mt-12 grid max-w-3xl gap-4">
         {faqs.map((item) => (
-          <details key={item.q} className="group rounded-xl border bg-card p-6">
-            <summary className="cursor-pointer list-none text-base font-semibold group-open:text-primary">
-              {item.q}
+          <details
+            key={item.q}
+            className="group rounded-2xl border bg-card p-6 transition hover:border-mint-300"
+          >
+            <summary className="flex cursor-pointer items-center justify-between list-none text-base font-semibold group-open:text-primary">
+              <span>{item.q}</span>
+              <span className="ml-4 text-2xl leading-none text-mint-700 transition-transform group-open:rotate-45">
+                +
+              </span>
             </summary>
             <p className="mt-3 text-sm text-muted-foreground">{item.a}</p>
           </details>

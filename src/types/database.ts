@@ -49,6 +49,68 @@ export const MENTOR_TONE_LABELS: Record<MentorTone, string> = {
   didactico: "Didáctico",
 };
 
+export type MilestoneType =
+  | "problem_solved"
+  | "project_completed"
+  | "practice_completed"
+  | "company_recommendation"
+  | "custom";
+
+export interface Milestone {
+  id: string;
+  organization_id: string;
+  student_id: string;
+  type: MilestoneType;
+  title: string;
+  description: string | null;
+  task_id: string | null;
+  deliverable_id: string | null;
+  company_endorsement: string | null;
+  endorsed_by: string | null;
+  endorsed_at: string | null;
+  is_published: boolean;
+  public_slug: string | null;
+  published_at: string | null;
+  tags: string[] | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const MILESTONE_TYPE_LABELS: Record<MilestoneType, string> = {
+  problem_solved: "Problema resuelto",
+  project_completed: "Proyecto completado",
+  practice_completed: "Fin de prácticas",
+  company_recommendation: "Recomendación de empresa",
+  custom: "Hito personalizado",
+};
+
+export const MILESTONE_TYPE_HINTS: Record<MilestoneType, { placeholder: string; cta: string }> = {
+  problem_solved: {
+    placeholder:
+      "Cuenta brevemente qué problema te encontraste, qué solución diseñaste y qué impacto tuvo. Sé concreto: tecnologías, métricas, contexto.",
+    cta: "Solución a un problema",
+  },
+  project_completed: {
+    placeholder:
+      "Describe el proyecto: objetivo, tu rol, qué tecnologías usaste, resultado y aprendizajes.",
+    cta: "Proyecto completado",
+  },
+  practice_completed: {
+    placeholder:
+      "Reflexiona sobre tu paso por la empresa: qué aprendiste, qué te llevas, qué le agradeces al equipo.",
+    cta: "He terminado mis prácticas",
+  },
+  company_recommendation: {
+    placeholder:
+      "Texto de la empresa recomendando al alumno: actitud, resultados, valores que ha demostrado.",
+    cta: "Recomendación recibida",
+  },
+  custom: {
+    placeholder: "Comparte lo que te apetezca destacar de tu experiencia.",
+    cta: "Otro hito",
+  },
+};
+
 export interface Organization {
   id: string;
   name: string;

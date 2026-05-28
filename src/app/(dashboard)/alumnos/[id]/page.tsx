@@ -14,6 +14,7 @@ import {
 } from "@/types/database";
 import { formatDate } from "@/lib/utils";
 import { InviteStudentButton } from "./invite-button";
+import { CompanyRecommendationButton } from "./recommendation-form";
 
 export const dynamic = "force-dynamic";
 
@@ -81,6 +82,11 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
           />
         </div>
       </div>
+
+      <CompanyRecommendationButton
+        studentId={student.id}
+        organizationId={student.organization_id}
+      />
 
       {missingDocs.length > 0 && (
         <Card className="border-amber-200 bg-amber-50">

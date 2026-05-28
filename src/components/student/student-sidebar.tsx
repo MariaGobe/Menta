@@ -10,6 +10,7 @@ import {
   Sparkles,
   Upload,
   Presentation,
+  Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
@@ -22,6 +23,7 @@ const items = [
   { href: "/student/diario", icon: BookOpen, label: "Diario" },
   { href: "/student/mentor", icon: Sparkles, label: "Mentor virtual" },
   { href: "/student/entregables", icon: Upload, label: "Entregables" },
+  { href: "/student/hitos", icon: Award, label: "Hitos / LinkedIn" },
   { href: "/student/presentacion", icon: Presentation, label: "Presentación" },
 ];
 

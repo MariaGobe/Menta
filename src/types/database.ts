@@ -84,6 +84,86 @@ export const MILESTONE_TYPE_LABELS: Record<MilestoneType, string> = {
   custom: "Hito personalizado",
 };
 
+export type ChallengeStatus = "draft" | "published" | "closed" | "archived";
+export type ChallengePaymentStatus = "free" | "pending" | "paid";
+export type ApplicationStatus =
+  | "registered"
+  | "in_progress"
+  | "submitted"
+  | "withdrawn"
+  | "shortlisted"
+  | "contacted";
+
+export interface Challenge {
+  id: string;
+  organization_id: string;
+  title: string;
+  short_description: string | null;
+  problem_statement: string | null;
+  requirements: string | null;
+  evaluation_criteria: string | null;
+  deliverable_format: string | null;
+  tags: string[] | null;
+  start_date: string;
+  end_date: string;
+  max_applicants: number | null;
+  status: ChallengeStatus;
+  payment_status: ChallengePaymentStatus;
+  stripe_payment_intent_id: string | null;
+  public_slug: string | null;
+  published_at: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ChallengeApplication {
+  id: string;
+  challenge_id: string;
+  organization_id: string;
+  applicant_name: string;
+  applicant_email: string;
+  applicant_phone: string | null;
+  applicant_linkedin: string | null;
+  applicant_education: string | null;
+  share_with_company: boolean;
+  status: ApplicationStatus;
+  score: number | null;
+  highlighted: boolean;
+  review_notes: string | null;
+  applied_at: string;
+  submitted_at: string | null;
+  shortlisted_at: string | null;
+}
+
+export interface ChallengeSubmission {
+  id: string;
+  application_id: string;
+  challenge_id: string;
+  content: string | null;
+  storage_path: string | null;
+  file_size: number | null;
+  mime_type: string | null;
+  external_url: string | null;
+  submitted_at: string;
+}
+
+export const CHALLENGE_STATUS_LABELS: Record<ChallengeStatus, string> = {
+  draft: "Borrador",
+  published: "Publicado",
+  closed: "Cerrado",
+  archived: "Archivado",
+};
+
+export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
+  registered: "Registrado",
+  in_progress: "En curso",
+  submitted: "Entregado",
+  withdrawn: "Retirado",
+  shortlisted: "Preseleccionado",
+  contacted: "Contactado",
+};
+
 export const MILESTONE_TYPE_HINTS: Record<MilestoneType, { placeholder: string; cta: string }> = {
   problem_solved: {
     placeholder:

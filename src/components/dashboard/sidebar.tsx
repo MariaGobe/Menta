@@ -11,6 +11,7 @@ import {
   ClipboardCheck,
   TrendingUp,
   FileSpreadsheet,
+  Trophy,
   CreditCard,
   Settings,
 } from "lucide-react";
@@ -24,6 +25,7 @@ const items = [
   { href: "/calendario", icon: Calendar, label: "Calendario" },
   { href: "/seguimiento", icon: ClipboardCheck, label: "Seguimiento" },
   { href: "/evaluacion", icon: TrendingUp, label: "Evaluación" },
+  { href: "/retos", icon: Trophy, label: "Retos abiertos" },
   { href: "/informes", icon: FileSpreadsheet, label: "Informes" },
   { href: "/documentos", icon: FileText, label: "Documentos" },
   { href: "/facturacion", icon: CreditCard, label: "Facturación" },

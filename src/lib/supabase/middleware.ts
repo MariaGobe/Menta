@@ -12,6 +12,7 @@ const COMPANY_ROUTES = [
   "/calendario",
   "/informes",
   "/evaluacion",
+  "/retos",
 ];
 
 const STUDENT_ROUTES = ["/student"];

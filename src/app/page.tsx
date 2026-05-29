@@ -4,6 +4,7 @@ import { MentorSection } from "@/components/landing/mentor-section";
 import { Features } from "@/components/landing/features";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { Audience } from "@/components/landing/audience";
+import { TalentSection } from "@/components/landing/talent-section";
 import { Pricing } from "@/components/landing/pricing";
 import { Faq } from "@/components/landing/faq";
 import { FinalCta } from "@/components/landing/cta";
@@ -19,6 +20,7 @@ export default function HomePage() {
         <Features />
         <HowItWorks />
         <Audience />
+        <TalentSection />
         <Pricing />
         <Faq />
         <FinalCta />

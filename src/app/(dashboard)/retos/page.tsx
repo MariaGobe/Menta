@@ -9,8 +9,8 @@ import {
   CHALLENGE_STATUS_LABELS,
   type ChallengeStatus,
 } from "@/types/database";
+import { checkChallengeAvailability } from "@/lib/challenges-server";
 import {
-  checkChallengeAvailability,
   CHALLENGE_ADDON_PRICE_EUR,
   FREE_CHALLENGES_PER_YEAR,
 } from "@/lib/challenges";

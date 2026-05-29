@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import {
-  checkChallengeAvailability,
-  slugify,
-} from "@/lib/challenges";
+import { slugify } from "@/lib/challenges";
+import { checkChallengeAvailability } from "@/lib/challenges-server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

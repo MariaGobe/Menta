@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+// Helpers PUROS para retos. No importan supabase server.
+// Las funciones server-only están en `lib/challenges-server.ts`.
 
 export const CHALLENGE_DURATION_DAYS = 30;
 export const CHALLENGE_ADDON_PRICE_EUR = 84;
@@ -14,46 +15,6 @@ export function slugify(text: string): string {
     .slice(0, 70);
 }
 
-/**
- * Devuelve cuántos retos ha publicado la empresa en los últimos 365 días
- * (excluyendo borradores). Solo cuentan los que ya están publicados o ya
- * tienen pago confirmado.
- */
-export async function countChallengesThisYear(
-  organizationId: string,
-): Promise<number> {
-  const supabase = createClient();
-  const oneYearAgo = new Date();
-  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-
-  const { count } = await supabase
-    .from("challenges")
-    .select("*", { count: "exact", head: true })
-    .eq("organization_id", organizationId)
-    .in("status", ["published", "closed", "archived"])
-    .gte("created_at", oneYearAgo.toISOString());
-
-  return count ?? 0;
-}
-
-export interface ChallengeAvailability {
-  hasFree: boolean;
-  usedThisYear: number;
-  priceEur: number;
-}
-
-export async function checkChallengeAvailability(
-  organizationId: string,
-): Promise<ChallengeAvailability> {
-  const used = await countChallengesThisYear(organizationId);
-  return {
-    hasFree: used < FREE_CHALLENGES_PER_YEAR,
-    usedThisYear: used,
-    priceEur: CHALLENGE_ADDON_PRICE_EUR,
-  };
-}
-
-/** Texto sugerido para LinkedIn al publicar un reto */
 export function buildChallengeLinkedInPost(input: {
   title: string;
   shortDescription: string | null;
@@ -73,7 +34,7 @@ export function buildChallengeLinkedInPost(input: {
   }
   lines.push("");
   lines.push(
-    `Cualquier alumno o estudiante puede apuntarse y enviar su propuesta. El reto está abierto del ${input.startDate} al ${input.endDate}.`,
+    `Cualquier alumno o estudiante puede apuntarse y enviar su propuesta. Reto abierto del ${input.startDate} al ${input.endDate}.`,
   );
   lines.push("");
   lines.push(`Apúntate aquí: ${input.publicUrl}`);
@@ -86,7 +47,6 @@ export function buildChallengeLinkedInPost(input: {
   return lines.join("\n");
 }
 
-/** Texto sugerido para LinkedIn al cerrar el reto con los destacados */
 export function buildChallengeResultsLinkedInPost(input: {
   title: string;
   publicUrl: string;

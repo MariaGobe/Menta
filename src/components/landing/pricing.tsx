@@ -2,148 +2,144 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Check, Minus, Plus } from "lucide-react";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { calculatePrice, formatCurrency } from "@/lib/utils";
-
-const includedFeatures = [
-  "Gestión ilimitada de alumnos",
-  "Documentación centralizada (convenio, PFI, seguros, etc.)",
-  "Multi-itinerario: FP, universidad, formación interna",
-  "Registro de horas y evaluaciones",
-  "Informes finales descargables",
-  "Soporte por email",
-];
+import {
+  PLANS,
+  annualSavings,
+  formatCurrency,
+  type BillingCycle,
+  type PlanDefinition,
+} from "@/lib/utils";
 
 export function Pricing() {
-  const [students, setStudents] = useState(2);
-  const extra = Math.max(0, students - 2);
-  const total = calculatePrice(extra);
+  const [cycle, setCycle] = useState<BillingCycle>("yearly");
 
   return (
     <section id="precios" className="container py-20 md:py-28">
       <div className="mx-auto max-w-2xl text-center">
         <Badge variant="success" className="mb-4">
-          Precios simples y transparentes
+          Precios claros y sin sorpresas
         </Badge>
         <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-          Empieza gratis. Paga solo lo que necesitas.
+          Empieza gratis. Elige el plan que encaje contigo.
         </h2>
         <p className="mt-4 text-lg text-muted-foreground">
-          1 mes de prueba gratis. Sin permanencia. Cancela cuando quieras.
+          1 mes de prueba gratuita en cualquier plan. Sin permanencia. Cancela
+          cuando quieras.
         </p>
+
+        <div className="mt-8 inline-flex items-center rounded-full border bg-card p-1 text-sm">
+          <button
+            onClick={() => setCycle("monthly")}
+            className={`rounded-full px-4 py-1.5 transition ${cycle === "monthly" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+          >
+            Pago mensual
+          </button>
+          <button
+            onClick={() => setCycle("yearly")}
+            className={`relative rounded-full px-4 py-1.5 transition ${cycle === "yearly" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+          >
+            Pago anual
+            <span className="ml-2 rounded-full bg-mint-100 px-2 py-0.5 text-[10px] font-semibold text-mint-800">
+              Ahorra hasta 10%
+            </span>
+          </button>
+        </div>
       </div>
 
-      <div className="mx-auto mt-12 grid max-w-5xl gap-8 lg:grid-cols-2">
-        {/* Trial card */}
-        <Card className="flex flex-col p-8">
-          <div>
-            <h3 className="text-xl font-bold">Prueba gratuita</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Descubre la plataforma sin compromiso.
-            </p>
-          </div>
-          <div className="mt-6">
-            <span className="text-5xl font-bold">0€</span>
-            <span className="ml-1 text-muted-foreground">durante 1 mes</span>
-          </div>
-          <ul className="mt-6 flex-1 space-y-3 text-sm">
-            <li className="flex gap-2">
-              <Check className="h-5 w-5 shrink-0 text-primary" />
-              Acceso completo a todas las funcionalidades
-            </li>
-            <li className="flex gap-2">
-              <Check className="h-5 w-5 shrink-0 text-primary" />
-              Sin tarjeta de crédito
-            </li>
-            <li className="flex gap-2">
-              <Check className="h-5 w-5 shrink-0 text-primary" />
-              Migra tus datos cuando quieras pasar a plan de pago
-            </li>
-          </ul>
-          <Button className="mt-8" variant="outline" size="lg" asChild>
-            <Link href="/registro">Empezar prueba</Link>
-          </Button>
-        </Card>
-
-        {/* Paid card */}
-        <Card className="relative flex flex-col border-primary/20 bg-mint-50/50 p-8 shadow-md">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-            <Badge>Más popular</Badge>
-          </div>
-          <div>
-            <h3 className="text-xl font-bold">Plan Empresa</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Para empresas que reciben alumnos cada año.
-            </p>
-          </div>
-          <div className="mt-6">
-            <span className="text-5xl font-bold">{formatCurrency(total)}</span>
-            <span className="ml-1 text-muted-foreground">/ año</span>
-            <p className="mt-1 text-xs text-muted-foreground">IVA no incluido</p>
-          </div>
-
-          {/* Slider de alumnos */}
-          <div className="mt-6 rounded-lg border bg-white p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Número de alumnos</span>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setStudents((v) => Math.max(1, v - 1))}
-                >
-                  <Minus className="h-3 w-3" />
-                </Button>
-                <span className="w-10 text-center text-lg font-semibold">{students}</span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setStudents((v) => v + 1)}
-                >
-                  <Plus className="h-3 w-3" />
-                </Button>
-              </div>
-            </div>
-            <div className="mt-3 space-y-1 text-xs text-muted-foreground">
-              <div className="flex justify-between">
-                <span>Plan base (hasta 2 alumnos)</span>
-                <span>490€</span>
-              </div>
-              {extra > 0 && (
-                <div className="flex justify-between">
-                  <span>+ {extra} alumno{extra > 1 ? "s" : ""} extra (39€/año c/u)</span>
-                  <span>+ {extra * 39}€</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <ul className="mt-6 flex-1 space-y-3 text-sm">
-            {includedFeatures.map((f) => (
-              <li key={f} className="flex gap-2">
-                <Check className="h-5 w-5 shrink-0 text-primary" />
-                {f}
-              </li>
-            ))}
-          </ul>
-          <Button className="mt-8" size="lg" asChild>
-            <Link href="/registro">Empezar 1 mes gratis</Link>
-          </Button>
-        </Card>
+      <div className="mx-auto mt-12 grid max-w-6xl gap-6 lg:grid-cols-3">
+        {PLANS.map((p) => (
+          <PlanCard key={p.id} plan={p} cycle={cycle} />
+        ))}
       </div>
 
       <p className="mt-10 text-center text-sm text-muted-foreground">
-        ¿Necesitas más de 20 alumnos o funcionalidades específicas?{" "}
-        <Link href="mailto:menta@gobesoluciones.com" className="font-medium text-primary hover:underline">
-          Contáctanos
-        </Link>
-        .
+        Todos los precios sin IVA. Alumnos adicionales: 49€/año por encima de
+        los incluidos en cada plan.
       </p>
     </section>
+  );
+}
+
+function PlanCard({ plan, cycle }: { plan: PlanDefinition; cycle: BillingCycle }) {
+  const isCustom = plan.id === "custom";
+  const price =
+    cycle === "yearly" ? plan.yearlyPrice : plan.monthlyPrice;
+  const savings = annualSavings(plan);
+
+  return (
+    <Card
+      className={
+        plan.highlight
+          ? "relative flex flex-col border-primary/40 bg-mint-50/40 p-8 shadow-md"
+          : "flex flex-col p-8"
+      }
+    >
+      {plan.highlight && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+          <Badge>Más popular</Badge>
+        </div>
+      )}
+
+      <div>
+        <h3 className="text-xl font-bold">{plan.name}</h3>
+        <p className="mt-2 text-sm text-muted-foreground">{plan.tagline}</p>
+      </div>
+
+      <div className="mt-6">
+        {isCustom ? (
+          <div>
+            <span className="text-4xl font-bold">A medida</span>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Hablemos para construir tu plan.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-baseline gap-1">
+              <span className="text-5xl font-bold">{formatCurrency(price ?? 0)}</span>
+              <span className="text-muted-foreground">
+                {cycle === "yearly" ? "/ año" : "/ mes"}
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              + IVA · hasta {plan.includedStudents} alumnos incluidos
+            </p>
+            {cycle === "yearly" && savings > 0 && (
+              <p className="mt-2 text-xs font-medium text-mint-700">
+                Ahorras {formatCurrency(savings)} al año
+              </p>
+            )}
+          </>
+        )}
+      </div>
+
+      <ul className="mt-6 flex-1 space-y-3 text-sm">
+        {plan.features.map((f) => (
+          <li key={f} className="flex gap-2">
+            <Check className="h-5 w-5 shrink-0 text-primary" />
+            <span>{f}</span>
+          </li>
+        ))}
+      </ul>
+
+      {isCustom ? (
+        <Button className="mt-8" variant="outline" size="lg" asChild>
+          <a href="mailto:menta@gobesoluciones.com">Contactar</a>
+        </Button>
+      ) : (
+        <Button
+          className="mt-8"
+          size="lg"
+          variant={plan.highlight ? "default" : "outline"}
+          asChild
+        >
+          <Link href="/registro">Empezar 1 mes gratis</Link>
+        </Button>
+      )}
+    </Card>
   );
 }

@@ -2,8 +2,8 @@ import Link from "next/link";
 import { ArrowLeft, Sparkles, CreditCard } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { checkChallengeAvailability } from "@/lib/challenges-server";
 import {
-  checkChallengeAvailability,
   CHALLENGE_ADDON_PRICE_EUR,
   FREE_CHALLENGES_PER_YEAR,
 } from "@/lib/challenges";

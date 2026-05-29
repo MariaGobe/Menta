@@ -90,13 +90,13 @@ export function BillingPanel({ hasSubscription, currentExtras, currentStudents }
           </div>
           <div className="mt-4 space-y-1 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Plan base (hasta 2 alumnos)</span>
-              <span>490€</span>
+              <span className="text-muted-foreground">Plan Base (hasta 2 alumnos)</span>
+              <span>690€</span>
             </div>
             {extras > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">+ {extras} alumno{extras > 1 ? "s" : ""} extra (39€ c/u)</span>
-                <span>+ {extras * 39}€</span>
+                <span className="text-muted-foreground">+ {extras} alumno{extras > 1 ? "s" : ""} extra (49€ c/u)</span>
+                <span>+ {extras * 49}€</span>
               </div>
             )}
             <div className="flex justify-between border-t pt-2 font-semibold">

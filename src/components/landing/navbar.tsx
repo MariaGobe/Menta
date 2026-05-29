@@ -11,17 +11,17 @@ export function Navbar() {
           <span className="text-xl font-bold tracking-tight">Menta</span>
         </Link>
 
-        <nav className="hidden gap-6 md:flex">
+        <nav className="hidden gap-5 md:flex">
           <Link href="/#mentor" className="text-sm font-medium text-muted-foreground hover:text-foreground">
             Mentor virtual
+          </Link>
+          <Link href="/#talento" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            Talento
           </Link>
           <Link href="/#caracteristicas" className="text-sm font-medium text-muted-foreground hover:text-foreground">
             Características
           </Link>
-          <Link href="/#como-funciona" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-            Cómo funciona
-          </Link>
-          <Link href="/precios" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+          <Link href="/#precios" className="text-sm font-medium text-muted-foreground hover:text-foreground">
             Precios
           </Link>
           <Link href="/#faq" className="text-sm font-medium text-muted-foreground hover:text-foreground">

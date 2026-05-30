@@ -2,7 +2,12 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BillingPanel } from "./billing-panel";
-import { formatDate } from "@/lib/utils";
+import {
+  formatDate,
+  PLANS,
+  type BillingCycle,
+  type PlanId,
+} from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +16,7 @@ export default async function FacturacionPage() {
   const { data: org } = await supabase
     .from("organizations")
     .select(
-      "subscription_status, trial_ends_at, current_period_end, extra_students_count, stripe_customer_id, stripe_subscription_id",
+      "subscription_status, trial_ends_at, current_period_end, extra_students_count, stripe_customer_id, stripe_subscription_id, plan_id, billing_cycle",
     )
     .single();
 
@@ -19,7 +24,10 @@ export default async function FacturacionPage() {
     .from("students")
     .select("*", { count: "exact", head: true });
 
-  const statusLabel: Record<string, { label: string; variant: "success" | "warning" | "destructive" | "secondary" }> = {
+  const statusLabel: Record<
+    string,
+    { label: string; variant: "success" | "warning" | "destructive" | "secondary" }
+  > = {
     trialing: { label: "Prueba gratuita", variant: "warning" },
     active: { label: "Activa", variant: "success" },
     past_due: { label: "Pago pendiente", variant: "destructive" },
@@ -29,6 +37,15 @@ export default async function FacturacionPage() {
 
   const current = org?.subscription_status ?? "trialing";
   const isActive = current === "active";
+
+  const planId = (org?.plan_id ?? "base") as PlanId;
+  const cycle = (org?.billing_cycle ?? "yearly") as BillingCycle;
+  const plan = PLANS.find((p) => p.id === planId) ?? PLANS[0];
+  const priceLabel =
+    cycle === "yearly"
+      ? `${plan.yearlyPrice}€`
+      : `${plan.monthlyPrice}€`;
+  const cycleLabel = cycle === "yearly" ? "/ año" : "/ mes";
 
   return (
     <div className="space-y-6">
@@ -60,14 +77,18 @@ export default async function FacturacionPage() {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
             <div className="rounded-lg border p-4">
-              <p className="text-xs text-muted-foreground">Plan base</p>
-              <p className="text-2xl font-bold">490€</p>
-              <p className="text-xs text-muted-foreground">+ IVA / año, hasta 2 alumnos</p>
+              <p className="text-xs text-muted-foreground">Plan {plan.name}</p>
+              <p className="text-2xl font-bold">{priceLabel}</p>
+              <p className="text-xs text-muted-foreground">
+                + IVA {cycleLabel}, hasta {plan.includedStudents} alumnos
+              </p>
             </div>
             <div className="rounded-lg border p-4">
               <p className="text-xs text-muted-foreground">Alumnos extra contratados</p>
               <p className="text-2xl font-bold">{org?.extra_students_count ?? 0}</p>
-              <p className="text-xs text-muted-foreground">39€ + IVA / año cada uno</p>
+              <p className="text-xs text-muted-foreground">
+                49€ + IVA / año cada uno
+              </p>
             </div>
             <div className="rounded-lg border p-4">
               <p className="text-xs text-muted-foreground">Alumnos actuales</p>
@@ -82,6 +103,8 @@ export default async function FacturacionPage() {
         hasSubscription={!!org?.stripe_subscription_id}
         currentExtras={org?.extra_students_count ?? 0}
         currentStudents={studentsCount ?? 0}
+        currentPlanId={(org?.plan_id as PlanId | null) ?? null}
+        currentCycle={(org?.billing_cycle as BillingCycle | null) ?? null}
       />
     </div>
   );

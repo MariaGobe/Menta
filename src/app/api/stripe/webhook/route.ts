@@ -3,8 +3,8 @@ import { headers } from "next/headers";
 import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
+import { reversePrice } from "@/lib/stripe/prices";
 
-// Forzar runtime dinámico para que no se ejecute en build time
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
@@ -18,6 +18,15 @@ function getServiceClient() {
   }
   return createServiceClient(url, key);
 }
+
+const EXTRA_STUDENT_PRICE_IDS = () =>
+  new Set(
+    [
+      process.env.STRIPE_PRICE_EXTRA_STUDENT,
+      process.env.STRIPE_PRICE_EXTRA_STUDENT_YEARLY,
+      process.env.STRIPE_PRICE_EXTRA_STUDENT_MONTHLY,
+    ].filter(Boolean) as string[],
+  );
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -45,15 +54,37 @@ export async function POST(request: Request) {
   }
 
   const supabase = getServiceClient();
+  const extraIds = EXTRA_STUDENT_PRICE_IDS();
 
   switch (event.type) {
     case "customer.subscription.created":
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
+
+      // Cantidad de alumnos extra (suma cualquier price de "alumno extra")
       const extraQty =
-        subscription.items.data.find(
-          (i) => i.price.id === process.env.STRIPE_PRICE_EXTRA_STUDENT,
-        )?.quantity ?? 0;
+        subscription.items.data
+          .filter((i) => extraIds.has(i.price.id))
+          .reduce((sum, i) => sum + (i.quantity ?? 0), 0) ?? 0;
+
+      // Detectar el plan principal (no extra)
+      const basePriceId = subscription.items.data.find(
+        (i) => !extraIds.has(i.price.id),
+      )?.price.id;
+      const { planId, cycle } = reversePrice(basePriceId);
+
+      // Metadata enviada en checkout tiene prioridad (más fiable)
+      const metaPlan =
+        (subscription.metadata?.plan_id as
+          | "base"
+          | "pro"
+          | "custom"
+          | undefined) ?? planId;
+      const metaCycle =
+        (subscription.metadata?.billing_cycle as
+          | "monthly"
+          | "yearly"
+          | undefined) ?? cycle;
 
       await supabase
         .from("organizations")
@@ -69,6 +100,8 @@ export async function POST(request: Request) {
           current_period_end: new Date(
             subscription.current_period_end * 1000,
           ).toISOString(),
+          plan_id: metaPlan ?? null,
+          billing_cycle: metaCycle ?? null,
         })
         .eq("stripe_customer_id", subscription.customer as string);
       break;

@@ -206,6 +206,8 @@ export interface Organization {
   stripe_subscription_id: string | null;
   extra_students_count: number;
   current_period_end: string | null;
+  plan_id: "base" | "pro" | "custom" | null;
+  billing_cycle: "monthly" | "yearly" | null;
   created_at: string;
 }
 

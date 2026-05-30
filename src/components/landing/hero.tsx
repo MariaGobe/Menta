@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-export function Hero() {
+export async function Hero() {
+  const t = await getTranslations("Hero");
+  const c = await getTranslations("Common");
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 gradient-mint-soft" />
@@ -17,48 +20,45 @@ export function Hero() {
       <div className="container relative py-20 md:py-28">
         <div className="mx-auto max-w-3xl text-center animate-fade-in">
           <Badge variant="success" className="mb-6">
-            Plataforma todo-en-uno con mentor virtual
+            {t("badge")}
           </Badge>
           <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
-            Gestiona prácticas en empresa{" "}
-            <span className="text-gradient-mint">sin perder tiempo</span>
+            {t("title_a")} <span className="text-gradient-mint">{t("title_b")}</span>
           </h1>
           <p className="mt-6 text-lg text-muted-foreground md:text-xl">
-            Da de alta a tus alumnos. Menta genera el plan, los acompaña día a
-            día con un mentor virtual y produce los informes finales.
-            <span className="font-medium text-foreground"> Tú solo supervisas.</span>
+            {t("subtitle")}{" "}
+            <span className="font-medium text-foreground">{t("subtitle_emphasis")}</span>
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Button size="lg" asChild>
               <Link href="/registro">
-                Empieza gratis 1 mes <ArrowRight className="h-4 w-4" />
+                {c("free_trial_cta")} <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="/#como-funciona">Cómo funciona</Link>
+              <Link href="/#como-funciona">{c("how_it_works")}</Link>
             </Button>
           </div>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
               <CheckCircle2 className="h-4 w-4 text-primary" />
-              Sin tarjeta de crédito
+              {c("no_card")}
             </span>
             <span className="flex items-center gap-1.5">
               <CheckCircle2 className="h-4 w-4 text-primary" />
-              Listo en minutos
+              {c("ready_in_minutes")}
             </span>
             <span className="flex items-center gap-1.5">
               <CheckCircle2 className="h-4 w-4 text-primary" />
-              Cancela cuando quieras
+              {c("cancel_anytime")}
             </span>
           </div>
         </div>
 
-        {/* Ahorro de tiempo destacado */}
         <div className="mx-auto mt-16 grid max-w-4xl gap-4 md:grid-cols-3">
-          <Stat number="80%" label="menos tiempo del tutor por alumno" />
-          <Stat number="24/7" label="acompañamiento del mentor al alumno" />
-          <Stat number="1 click" label="informes listos para el centro" />
+          <Stat number="80%" label={t("stat_time")} />
+          <Stat number="24/7" label={t("stat_247")} />
+          <Stat number="1 click" label={t("stat_reports")} />
         </div>
       </div>
     </section>

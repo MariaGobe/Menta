@@ -1,46 +1,19 @@
-const steps = [
-  {
-    n: "01",
-    title: "Configura tu mentor virtual",
-    description:
-      "Cuéntale al mentor de qué va tu empresa, qué herramientas usáis y cómo trabajáis. Una vez, y sirve para todos tus alumnos.",
-  },
-  {
-    n: "02",
-    title: "Da de alta a tus alumnos",
-    description:
-      "Tipo de práctica (FP, universidad o formación interna), fechas y datos del tutor. Menta se adapta a cada caso.",
-  },
-  {
-    n: "03",
-    title: "Genera el plan de prácticas",
-    description:
-      "Pulsa un botón. Menta crea fases, tareas y deadlines. Tú lo revisas, ajustas y apruebas.",
-  },
-  {
-    n: "04",
-    title: "El alumno trabaja con el mentor",
-    description:
-      "Cada día el alumno consulta sus tareas, habla con el mentor cuando se atasca, sube entregables y registra su actividad.",
-  },
-  {
-    n: "05",
-    title: "Tú supervisas y firmas",
-    description:
-      "Menta te da una evaluación automática y los informes listos para la empresa, el centro educativo y la memoria del alumno.",
-  },
-];
+import { getTranslations } from "next-intl/server";
 
-export function HowItWorks() {
+export async function HowItWorks() {
+  const t = await getTranslations("HowItWorks");
+  const steps = [
+    { n: "01", title: t("s1_title"), description: t("s1_desc") },
+    { n: "02", title: t("s2_title"), description: t("s2_desc") },
+    { n: "03", title: t("s3_title"), description: t("s3_desc") },
+    { n: "04", title: t("s4_title"), description: t("s4_desc") },
+    { n: "05", title: t("s5_title"), description: t("s5_desc") },
+  ];
   return (
     <section id="como-funciona" className="container py-20 md:py-28">
       <div className="mx-auto max-w-2xl text-center">
-        <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-          Cómo funciona Menta
-        </h2>
-        <p className="mt-4 text-lg text-muted-foreground">
-          5 pasos para automatizar la gestión de prácticas en tu empresa.
-        </p>
+        <h2 className="text-3xl font-bold tracking-tight md:text-4xl">{t("title")}</h2>
+        <p className="mt-4 text-lg text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <div className="mx-auto mt-16 max-w-4xl">
@@ -53,14 +26,10 @@ export function HowItWorks() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">{s.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {s.description}
-                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">{s.description}</p>
                 </div>
               </div>
-              {i < steps.length - 1 && (
-                <div className="ml-11 h-4 w-px bg-mint-200" aria-hidden />
-              )}
+              {i < steps.length - 1 && <div className="ml-11 h-4 w-px bg-mint-200" aria-hidden />}
             </li>
           ))}
         </ol>

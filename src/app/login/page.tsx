@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import { createClient } from "@/lib/supabase/client";
 export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("Login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,7 +28,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      setError("Credenciales incorrectas. Verifica email y contraseña.");
+      setError(t("error_invalid"));
       return;
     }
     router.push("/dashboard");
@@ -42,19 +44,17 @@ export default function LoginPage() {
 
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Inicia sesión</CardTitle>
-          <CardDescription>
-            Accede al panel de gestión de tu empresa.
-          </CardDescription>
+          <CardTitle>{t("title")}</CardTitle>
+          <CardDescription>{t("subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("email")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="tu@empresa.com"
+                placeholder={t("email_placeholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -62,9 +62,9 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Contraseña</Label>
+                <Label htmlFor="password">{t("password")}</Label>
                 <Link href="/recuperar" className="text-xs text-muted-foreground hover:text-primary">
-                  ¿La olvidaste?
+                  {t("forgot")}
                 </Link>
               </div>
               <Input
@@ -77,21 +77,19 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                {error}
-              </p>
+              <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p>
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              Entrar
+              {t("submit")}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            ¿Aún no tienes cuenta?{" "}
+            {t("no_account")}{" "}
             <Link href="/registro" className="font-medium text-primary hover:underline">
-              Empieza gratis
+              {t("start_free")}
             </Link>
           </p>
         </CardContent>

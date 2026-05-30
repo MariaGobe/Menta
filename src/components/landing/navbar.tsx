@@ -1,8 +1,12 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 
-export function Navbar() {
+export async function Navbar() {
+  const tNav = await getTranslations("Navbar");
+  const tCommon = await getTranslations("Common");
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur">
       <div className="container flex h-16 items-center justify-between">
@@ -13,28 +17,29 @@ export function Navbar() {
 
         <nav className="hidden gap-5 md:flex">
           <Link href="/#mentor" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-            Mentor virtual
+            {tNav("mentor")}
           </Link>
           <Link href="/#talento" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-            Talento
+            {tNav("talent")}
           </Link>
           <Link href="/#caracteristicas" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-            Características
+            {tNav("features")}
           </Link>
           <Link href="/#precios" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-            Precios
+            {tNav("pricing")}
           </Link>
           <Link href="/#faq" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-            FAQ
+            {tNav("faq")}
           </Link>
         </nav>
 
         <div className="flex items-center gap-2">
+          <LanguageSwitcher />
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/login">Iniciar sesión</Link>
+            <Link href="/login">{tCommon("log_in")}</Link>
           </Button>
           <Button size="sm" asChild>
-            <Link href="/registro">Prueba gratis</Link>
+            <Link href="/registro">{tCommon("sign_up")}</Link>
           </Button>
         </div>
       </div>

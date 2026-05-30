@@ -1,54 +1,40 @@
 import Link from "next/link";
 import { Sparkles, CheckCircle2 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 
-export function MentorSection() {
+export async function MentorSection() {
+  const t = await getTranslations("Mentor");
   return (
     <section id="mentor" className="relative overflow-hidden bg-mint-50/40">
       <div className="container py-20 md:py-28">
         <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:items-center">
-          {/* Texto */}
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-mint-200 bg-white px-3 py-1 text-xs font-medium text-mint-800">
               <Sparkles className="h-3.5 w-3.5" />
-              El núcleo de Menta
+              {t("eyebrow")}
             </div>
             <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
-              Un mentor virtual que <span className="text-gradient-mint">tú entrenas</span>
+              {t("title_a")} <span className="text-gradient-mint">{t("title_b")}</span>
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Tu empresa alimenta al mentor con su forma de trabajar,
-              herramientas y procesos. A partir de ahí, atiende a tus alumnos
-              en prácticas día a día, sin que tu equipo dedique horas a cada
-              uno.
-            </p>
+            <p className="mt-4 text-lg text-muted-foreground">{t("subtitle")}</p>
 
             <ul className="mt-8 space-y-3">
-              <Feature
-                title="La empresa lo configura una vez"
-                description="Descripción de la empresa, tono, herramientas, normas internas y enlaces útiles."
-              />
-              <Feature
-                title="El alumno habla con él cuando lo necesita"
-                description="Resuelve dudas, planifica el día, desbloquea problemas y recuerda deadlines."
-              />
-              <Feature
-                title="Tú recibes el resumen"
-                description="Sin atender mil consultas: tú revisas la evaluación automática y firmas los informes."
-              />
+              <Feature title={t("feature_setup_title")} description={t("feature_setup_desc")} />
+              <Feature title={t("feature_chat_title")} description={t("feature_chat_desc")} />
+              <Feature title={t("feature_summary_title")} description={t("feature_summary_desc")} />
             </ul>
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild>
-                <Link href="/registro">Probar el mentor gratis</Link>
+                <Link href="/registro">{t("cta_try")}</Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="/#caracteristicas">Ver todas las funcionalidades</Link>
+                <Link href="/#caracteristicas">{t("cta_features")}</Link>
               </Button>
             </div>
           </div>
 
-          {/* Mockup conversación */}
           <div className="relative">
             <div className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-mint-200/40 to-mint-100/20 blur-2xl" />
             <div className="relative rounded-2xl border bg-card shadow-xl">
@@ -57,26 +43,16 @@ export function MentorSection() {
                   <Sparkles className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold">Mentor virtual</p>
-                  <p className="text-xs text-mint-700">en línea</p>
+                  <p className="text-sm font-semibold">{t("chat_name")}</p>
+                  <p className="text-xs text-mint-700">{t("chat_status")}</p>
                 </div>
               </div>
               <div className="space-y-3 p-4">
-                <ChatBubble
-                  role="assistant"
-                  text="Hola Lucía 👋 Hoy te toca arrancar la pantalla de login. Tienes el mock en Figma (te paso el enlace) y el componente Button ya hecho en /components/ui."
-                />
-                <ChatBubble
-                  role="user"
-                  text="¿Y para conectar con la API de auth?"
-                />
-                <ChatBubble
-                  role="assistant"
-                  text="En nuestra empresa usamos Supabase Auth. Tienes el hook useAuth() en /lib/auth.ts. Si te atascas más de 30 min, pídele revisión a Ana (CTO)."
-                />
+                <ChatBubble role="assistant" text={t("chat_msg1")} />
+                <ChatBubble role="user" text={t("chat_msg2")} />
+                <ChatBubble role="assistant" text={t("chat_msg3")} />
                 <div className="rounded-lg border border-dashed bg-muted/30 p-3 text-center text-xs text-muted-foreground">
-                  El mentor responde con el conocimiento que <strong>tu empresa</strong>{" "}
-                  le ha configurado.
+                  {t("chat_caption")}
                 </div>
               </div>
             </div>

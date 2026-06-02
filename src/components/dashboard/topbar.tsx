@@ -1,4 +1,5 @@
 import { LogOut } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -6,11 +7,12 @@ interface Props {
   userName: string;
 }
 
-export function Topbar({ organizationName, userName }: Props) {
+export async function Topbar({ organizationName, userName }: Props) {
+  const t = await getTranslations("Topbar");
   return (
     <header className="flex h-16 items-center justify-between border-b bg-card px-6">
       <div>
-        <p className="text-xs text-muted-foreground">Organización</p>
+        <p className="text-xs text-muted-foreground">{t("organization")}</p>
         <p className="text-sm font-semibold">{organizationName}</p>
       </div>
 
@@ -22,7 +24,7 @@ export function Topbar({ organizationName, userName }: Props) {
           {userName.charAt(0).toUpperCase()}
         </div>
         <form action="/auth/signout" method="POST">
-          <Button variant="ghost" size="icon" type="submit" title="Cerrar sesión">
+          <Button variant="ghost" size="icon" type="submit" title={t("logout")}>
             <LogOut className="h-4 w-4" />
           </Button>
         </form>

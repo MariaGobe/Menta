@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Plus, ClipboardList } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +12,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PlanesPage() {
   const supabase = createClient();
+  const t = await getTranslations("Plans");
   const { data: plans } = await supabase
     .from("practice_plans")
     .select(
@@ -18,20 +20,19 @@ export default async function PlanesPage() {
     )
     .order("created_at", { ascending: false });
 
+  const n = plans?.length ?? 0;
+  const countLabel = n === 0 ? t("count_zero") : n === 1 ? t("count_one") : t("count_other", { n });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Planes de prácticas
-          </h1>
-          <p className="text-muted-foreground">
-            {plans?.length ?? 0} planes activos
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground">{countLabel}</p>
         </div>
         <Button asChild>
           <Link href="/planes/nuevo">
-            <Plus className="h-4 w-4" /> Generar plan
+            <Plus className="h-4 w-4" /> {t("generate")}
           </Link>
         </Button>
       </div>
@@ -40,13 +41,11 @@ export default async function PlanesPage() {
         <Card>
           <CardContent className="p-12 text-center">
             <ClipboardList className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold">Aún no hay planes</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Crea el primer plan de prácticas para un alumno.
-            </p>
+            <h3 className="mt-4 text-lg font-semibold">{t("empty_title")}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{t("empty_subtitle")}</p>
             <Button className="mt-6" asChild>
               <Link href="/planes/nuevo">
-                <Plus className="h-4 w-4" /> Generar primer plan
+                <Plus className="h-4 w-4" /> {t("empty_button")}
               </Link>
             </Button>
           </CardContent>
@@ -57,11 +56,11 @@ export default async function PlanesPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-left text-xs uppercase text-muted-foreground">
-                  <th className="px-6 py-3 font-medium">Alumno</th>
-                  <th className="px-6 py-3 font-medium">Plan</th>
-                  <th className="px-6 py-3 font-medium">Período</th>
-                  <th className="px-6 py-3 font-medium">Horas</th>
-                  <th className="px-6 py-3 font-medium">Estado</th>
+                  <th className="px-6 py-3 font-medium">{t("th_student")}</th>
+                  <th className="px-6 py-3 font-medium">{t("th_plan")}</th>
+                  <th className="px-6 py-3 font-medium">{t("th_period")}</th>
+                  <th className="px-6 py-3 font-medium">{t("th_hours")}</th>
+                  <th className="px-6 py-3 font-medium">{t("th_status")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">

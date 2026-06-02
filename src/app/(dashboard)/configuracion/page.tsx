@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Sparkles, ArrowRight } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrganizationForm } from "./organization-form";
@@ -8,6 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function ConfiguracionPage() {
   const supabase = createClient();
+  const t = await getTranslations("Configuracion");
   const { data: org } = await supabase
     .from("organizations")
     .select("id, name, nif, email, phone, address, city, postal_code")
@@ -16,8 +18,8 @@ export default async function ConfiguracionPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Configuración</h1>
-        <p className="text-muted-foreground">Gestiona tu organización y el mentor virtual.</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <Link
@@ -29,12 +31,8 @@ export default async function ConfiguracionPage() {
             <Sparkles className="h-5 w-5" />
           </div>
           <div className="flex-1">
-            <p className="font-semibold">Configurar mentor virtual</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Alimenta al mentor con información sobre tu empresa, herramientas
-              y forma de trabajar. Lo usará para acompañar a tus alumnos día a
-              día sin necesidad de tu intervención.
-            </p>
+            <p className="font-semibold">{t("mentor_card_title")}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{t("mentor_card_desc")}</p>
           </div>
           <ArrowRight className="h-5 w-5 self-center text-muted-foreground" />
         </div>
@@ -42,14 +40,10 @@ export default async function ConfiguracionPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Datos de la empresa</CardTitle>
-          <CardDescription>
-            Esta información aparecerá en convenios y documentos generados.
-          </CardDescription>
+          <CardTitle className="text-base">{t("company_card_title")}</CardTitle>
+          <CardDescription>{t("company_card_desc")}</CardDescription>
         </CardHeader>
-        <CardContent>
-          {org && <OrganizationForm organization={org} />}
-        </CardContent>
+        <CardContent>{org && <OrganizationForm organization={org} />}</CardContent>
       </Card>
     </div>
   );

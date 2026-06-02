@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   LayoutDashboard,
   Users,
@@ -18,22 +19,23 @@ import {
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 
-const items = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/alumnos", icon: Users, label: "Alumnos" },
-  { href: "/planes", icon: ClipboardList, label: "Planes" },
-  { href: "/calendario", icon: Calendar, label: "Calendario" },
-  { href: "/seguimiento", icon: ClipboardCheck, label: "Seguimiento" },
-  { href: "/evaluacion", icon: TrendingUp, label: "Evaluación" },
-  { href: "/retos", icon: Trophy, label: "Retos abiertos" },
-  { href: "/informes", icon: FileSpreadsheet, label: "Informes" },
-  { href: "/documentos", icon: FileText, label: "Documentos" },
-  { href: "/facturacion", icon: CreditCard, label: "Facturación" },
-  { href: "/configuracion", icon: Settings, label: "Configuración" },
-];
-
 export function Sidebar() {
   const pathname = usePathname();
+  const t = useTranslations("CompanySidebar");
+
+  const items = [
+    { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard") },
+    { href: "/alumnos", icon: Users, label: t("students") },
+    { href: "/planes", icon: ClipboardList, label: t("plans") },
+    { href: "/calendario", icon: Calendar, label: t("calendar") },
+    { href: "/seguimiento", icon: ClipboardCheck, label: t("tracking") },
+    { href: "/evaluacion", icon: TrendingUp, label: t("evaluation") },
+    { href: "/retos", icon: Trophy, label: t("challenges") },
+    { href: "/informes", icon: FileSpreadsheet, label: t("reports") },
+    { href: "/documentos", icon: FileText, label: t("documents") },
+    { href: "/facturacion", icon: CreditCard, label: t("billing") },
+    { href: "/configuracion", icon: Settings, label: t("settings") },
+  ];
 
   return (
     <aside className="hidden w-64 shrink-0 border-r bg-card md:flex md:flex-col">
@@ -67,12 +69,9 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t p-4">
-        <Link
-          href="/precios"
-          className="block rounded-lg bg-mint-50 p-3 text-xs"
-        >
-          <p className="font-semibold text-mint-800">Estás en período de prueba</p>
-          <p className="mt-1 text-mint-700">Activa tu suscripción cuando quieras.</p>
+        <Link href="/precios" className="block rounded-lg bg-mint-50 p-3 text-xs">
+          <p className="font-semibold text-mint-800">{t("trial_title")}</p>
+          <p className="mt-1 text-mint-700">{t("trial_hint")}</p>
         </Link>
       </div>
     </aside>

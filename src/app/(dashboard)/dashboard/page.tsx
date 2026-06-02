@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import {
   Users,
   FileText,
@@ -19,6 +20,7 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const supabase = createClient();
+  const t = await getTranslations("CompanyDashboard");
 
   const [{ count: studentsCount }, { count: activeCount }, { count: docsCount }, { data: recent }] = await Promise.all([
     supabase.from("students").select("*", { count: "exact", head: true }),
@@ -40,12 +42,12 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Resumen de tus prácticas en curso.</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("subtitle")}</p>
         </div>
         <Button asChild>
           <Link href="/alumnos/nuevo">
-            <Plus className="h-4 w-4" /> Nuevo alumno
+            <Plus className="h-4 w-4" /> {t("new_student")}
           </Link>
         </Button>
       </div>
@@ -56,40 +58,39 @@ export default async function DashboardPage() {
             <div className="flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-amber-600" />
               <p className="text-sm text-amber-900">
-                Tu prueba gratuita termina el{" "}
-                <strong>{formatDate(org.trial_ends_at)}</strong>. Activa tu plan para no perder el acceso.
+                {t("trial_message_1")}{" "}
+                <strong>{formatDate(org.trial_ends_at)}</strong>
+                {t("trial_message_2")}
               </p>
             </div>
             <Button size="sm" asChild>
-              <Link href="/facturacion">Activar plan</Link>
+              <Link href="/facturacion">{t("activate_plan")}</Link>
             </Button>
           </CardContent>
         </Card>
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Alumnos totales" value={studentsCount ?? 0} icon={Users} />
-        <StatCard label="Activos" value={activeCount ?? 0} icon={ClipboardCheck} tone="success" />
-        <StatCard label="Documentos" value={docsCount ?? 0} icon={FileText} />
-        <StatCard label="Horas registradas" value="—" icon={Clock} hint="Esta semana" />
+        <StatCard label={t("stat_total")} value={studentsCount ?? 0} icon={Users} />
+        <StatCard label={t("stat_active")} value={activeCount ?? 0} icon={ClipboardCheck} tone="success" />
+        <StatCard label={t("stat_documents")} value={docsCount ?? 0} icon={FileText} />
+        <StatCard label={t("stat_hours")} value="—" icon={Clock} hint={t("stat_hours_hint")} />
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Alumnos recientes</CardTitle>
-          <CardDescription>Los últimos alumnos dados de alta.</CardDescription>
+          <CardTitle>{t("recent_title")}</CardTitle>
+          <CardDescription>{t("recent_subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           {!recent?.length ? (
             <div className="rounded-lg border border-dashed p-8 text-center">
               <Users className="mx-auto h-10 w-10 text-muted-foreground" />
-              <p className="mt-3 text-sm font-medium">Aún no hay alumnos</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Empieza dando de alta a tu primer alumno en prácticas.
-              </p>
+              <p className="mt-3 text-sm font-medium">{t("empty_title")}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("empty_hint")}</p>
               <Button className="mt-4" asChild>
                 <Link href="/alumnos/nuevo">
-                  <Plus className="h-4 w-4" /> Añadir alumno
+                  <Plus className="h-4 w-4" /> {t("empty_button")}
                 </Link>
               </Button>
             </div>
@@ -104,7 +105,7 @@ export default async function DashboardPage() {
                   <div>
                     <p className="font-medium">{s.full_name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {PRACTICE_TYPE_LABELS[s.practice_type]} · Inicio {formatDate(s.start_date)}
+                      {PRACTICE_TYPE_LABELS[s.practice_type]} · {t("starts")} {formatDate(s.start_date)}
                     </p>
                   </div>
                   <Badge variant={s.status === "active" ? "success" : "secondary"}>

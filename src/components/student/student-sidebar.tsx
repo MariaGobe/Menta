@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   LayoutDashboard,
   Calendar,
@@ -15,20 +16,21 @@ import {
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 
-const items = [
-  { href: "/student/dashboard", icon: LayoutDashboard, label: "Inicio" },
-  { href: "/student/mi-plan", icon: ClipboardList, label: "Mi plan" },
-  { href: "/student/calendario", icon: Calendar, label: "Mi calendario" },
-  { href: "/student/tareas", icon: ClipboardList, label: "Tareas de hoy" },
-  { href: "/student/diario", icon: BookOpen, label: "Diario" },
-  { href: "/student/mentor", icon: Sparkles, label: "Mentor virtual" },
-  { href: "/student/entregables", icon: Upload, label: "Entregables" },
-  { href: "/student/hitos", icon: Award, label: "Hitos / LinkedIn" },
-  { href: "/student/presentacion", icon: Presentation, label: "Presentación" },
-];
-
 export function StudentSidebar() {
   const pathname = usePathname();
+  const t = useTranslations("StudentSidebar");
+
+  const items = [
+    { href: "/student/dashboard", icon: LayoutDashboard, label: t("home") },
+    { href: "/student/mi-plan", icon: ClipboardList, label: t("my_plan") },
+    { href: "/student/calendario", icon: Calendar, label: t("calendar") },
+    { href: "/student/tareas", icon: ClipboardList, label: t("today_tasks") },
+    { href: "/student/diario", icon: BookOpen, label: t("diary") },
+    { href: "/student/mentor", icon: Sparkles, label: t("mentor") },
+    { href: "/student/entregables", icon: Upload, label: t("deliverables") },
+    { href: "/student/hitos", icon: Award, label: t("milestones") },
+    { href: "/student/presentacion", icon: Presentation, label: t("presentation") },
+  ];
 
   return (
     <aside className="hidden w-64 shrink-0 border-r bg-card md:flex md:flex-col">
@@ -60,10 +62,8 @@ export function StudentSidebar() {
 
       <div className="border-t p-4">
         <div className="rounded-lg bg-mint-50 p-3 text-xs">
-          <p className="font-semibold text-mint-800">Portal del alumno</p>
-          <p className="mt-1 text-mint-700">
-            Tu espacio personal de prácticas.
-          </p>
+          <p className="font-semibold text-mint-800">{t("portal_title")}</p>
+          <p className="mt-1 text-mint-700">{t("portal_hint")}</p>
         </div>
       </div>
     </aside>

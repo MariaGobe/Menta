@@ -15,6 +15,8 @@ import {
 import { formatDate } from "@/lib/utils";
 import { InviteStudentButton } from "./invite-button";
 import { CompanyRecommendationButton } from "./recommendation-form";
+import { DeleteStudentButton } from "./delete-button";
+import { Pencil } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -72,13 +74,22 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
             {student.institution_name ?? "Sin centro"}
           </p>
         </div>
-        <div className="flex items-start gap-2">
+        <div className="flex flex-wrap items-start justify-end gap-2">
+          <Button variant="outline" asChild>
+            <Link href={`/alumnos/${student.id}/editar`}>
+              <Pencil className="h-4 w-4" /> Editar
+            </Link>
+          </Button>
           <Button variant="outline" asChild>
             <Link href={`/planes/nuevo?student=${student.id}`}>Generar plan</Link>
           </Button>
           <InviteStudentButton
             studentId={student.id}
             studentEmail={student.email}
+          />
+          <DeleteStudentButton
+            studentId={student.id}
+            studentName={student.full_name}
           />
         </div>
       </div>

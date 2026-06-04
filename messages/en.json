@@ -311,6 +311,16 @@
     "no_account": "Don't have an account yet?",
     "start_free": "Start free"
   },
+  "Recover": {
+    "title": "Recover password",
+    "subtitle": "We'll send a link to your email to create a new password.",
+    "email": "Email",
+    "email_placeholder": "you@email.com",
+    "submit": "Send link",
+    "sent_title": "Check your email",
+    "sent_message": "If the address is registered, you'll receive a link shortly. Remember to also check the spam folder.",
+    "back_to_login": "Back to log in"
+  },
   "SetPassword": {
     "title": "Set your password",
     "subtitle": "Welcome to Menta. Set a password to access your internship portal.",

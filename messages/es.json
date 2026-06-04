@@ -311,6 +311,16 @@
     "no_account": "¿Aún no tienes cuenta?",
     "start_free": "Empieza gratis"
   },
+  "Recover": {
+    "title": "Recuperar contraseña",
+    "subtitle": "Te enviaremos un enlace a tu email para crear una nueva contraseña.",
+    "email": "Email",
+    "email_placeholder": "tu@email.com",
+    "submit": "Enviar enlace",
+    "sent_title": "Revisa tu email",
+    "sent_message": "Si la dirección está registrada, recibirás un enlace en breve. Recuerda mirar también en spam.",
+    "back_to_login": "Volver al inicio de sesión"
+  },
   "SetPassword": {
     "title": "Crea tu contraseña",
     "subtitle": "Bienvenido a Menta. Establece una contraseña para acceder a tu portal de prácticas.",

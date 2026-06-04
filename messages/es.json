@@ -307,8 +307,21 @@
     "forgot": "¿La olvidaste?",
     "submit": "Entrar",
     "error_invalid": "Credenciales incorrectas. Verifica email y contraseña.",
+    "error_otp_expired": "El enlace de invitación ha caducado o ya se ha usado. Pide a tu empresa que te envíe una nueva invitación.",
     "no_account": "¿Aún no tienes cuenta?",
     "start_free": "Empieza gratis"
+  },
+  "SetPassword": {
+    "title": "Crea tu contraseña",
+    "subtitle": "Bienvenido a Menta. Establece una contraseña para acceder a tu portal de prácticas.",
+    "password": "Contraseña",
+    "password_hint": "Mínimo 8 caracteres.",
+    "password_confirm": "Repite la contraseña",
+    "submit": "Establecer contraseña y entrar",
+    "error_mismatch": "Las contraseñas no coinciden.",
+    "error_short": "La contraseña debe tener al menos 8 caracteres.",
+    "error_session": "No hemos encontrado tu sesión. Es probable que el enlace haya caducado. Pide a tu empresa que te reenvíe la invitación.",
+    "back_to_login": "Volver al inicio de sesión"
   },
   "Register": {
     "title": "Crea tu cuenta",

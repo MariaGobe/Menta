@@ -307,8 +307,21 @@
     "forgot": "Forgot it?",
     "submit": "Sign in",
     "error_invalid": "Wrong credentials. Check your email and password.",
+    "error_otp_expired": "The invitation link has expired or has already been used. Ask your company to send you a new invitation.",
     "no_account": "Don't have an account yet?",
     "start_free": "Start free"
+  },
+  "SetPassword": {
+    "title": "Set your password",
+    "subtitle": "Welcome to Menta. Set a password to access your internship portal.",
+    "password": "Password",
+    "password_hint": "Minimum 8 characters.",
+    "password_confirm": "Repeat password",
+    "submit": "Set password and enter",
+    "error_mismatch": "Passwords don't match.",
+    "error_short": "Password must be at least 8 characters.",
+    "error_session": "We couldn't find your session. The link has likely expired. Ask your company to resend the invitation.",
+    "back_to_login": "Back to log in"
   },
   "Register": {
     "title": "Create your account",

@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-theta.vercel.app"}/student/dashboard`;
+  const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-theta.vercel.app"}/auth/establecer-contrasena`;
 
   const { error: inviteErr } = await admin.auth.admin.inviteUserByEmail(
     student.email,

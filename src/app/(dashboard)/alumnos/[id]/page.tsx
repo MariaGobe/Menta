@@ -51,6 +51,14 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
 
   const loggedHours = (hoursAgg ?? []).reduce((sum, l) => sum + Number(l.hours), 0);
 
+  // ¿El alumno ya tiene cuenta en Menta? (un profile vinculado a su student_id)
+  const { data: studentProfile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("student_id", student.id)
+    .maybeSingle();
+  const hasAccount = !!studentProfile;
+
   const requiredDocs = REQUIRED_DOCUMENTS[student.practice_type];
   const uploadedTypes = new Set((documents ?? []).map((d) => d.type));
   const missingDocs = requiredDocs.filter((t) => !uploadedTypes.has(t));
@@ -86,6 +94,7 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
           <InviteStudentButton
             studentId={student.id}
             studentEmail={student.email}
+            hasAccount={hasAccount}
           />
           <DeleteStudentButton
             studentId={student.id}

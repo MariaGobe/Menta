@@ -1,30 +1,40 @@
 "use client";
 
-import { useState } from "react";
-import { Loader2, Mail, Check } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Loader2, Mail, Check, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Props {
   studentId: string;
   studentEmail: string | null;
+  hasAccount: boolean;
 }
 
-export function InviteStudentButton({ studentId, studentEmail }: Props) {
+export function InviteStudentButton({ studentId, studentEmail, hasAccount }: Props) {
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [sent, setSent] = useState<null | "invited" | "reset">(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function invite() {
+  // Limpia el badge "enviado" tras 4 segundos para permitir reenvíos.
+  useEffect(() => {
+    if (!sent) return;
+    const t = setTimeout(() => setSent(null), 4000);
+    return () => clearTimeout(t);
+  }, [sent]);
+
+  const label = hasAccount ? "Reenviar enlace de acceso" : "Invitar al portal";
+  const Icon = hasAccount ? RefreshCw : Mail;
+
+  async function action() {
     if (!studentEmail) {
       setError("El alumno no tiene email registrado");
       return;
     }
-    if (
-      !confirm(
-        `Se enviará un correo a ${studentEmail} con un enlace para que el alumno acceda a su portal personal. ¿Continuar?`,
-      )
-    )
-      return;
+    const message = hasAccount
+      ? `Se enviará un correo a ${studentEmail} con un nuevo enlace para entrar al portal (re-establecer contraseña). ¿Continuar?`
+      : `Se enviará un correo a ${studentEmail} con un enlace para que el alumno acceda a su portal personal. ¿Continuar?`;
+    if (!confirm(message)) return;
+
     setLoading(true);
     setError(null);
     const res = await fetch("/api/students/invite", {
@@ -35,29 +45,28 @@ export function InviteStudentButton({ studentId, studentEmail }: Props) {
     setLoading(false);
     if (!res.ok) {
       const err = (await res.json()) as { error?: string };
-      setError(err.error ?? "No se pudo enviar la invitación");
+      setError(err.error ?? "No se pudo enviar el enlace");
       return;
     }
-    setSent(true);
-  }
-
-  if (sent) {
-    return (
-      <Button variant="outline" disabled>
-        <Check className="h-4 w-4" /> Invitación enviada
-      </Button>
-    );
+    const data = (await res.json()) as { mode: "invited" | "reset" };
+    setSent(data.mode);
   }
 
   return (
     <div className="flex flex-col items-end gap-1">
-      <Button onClick={invite} disabled={loading || !studentEmail} variant="outline">
+      <Button onClick={action} disabled={loading || !studentEmail} variant="outline">
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
+        ) : sent ? (
+          <Check className="h-4 w-4 text-mint-700" />
         ) : (
-          <Mail className="h-4 w-4" />
+          <Icon className="h-4 w-4" />
         )}
-        Invitar al portal
+        {sent === "invited"
+          ? "Invitación enviada"
+          : sent === "reset"
+            ? "Enlace reenviado"
+            : label}
       </Button>
       {error && <p className="text-xs text-destructive">{error}</p>}
       {!studentEmail && (

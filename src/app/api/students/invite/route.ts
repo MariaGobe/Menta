@@ -6,9 +6,14 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 /**
- * Invita a un alumno al portal mediante magic link de Supabase Auth.
- * Pasa metadata { student_id, organization_id, full_name } al token, y el
- * trigger handle_new_user crea el profile con role 'student' al confirmar.
+ * Invita o reenvía acceso al portal del alumno.
+ *
+ * - Si el alumno aún no tiene cuenta (no existe profile con su student_id),
+ *   usa `inviteUserByEmail` (magic link de invitación).
+ * - Si ya tiene cuenta, usa `resetPasswordForEmail` para que pueda volver
+ *   a establecer su contraseña a través del enlace recibido.
+ *
+ * Devuelve { ok: true, mode: "invited" | "reset", email }.
  */
 export async function POST(request: Request) {
   const supabase = createClient();
@@ -23,7 +28,7 @@ export async function POST(request: Request) {
   if (!studentId)
     return NextResponse.json({ error: "studentId requerido" }, { status: 400 });
 
-  // Verificamos que el alumno pertenece a la organización del usuario
+  // Verificamos que el alumno pertenece a la organización del usuario (RLS lo asegura)
   const { data: student, error: studentErr } = await supabase
     .from("students")
     .select("id, organization_id, full_name, email")
@@ -40,6 +45,13 @@ export async function POST(request: Request) {
     );
   }
 
+  // ¿Ya tiene cuenta creada en Menta?
+  const { data: existingProfile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("student_id", student.id)
+    .maybeSingle();
+
   const serviceUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceUrl || !serviceKey) {
@@ -55,6 +67,18 @@ export async function POST(request: Request) {
 
   const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-theta.vercel.app"}/auth/establecer-contrasena`;
 
+  if (existingProfile) {
+    // Caso B: cuenta ya creada → recovery link para re-establecer contraseña
+    const { error: resetErr } = await admin.auth.resetPasswordForEmail(student.email, {
+      redirectTo,
+    });
+    if (resetErr) {
+      return NextResponse.json({ error: resetErr.message }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true, mode: "reset", email: student.email });
+  }
+
+  // Caso A: primera invitación
   const { error: inviteErr } = await admin.auth.admin.inviteUserByEmail(
     student.email,
     {
@@ -71,5 +95,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: inviteErr.message }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, email: student.email });
+  return NextResponse.json({ ok: true, mode: "invited", email: student.email });
 }

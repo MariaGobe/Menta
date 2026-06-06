@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
+import { sendEmail } from "@/lib/email";
+import {
+  challengeApplicationConfirmationEmail,
+  challengeApplicationCompanyEmail,
+} from "@/lib/email-templates";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -89,6 +94,37 @@ export async function POST(request: Request) {
       );
     }
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-theta.vercel.app";
+  const workspaceUrl = `${APP_URL}/r/${challenge.public_slug}/aplicacion/${data.id}`;
+
+  // Cargamos el nombre de la organización para el email.
+  const { data: org } = await supabase
+    .from("organizations")
+    .select("name, email")
+    .eq("id", challenge.organization_id)
+    .single();
+
+  // Email al aplicante (confirmación)
+  const conf = challengeApplicationConfirmationEmail({
+    applicantName: body.name,
+    challengeTitle: challenge.title,
+    companyName: org?.name ?? "la empresa",
+    workspaceUrl,
+  });
+  sendEmail({ to: body.email, subject: conf.subject, html: conf.html }).catch(() => {});
+
+  // Email a la empresa (nueva candidatura)
+  if (org?.email) {
+    const comp = challengeApplicationCompanyEmail({
+      challengeTitle: challenge.title,
+      applicantName: body.name,
+      applicantEmail: body.email,
+      applicantLinkedin: body.linkedin ?? null,
+      companyChallengesUrl: `${APP_URL}/retos`,
+    });
+    sendEmail({ to: org.email, subject: comp.subject, html: comp.html }).catch(() => {});
   }
 
   return NextResponse.json({

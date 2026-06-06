@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ArrowLeft, FileText, ClipboardCheck, Clock, Mail, Phone, CalendarDays, GraduationCap } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +23,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AlumnoDetailPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
+  const t = await getTranslations("StudentDetail");
 
   const { data: student } = await supabase
     .from("students")
@@ -66,7 +68,7 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <Link href="/alumnos" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" /> Volver a alumnos
+        <ArrowLeft className="h-4 w-4" /> {t("back")}
       </Link>
 
       <div className="flex items-start justify-between gap-4">
@@ -79,17 +81,17 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
           </div>
           <p className="mt-1 text-muted-foreground">
             {PRACTICE_TYPE_LABELS[student.practice_type]} ·{" "}
-            {student.institution_name ?? "Sin centro"}
+            {student.institution_name ?? t("no_institution")}
           </p>
         </div>
         <div className="flex flex-wrap items-start justify-end gap-2">
           <Button variant="outline" asChild>
             <Link href={`/alumnos/${student.id}/editar`}>
-              <Pencil className="h-4 w-4" /> Editar
+              <Pencil className="h-4 w-4" /> {t("edit")}
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href={`/planes/nuevo?student=${student.id}`}>Generar plan</Link>
+            <Link href={`/planes/nuevo?student=${student.id}`}>{t("generate_plan")}</Link>
           </Button>
           <InviteStudentButton
             studentId={student.id}
@@ -112,8 +114,8 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
         <Card className="border-amber-200 bg-amber-50">
           <CardContent className="p-4">
             <p className="text-sm font-medium text-amber-900">
-              Faltan documentos obligatorios:{" "}
-              {missingDocs.map((t) => DOCUMENT_TYPE_LABELS[t]).join(", ")}
+              {t("missing_docs")}{" "}
+              {missingDocs.map((dt) => DOCUMENT_TYPE_LABELS[dt]).join(", ")}
             </p>
           </CardContent>
         </Card>
@@ -122,7 +124,7 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
       <div className="grid gap-6 md:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Datos personales</CardTitle>
+            <CardTitle className="text-base">{t("personal_data")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="flex items-center gap-2 text-muted-foreground">
@@ -135,41 +137,41 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
               <GraduationCap className="h-4 w-4" /> {student.program_name ?? "—"}
             </div>
             <Separator />
-            <p className="text-xs text-muted-foreground">DNI</p>
+            <p className="text-xs text-muted-foreground">{t("dni")}</p>
             <p>{student.dni ?? "—"}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Período</CardTitle>
+            <CardTitle className="text-base">{t("period")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="flex items-center gap-2 text-muted-foreground">
               <CalendarDays className="h-4 w-4" /> {formatDate(student.start_date)} – {formatDate(student.end_date)}
             </div>
             <Separator />
-            <p className="text-xs text-muted-foreground">Horas totales</p>
+            <p className="text-xs text-muted-foreground">{t("total_hours")}</p>
             <p className="text-2xl font-bold">
-              {loggedHours} <span className="text-sm font-normal text-muted-foreground">/ {student.total_hours} h</span>
+              {loggedHours} <span className="text-sm font-normal text-muted-foreground">/ {student.total_hours} {t("hours_unit")}</span>
             </p>
-            <p className="text-xs text-muted-foreground">{student.weekly_hours ?? "—"} h/semana</p>
+            <p className="text-xs text-muted-foreground">{student.weekly_hours ?? "—"} {t("hours_per_week")}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Tutores</CardTitle>
+            <CardTitle className="text-base">{t("tutors")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div>
-              <p className="text-xs text-muted-foreground">Tutor académico</p>
+              <p className="text-xs text-muted-foreground">{t("tutor_academic")}</p>
               <p>{student.tutor_academic_name ?? "—"}</p>
               <p className="text-xs text-muted-foreground">{student.tutor_academic_email ?? ""}</p>
             </div>
             <Separator />
             <div>
-              <p className="text-xs text-muted-foreground">Tutor de empresa</p>
+              <p className="text-xs text-muted-foreground">{t("tutor_company")}</p>
               <p>{student.tutor_company_name ?? "—"}</p>
               <p className="text-xs text-muted-foreground">{student.tutor_company_email ?? ""}</p>
             </div>
@@ -180,16 +182,16 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
       <div className="grid gap-6 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-base">Documentos</CardTitle>
+            <CardTitle className="text-base">{t("documents")}</CardTitle>
             <Button size="sm" variant="outline" asChild>
               <Link href={`/documentos?student=${student.id}`}>
-                <FileText className="h-4 w-4" /> Gestionar
+                <FileText className="h-4 w-4" /> {t("manage")}
               </Link>
             </Button>
           </CardHeader>
           <CardContent>
             {!documents?.length ? (
-              <p className="text-sm text-muted-foreground">Sin documentos subidos.</p>
+              <p className="text-sm text-muted-foreground">{t("no_documents")}</p>
             ) : (
               <ul className="space-y-2 text-sm">
                 {documents.slice(0, 5).map((d) => (
@@ -205,16 +207,16 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-base">Evaluaciones</CardTitle>
+            <CardTitle className="text-base">{t("evaluations")}</CardTitle>
             <Button size="sm" variant="outline" asChild>
               <Link href={`/seguimiento?student=${student.id}`}>
-                <ClipboardCheck className="h-4 w-4" /> Ver
+                <ClipboardCheck className="h-4 w-4" /> {t("view")}
               </Link>
             </Button>
           </CardHeader>
           <CardContent>
             {!evaluations?.length ? (
-              <p className="text-sm text-muted-foreground">Sin evaluaciones.</p>
+              <p className="text-sm text-muted-foreground">{t("no_evaluations")}</p>
             ) : (
               <ul className="space-y-2 text-sm">
                 {evaluations.map((e) => (
@@ -232,17 +234,17 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-base">Horas</CardTitle>
+            <CardTitle className="text-base">{t("hours")}</CardTitle>
             <Button size="sm" variant="outline" asChild>
               <Link href={`/seguimiento?student=${student.id}&tab=hours`}>
-                <Clock className="h-4 w-4" /> Registrar
+                <Clock className="h-4 w-4" /> {t("register")}
               </Link>
             </Button>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{loggedHours}h</p>
+            <p className="text-3xl font-bold">{loggedHours}{t("hours_unit")}</p>
             <p className="text-xs text-muted-foreground">
-              de {student.total_hours}h previstas
+              {t("of_planned", { total: student.total_hours ?? 0 })}
             </p>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
               <div
@@ -259,7 +261,7 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
       {student.notes && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Notas</CardTitle>
+            <CardTitle className="text-base">{t("notes")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="whitespace-pre-line text-sm text-muted-foreground">{student.notes}</p>

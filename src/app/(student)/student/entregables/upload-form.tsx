@@ -55,22 +55,35 @@ export function UploadDeliverableForm({ studentId, organizationId, tasks }: Prop
       return;
     }
 
-    const { error: dbErr } = await supabase.from("deliverables").insert({
-      organization_id: organizationId,
-      student_id: studentId,
-      task_id: taskId || null,
-      title: (fd.get("title") as string) || file.name,
-      description: (fd.get("description") as string) || null,
-      storage_path: path,
-      file_size: file.size,
-      mime_type: file.type,
-    });
+    const { data: inserted, error: dbErr } = await supabase
+      .from("deliverables")
+      .insert({
+        organization_id: organizationId,
+        student_id: studentId,
+        task_id: taskId || null,
+        title: (fd.get("title") as string) || file.name,
+        description: (fd.get("description") as string) || null,
+        storage_path: path,
+        file_size: file.size,
+        mime_type: file.type,
+      })
+      .select("id")
+      .single();
 
-    setLoading(false);
-    if (dbErr) {
-      setError(dbErr.message);
+    if (dbErr || !inserted) {
+      setLoading(false);
+      setError(dbErr?.message ?? "Error guardando el entregable");
       return;
     }
+
+    // Notificar al tutor — fire-and-forget, no bloqueamos el flujo si falla.
+    fetch("/api/notifications/deliverable-submitted", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ deliverableId: inserted.id }),
+    }).catch(() => {});
+
+    setLoading(false);
     (e.target as HTMLFormElement).reset();
     setTaskId("");
     router.refresh();

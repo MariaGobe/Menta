@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
   Users,
@@ -44,6 +45,15 @@ function daysUntil(dateStr: string): number {
 export default async function DashboardPage() {
   const supabase = createClient();
   const t = await getTranslations("CompanyDashboard");
+
+  // Si la empresa todavía no ha hecho el onboarding, lo mostramos primero.
+  const { data: orgOnboarding } = await supabase
+    .from("organizations")
+    .select("onboarded_at")
+    .single();
+  if (orgOnboarding && !orgOnboarding.onboarded_at) {
+    redirect("/bienvenida");
+  }
 
   const today = todayISO();
   const monthStart = startOfMonthISO();

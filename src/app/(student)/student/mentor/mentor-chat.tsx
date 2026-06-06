@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Send, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Loader2, Send, Sparkles, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,7 @@ const SUGGESTIONS = [
 ];
 
 export function MentorChat({ studentId, studentName, initialMessages }: Props) {
+  const t = useTranslations("MentorChat");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -163,6 +165,11 @@ export function MentorChat({ studentId, studentName, initialMessages }: Props) {
           <Send className="h-4 w-4" />
         </Button>
       </form>
+
+      <p className="flex items-start gap-2 text-xs text-muted-foreground">
+        <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        <span>{t("disclaimer")}</span>
+      </p>
     </div>
   );
 }

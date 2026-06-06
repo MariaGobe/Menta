@@ -228,6 +228,11 @@
     "s_processors_b2": "Vercel Inc. (web application hosting).",
     "s_processors_b3": "Stripe Payments Europe, Ltd. (payment processing; card data is never stored by Gobe).",
     "s_processors_b4": "Transactional email providers for invitations and notifications.",
+    "s_processors_b5": "Anthropic PBC (Claude model) as an AI processor for virtual mentor conversations.",
+    "s_ai_title": "Use of artificial intelligence",
+    "s_ai_p1": "Menta includes a \"virtual mentor\" that uses Anthropic PBC AI models to answer student questions. When a student writes to the mentor, we send Anthropic: (i) the student's message; (ii) their first name; (iii) the title of their internship plan and up to five pending tasks; (iv) the company description, industry, tone and other fields the company has filled in mentor configuration; and (v) up to six previous conversation turns to keep context.",
+    "s_ai_p2": "We do NOT send Anthropic emails, phone numbers, IDs, documents, deliverables, journal, evaluations, financial data or information about other students. Companies are responsible for not including passwords, customer data or classified information in the free-text fields of mentor configuration.",
+    "s_ai_p3": "Anthropic acts as a data processor. Data may be processed on servers outside the European Economic Area under appropriate safeguards per GDPR (Standard Contractual Clauses). For more details, see their privacy policy at anthropic.com.",
     "s_transfers_title": "International transfers",
     "s_transfers_p1": "Some processors may be based outside the European Economic Area. In such cases, transfers are carried out under appropriate safeguards in line with the GDPR (Standard Contractual Clauses approved by the European Commission).",
     "s_rights_title": "Your rights",
@@ -410,6 +415,13 @@
     "company": "Company",
     "student": "Student",
     "logout": "Log out"
+  },
+  "MentorChat": {
+    "disclaimer": "Your messages are processed by artificial intelligence (Anthropic). Do not share passwords or confidential data of real individuals."
+  },
+  "MentorConfig": {
+    "knowledge_warning_title": "About what you write here",
+    "knowledge_warning": "The text you fill in \"internal information\" and \"specific instructions\" will be sent to Anthropic (AI provider) every time a student talks to the mentor. Do not include passwords, customer data or classified information."
   },
   "StudentDetail": {
     "back": "Back to students",

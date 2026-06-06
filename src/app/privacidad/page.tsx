@@ -64,7 +64,14 @@ export default async function PrivacidadPage() {
           <li>{t("s_processors_b2")}</li>
           <li>{t("s_processors_b3")}</li>
           <li>{t("s_processors_b4")}</li>
+          <li>{t("s_processors_b5")}</li>
         </ul>
+      </LegalSection>
+
+      <LegalSection title={t("s_ai_title")}>
+        <p>{t("s_ai_p1")}</p>
+        <p>{t("s_ai_p2")}</p>
+        <p>{t("s_ai_p3")}</p>
       </LegalSection>
 
       <LegalSection title={t("s_transfers_title")}>

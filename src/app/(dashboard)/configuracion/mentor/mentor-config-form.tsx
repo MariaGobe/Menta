@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Check, Loader2, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +30,7 @@ interface Props {
 export function MentorConfigForm({ organizationId, config }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const tWarn = useTranslations("MentorConfig");
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
   const [tone, setTone] = useState<MentorTone>(
@@ -135,6 +137,14 @@ export function MentorConfigForm({ organizationId, config }: Props) {
           defaultValue={config?.mentor_personality ?? ""}
           placeholder="Ej. paciente, directo, motivador, exigente con la calidad pero comprensivo con el aprendizaje"
         />
+      </div>
+
+      <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm">
+        <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+        <div>
+          <p className="font-semibold text-amber-900">{tWarn("knowledge_warning_title")}</p>
+          <p className="mt-1 text-amber-800">{tWarn("knowledge_warning")}</p>
+        </div>
       </div>
 
       <div className="space-y-2">

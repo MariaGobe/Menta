@@ -228,6 +228,11 @@
     "s_processors_b2": "Vercel Inc. (hosting de la aplicación web).",
     "s_processors_b3": "Stripe Payments Europe, Ltd. (procesamiento de pagos, datos de tarjeta nunca almacenados por Gobe).",
     "s_processors_b4": "Proveedores de email transaccional para invitaciones y notificaciones.",
+    "s_processors_b5": "Anthropic PBC (modelo Claude) como procesador de inteligencia artificial para las conversaciones del mentor virtual.",
+    "s_ai_title": "Uso de inteligencia artificial",
+    "s_ai_p1": "Menta incluye un \"mentor virtual\" que utiliza modelos de inteligencia artificial de Anthropic PBC para responder a las dudas de los alumnos. Cuando un alumno escribe al mentor, enviamos a Anthropic: (i) el mensaje del alumno; (ii) su primer nombre; (iii) el título de su plan de prácticas y de hasta cinco tareas pendientes; (iv) la descripción de la empresa, sector, tono y demás campos que la empresa haya rellenado en la configuración del mentor; y (v) hasta los seis turnos previos de la conversación para mantener contexto.",
+    "s_ai_p2": "No enviamos a Anthropic emails, teléfonos, DNI, documentos, entregables, diario, evaluaciones, datos financieros ni información sobre otros alumnos. Las empresas usuarias son responsables de no incluir contraseñas, datos de clientes o información clasificada en los campos libres de configuración del mentor.",
+    "s_ai_p3": "Anthropic actúa como encargado de tratamiento. Los datos pueden procesarse en servidores fuera del Espacio Económico Europeo bajo garantías adecuadas conforme al RGPD (Cláusulas Contractuales Tipo). Para más información, consulta su política de privacidad en anthropic.com.",
     "s_transfers_title": "Transferencias internacionales",
     "s_transfers_p1": "Algunos encargados de tratamiento pueden tener su sede fuera del Espacio Económico Europeo. En esos casos, las transferencias se realizan al amparo de garantías adecuadas conforme al RGPD (Cláusulas Contractuales Tipo aprobadas por la Comisión Europea).",
     "s_rights_title": "Tus derechos",
@@ -410,6 +415,13 @@
     "company": "Empresa",
     "student": "Alumno",
     "logout": "Cerrar sesión"
+  },
+  "MentorChat": {
+    "disclaimer": "Tus mensajes se procesan con inteligencia artificial (Anthropic). No compartas contraseñas ni datos confidenciales de personas reales."
+  },
+  "MentorConfig": {
+    "knowledge_warning_title": "Sobre lo que escribas aquí",
+    "knowledge_warning": "El texto que rellenes en \"información interna\" e \"instrucciones específicas\" se enviará a Anthropic (proveedor de IA) cada vez que un alumno hable con el mentor. No incluyas contraseñas, datos de clientes ni información clasificada."
   },
   "StudentDetail": {
     "back": "Volver a alumnos",

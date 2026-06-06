@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { claudeComplete } from "@/lib/anthropic";
 import type { MentorConfig, MentorTone } from "@/types/database";
 
 export const dynamic = "force-dynamic";
@@ -8,14 +9,16 @@ export const runtime = "nodejs";
 /**
  * Endpoint del mentor virtual.
  *
- * Carga el contexto que la empresa ha configurado en `mentor_configs` y lo
- * combina con los datos del alumno (plan, tareas) para generar una respuesta.
+ * Carga la configuración que la empresa ha definido en `mentor_configs` y la
+ * combina con el contexto del alumno (plan, tareas, primer nombre).
  *
- * HOY: respuestas heurísticas que usan el contexto para personalizar tono y
- * referencias (recursos, knowledge base).
+ * - Si hay ANTHROPIC_API_KEY: llama a Claude Haiku con el system prompt + los
+ *   últimos turnos como historial.
+ * - Si no hay key o la llamada falla: vuelve al stub heurístico para que la
+ *   feature siga funcionando sin sorpresas.
  *
- * MAÑANA: este mismo endpoint llamará a un LLM con `buildSystemPrompt(context)`
- * como system prompt y mantendrá el contrato hacia el cliente.
+ * Privacidad: solo enviamos el PRIMER NOMBRE del alumno al modelo (no apellidos,
+ * ni email, ni DNI, ni datos de tutores).
  */
 export async function POST(request: Request) {
   const supabase = createClient();
@@ -39,8 +42,14 @@ export async function POST(request: Request) {
     content: message,
   });
 
-  // Cargar contexto: alumno, plan, tareas pendientes y config del mentor
-  const [{ data: student }, { data: tasks }, { data: plan }] = await Promise.all([
+  // Cargar contexto: alumno, plan, tareas pendientes, config del mentor e
+  // historial corto para dar continuidad sin saturar el prompt.
+  const [
+    { data: student },
+    { data: tasks },
+    { data: plan },
+    { data: history },
+  ] = await Promise.all([
     supabase
       .from("students")
       .select("organization_id, full_name, practice_type")
@@ -58,6 +67,12 @@ export async function POST(request: Request) {
       .select("title, status, start_date, end_date")
       .eq("student_id", studentId)
       .maybeSingle(),
+    supabase
+      .from("mentor_messages")
+      .select("role, content")
+      .eq("student_id", studentId)
+      .order("created_at", { ascending: false })
+      .limit(7), // últimos 7 (último es el que acabamos de insertar)
   ]);
 
   let mentorConfig: MentorConfig | null = null;
@@ -70,12 +85,52 @@ export async function POST(request: Request) {
     mentorConfig = data ?? null;
   }
 
-  const reply = generateReply(message, {
-    studentName: student?.full_name ?? null,
+  // Solo primer nombre — minimización de PII enviada al LLM.
+  const firstName = (student?.full_name ?? "").split(" ")[0] || null;
+
+  const ctx: MentorContext = {
+    studentFirstName: firstName,
     tasks: tasks ?? [],
     plan: plan ?? null,
     mentorConfig,
+  };
+
+  // Historial: descartamos el mensaje recién insertado (es el `message` actual)
+  // y revertimos para que vaya cronológico. Limitado a 6 turnos previos.
+  const prior = (history ?? [])
+    .slice(1)
+    .reverse()
+    .slice(-6)
+    .map((m) => ({
+      role: m.role as "user" | "assistant",
+      content: m.content,
+    }));
+
+  // Intentamos LLM primero; si no responde, caemos a stub.
+  let reply: string;
+  const llm = await claudeComplete({
+    system: buildSystemPrompt(ctx),
+    userMessage: message,
+    history: prior,
+    maxTokens: 600,
+    temperature: 0.7,
   });
+
+  if (llm.ok) {
+    reply = llm.text;
+    if (llm.usage) {
+      console.log(
+        "[mentor] LLM ok",
+        `in=${llm.usage.input_tokens}`,
+        `out=${llm.usage.output_tokens}`,
+      );
+    }
+  } else {
+    if (!("skipped" in llm)) {
+      console.warn("[mentor] LLM falló, usando stub heurístico:", llm.error);
+    }
+    reply = generateReply(message, ctx);
+  }
 
   await supabase.from("mentor_messages").insert({
     student_id: studentId,
@@ -87,7 +142,7 @@ export async function POST(request: Request) {
 }
 
 interface MentorContext {
-  studentName: string | null;
+  studentFirstName: string | null;
   tasks: { title: string; status: string; due_date: string | null }[];
   plan: {
     title: string;
@@ -99,8 +154,8 @@ interface MentorContext {
 }
 
 /**
- * System prompt que se enviará al LLM cuando se enchufe. Combina la config
- * de la empresa con el contexto puntual del alumno.
+ * System prompt enviado al LLM.
+ * Combina la config de la empresa con el contexto del alumno (sin PII).
  */
 export function buildSystemPrompt(ctx: MentorContext): string {
   const c = ctx.mentorConfig;
@@ -108,6 +163,9 @@ export function buildSystemPrompt(ctx: MentorContext): string {
 
   lines.push(
     "Eres el mentor virtual de Menta. Acompañas a alumnos en prácticas de empresa.",
+    "Tu rol es ayudar a planificar el día, desbloquear dudas y motivar al alumno.",
+    "Sé concreto, breve y útil. No inventes datos sobre la empresa o el plan que no estén en este prompt.",
+    "Si te preguntan algo que no sabes, dilo y sugiere hablar con el tutor humano.",
   );
 
   if (c?.company_description) {
@@ -123,24 +181,24 @@ export function buildSystemPrompt(ctx: MentorContext): string {
     lines.push(`Personalidad: ${c.mentor_personality}`);
   }
   if (c?.knowledge_base) {
-    lines.push(`\nInformación interna útil:\n${c.knowledge_base}`);
+    lines.push(`\nInformación interna útil de la empresa:\n${c.knowledge_base}`);
   }
   if (c?.resources && c.resources.length > 0) {
     lines.push(
-      `\nRecursos disponibles:\n${c.resources
+      `\nRecursos disponibles que puedes recomendar:\n${c.resources
         .map((r) => `- ${r.label}: ${r.url}`)
         .join("\n")}`,
     );
   }
   if (c?.custom_instructions) {
-    lines.push(`\nInstrucciones específicas:\n${c.custom_instructions}`);
+    lines.push(`\nInstrucciones específicas de la empresa:\n${c.custom_instructions}`);
   }
 
   lines.push("\n--- Contexto del alumno ---");
-  if (ctx.studentName) lines.push(`Nombre: ${ctx.studentName}`);
+  if (ctx.studentFirstName) lines.push(`Nombre: ${ctx.studentFirstName}`);
   if (ctx.plan)
     lines.push(
-      `Plan: "${ctx.plan.title}" (${ctx.plan.start_date} – ${ctx.plan.end_date})`,
+      `Plan: "${ctx.plan.title}" (del ${ctx.plan.start_date ?? "—"} al ${ctx.plan.end_date ?? "—"})`,
     );
   if (ctx.tasks.length > 0) {
     lines.push(
@@ -168,23 +226,21 @@ function tonePrompt(tone: MentorTone): string {
 }
 
 /**
- * Respuesta heurística que usa el contexto. Se sustituirá por llamada a LLM.
+ * Stub heurístico — solo se usa si la llamada al LLM falla.
+ * Se mantiene para que la feature no muera si la key se cae o expira.
  */
 function generateReply(message: string, ctx: MentorContext): string {
   const m = message.toLowerCase();
   const tone = (ctx.mentorConfig?.tone ?? "cercano") as MentorTone;
   const tu = tone === "formal" ? "usted" : "tú";
-  const greet = ctx.studentName
-    ? `${tone === "formal" ? "Buenos días" : "Hola"} ${ctx.studentName.split(" ")[0]}`
+  const greet = ctx.studentFirstName
+    ? `${tone === "formal" ? "Buenos días" : "Hola"} ${ctx.studentFirstName}`
     : tone === "formal"
       ? "Buenos días"
       : "Hola";
 
   if (/hola|buenos|qué tal|hey/.test(m)) {
-    const desc = ctx.mentorConfig?.company_description
-      ? ` Recuerda que estás haciendo prácticas en una empresa que ${ctx.mentorConfig.company_description.split(".")[0].toLowerCase()}.`
-      : "";
-    return `${greet}. Estoy aquí para ayudar${tone === "formal" ? "le" : "te"}.${desc} ¿En qué puedo ayudar${tone === "formal" ? "le" : "te"} hoy?`;
+    return `${greet}. ¿En qué puedo ayudar${tone === "formal" ? "le" : "te"} hoy?`;
   }
 
   if (/hoy|tarea|qué hago|que hago|qué tengo/.test(m)) {
@@ -195,35 +251,12 @@ function generateReply(message: string, ctx: MentorContext): string {
       .slice(0, 3)
       .map((t, i) => `${i + 1}. ${t.title}${t.due_date ? ` (vence ${t.due_date})` : ""}`)
       .join("\n");
-    return `${greet}. Estas son ${tu === "tú" ? "tus" : "sus"} próximas tareas:\n\n${lines}\n\nEmpieza por la primera. Si ${tone === "formal" ? "se queda" : "te quedas"} bloqueado, vuelve a preguntar${tone === "formal" ? "me" : "me"}.`;
+    return `${greet}. Estas son ${tu === "tú" ? "tus" : "sus"} próximas tareas:\n\n${lines}\n\nEmpieza por la primera. Si ${tone === "formal" ? "se queda" : "te quedas"} bloqueado, vuelve a preguntar.`;
   }
 
   if (/bloquead|atascad|no sé|dificult/.test(m)) {
-    const customNote = ctx.mentorConfig?.custom_instructions
-      ? "\n\n(Nota: tu empresa me ha indicado que algunas dudas las gestione directamente el tutor humano, así que si veo que es un tema complejo te derivaré)"
-      : "";
-    return `Te entiendo. Antes de bloquearte:\n\n• Divide la tarea en pasos pequeños y empieza por el más simple.\n• Escribe en el diario qué te bloquea — a veces solo redactarlo despeja.\n• Si tras 30 min sigues atascado, contacta con el tutor de empresa.${customNote}\n\n¿Quieres que repasemos la tarea concreta?`;
+    return `Te entiendo. Divide la tarea en pasos pequeños, escribe en el diario qué te bloquea y, si tras 30 min sigues atascado, contacta con tu tutor de empresa.`;
   }
 
-  if (/tiempo|deadline|fecha|voy bien/.test(m)) {
-    if (!ctx.plan) return "Aún no hay plan asignado, así que no puedo medir el avance.";
-    return `${greet}. ${tu === "tú" ? "Tu" : "Su"} plan "${ctx.plan.title}" termina el ${ctx.plan.end_date ?? "—"}. Quedan ${ctx.tasks.length} tareas pendientes. Si va${tu === "tú" ? "s" : ""} marcando una cada pocos días, llega${tu === "tú" ? "s" : ""} con margen.`;
-  }
-
-  if (/herramienta|cómo se|wiki|recurso/.test(m)) {
-    if (ctx.mentorConfig?.knowledge_base) {
-      return `Mira lo que tengo de la empresa sobre eso:\n\n${ctx.mentorConfig.knowledge_base.slice(0, 500)}${ctx.mentorConfig.knowledge_base.length > 500 ? "..." : ""}\n\n¿Concreta${tu === "tú" ? "s" : ""} la duda y te explico mejor?`;
-    }
-    return "Aún no tengo recursos cargados por tu empresa. Pídeselo a tu tutor o cuéntame qué necesitas saber y miramos juntos.";
-  }
-
-  if (/entrega|deliver|subir/.test(m)) {
-    return "Para una buena entrega: revisa el enunciado, comprueba que cumples cada requisito, prueba dos veces antes de subir, y añade una breve descripción del trabajo. ¿Sobre qué tarea concreta es?";
-  }
-
-  if (/memoria|presentaci/.test(m)) {
-    return "La memoria y la presentación final se generan a partir de tu diario, entregables y tareas completadas. Cuanto más rellenes el diario cada día, más fácil será que Menta te prepare un borrador potente al final.";
-  }
-
-  return `Buena pregunta. Cuénta${tu === "tú" ? "me" : "me"} un poco más de contexto para ayudar${tone === "formal" ? "le" : "te"} mejor: ¿es sobre una tarea concreta, sobre el plan general, o sobre cómo organiza${tu === "tú" ? "rte" : "rse"}?`;
+  return `Buena pregunta. Cuéntame un poco más de contexto: ¿es sobre una tarea concreta, sobre el plan general, o sobre cómo organizarte?`;
 }

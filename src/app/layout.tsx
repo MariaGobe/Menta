@@ -64,10 +64,8 @@ export const metadata: Metadata = {
     description:
       "La plataforma todo-en-uno para gestionar prácticas formativas en tu empresa.",
   },
-  icons: {
-    icon: "/favicon.svg",
-    apple: "/favicon.svg",
-  },
+  // Next.js detecta automáticamente src/app/icon.svg y src/app/apple-icon.svg
+  // No hace falta declararlos aquí.
 };
 
 export default async function RootLayout({

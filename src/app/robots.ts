@@ -26,6 +26,8 @@ export default function robots(): MetadataRoute.Robots {
           "/facturacion",
           "/configuracion",
           "/bienvenida",
+          "/admin",
+          "/admin/",
           "/student",
           "/student/",
           "/auth",

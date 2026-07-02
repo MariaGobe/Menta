@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { Topbar } from "@/components/dashboard/topbar";
+import { isSuperAdmin } from "@/lib/superadmin";
 
 export default async function DashboardLayout({
   children,
@@ -21,9 +22,11 @@ export default async function DashboardLayout({
     .eq("id", user.id)
     .single();
 
+  const superAdmin = isSuperAdmin(user.email);
+
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar />
+      <Sidebar isSuperAdmin={superAdmin} />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Topbar
           organizationName={

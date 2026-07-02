@@ -16,11 +16,16 @@ import {
   Trophy,
   CreditCard,
   Settings,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 
-export function Sidebar() {
+interface SidebarProps {
+  isSuperAdmin?: boolean;
+}
+
+export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
   const pathname = usePathname();
   const t = useTranslations("CompanySidebar");
 
@@ -69,6 +74,23 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      {isSuperAdmin && (
+        <div className="border-t p-4">
+          <Link
+            href="/admin"
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              pathname.startsWith("/admin")
+                ? "bg-amber-100 text-amber-900"
+                : "text-amber-700 hover:bg-amber-50",
+            )}
+          >
+            <ShieldCheck className="h-4 w-4" />
+            Super admin
+          </Link>
+        </div>
+      )}
 
       <div className="border-t p-4">
         <Link href="/precios" className="block rounded-lg bg-mint-50 p-3 text-xs">

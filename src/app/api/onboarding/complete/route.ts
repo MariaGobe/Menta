@@ -102,7 +102,7 @@ export async function POST(request: Request) {
       // Invitación inmediata (service role para no chocar con rate limits del cliente)
       const serviceUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-      const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-theta.vercel.app";
+      const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-gobe.com";
 
       if (serviceUrl && serviceKey) {
         const admin = createServiceClient(serviceUrl, serviceKey, {

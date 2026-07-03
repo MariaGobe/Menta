@@ -96,7 +96,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-theta.vercel.app";
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-gobe.com";
   const workspaceUrl = `${APP_URL}/r/${challenge.public_slug}/aplicacion/${data.id}`;
 
   // Cargamos el nombre de la organización para el email.

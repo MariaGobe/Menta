@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-theta.vercel.app"}/auth/establecer-contrasena`;
+  const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-gobe.com"}/auth/establecer-contrasena`;
 
   if (existingProfile) {
     // Caso B: cuenta ya creada → recovery link para re-establecer contraseña

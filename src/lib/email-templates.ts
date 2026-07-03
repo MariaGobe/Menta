@@ -3,7 +3,7 @@
  * Todas devuelven { subject, html } listo para pasar a sendEmail().
  */
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-theta.vercel.app";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-gobe.com";
 
 const baseStyles = `
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;

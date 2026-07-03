@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, skipped: "no_recipient" });
   }
 
-  const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-theta.vercel.app";
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://menta-gobe.com";
 
   const { subject, html } = deliverableSubmittedEmail({
     tutorName: student?.tutor_company_name ?? null,

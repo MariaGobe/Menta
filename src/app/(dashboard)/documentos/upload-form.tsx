@@ -41,9 +41,19 @@ export function UploadDocumentForm({ students }: Props) {
       return;
     }
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      setError("Sesión expirada. Vuelve a entrar.");
+      setLoading(false);
+      return;
+    }
+
     const { data: profile } = await supabase
       .from("profiles")
       .select("organization_id, id")
+      .eq("id", user.id)
       .single();
 
     if (!profile?.organization_id) {

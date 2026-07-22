@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { PLAN_STATUS_LABELS, type PlanStatus } from "@/types/database";
+import { DuplicatePlanButton } from "./duplicate-button";
 
 export const dynamic = "force-dynamic";
 
@@ -61,6 +62,7 @@ export default async function PlanesPage() {
                   <th className="px-6 py-3 font-medium">{t("th_period")}</th>
                   <th className="px-6 py-3 font-medium">{t("th_hours")}</th>
                   <th className="px-6 py-3 font-medium">{t("th_status")}</th>
+                  <th className="px-6 py-3 font-medium text-right">{t("th_actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -90,6 +92,9 @@ export default async function PlanesPage() {
                         >
                           {PLAN_STATUS_LABELS[p.status as PlanStatus]}
                         </Badge>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <DuplicatePlanButton planId={p.id} />
                       </td>
                     </tr>
                   );

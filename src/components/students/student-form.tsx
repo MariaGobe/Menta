@@ -88,9 +88,18 @@ export function StudentForm({ mode, initial }: Props) {
     };
 
     if (mode === "create") {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setError("Sesión expirada. Vuelve a entrar.");
+        setLoading(false);
+        return;
+      }
       const { data: profile } = await supabase
         .from("profiles")
         .select("organization_id")
+        .eq("id", user.id)
         .single();
       if (!profile?.organization_id) {
         setError("No se pudo obtener tu organización.");

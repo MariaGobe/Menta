@@ -11,6 +11,7 @@ import {
   Inbox,
   ChevronRight,
   ListChecks,
+  MessageSquareText,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
@@ -68,6 +69,7 @@ export default async function DashboardPage() {
     { count: upcomingEventsCount },
     { data: upcomingEvents },
     { data: upcomingTasks },
+    { data: pendingSuggestions },
     { data: recent },
     { data: org },
   ] = await Promise.all([
@@ -113,6 +115,12 @@ export default async function DashboardPage() {
       .order("due_date", { ascending: true })
       .limit(5),
     supabase
+      .from("plan_change_suggestions")
+      .select("id, title, plan_id, created_at, students(full_name)")
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
+      .limit(5),
+    supabase
       .from("students_summary")
       .select("id, full_name, practice_type, status, start_date, logged_hours, total_hours")
       .order("created_at", { ascending: false })
@@ -147,6 +155,35 @@ export default async function DashboardPage() {
           </Link>
         </Button>
       </div>
+
+      {pendingSuggestions && pendingSuggestions.length > 0 && (
+        <Card className="border-mint-200 bg-mint-50">
+          <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <MessageSquareText className="mt-0.5 h-5 w-5 shrink-0 text-mint-700" />
+              <div>
+                <p className="text-sm font-semibold text-mint-900">
+                  {t("pending_suggestions_title")}
+                </p>
+                <p className="text-sm text-mint-800">
+                  {t("pending_suggestions_hint", { n: pendingSuggestions.length })}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {pendingSuggestions.slice(0, 3).map((s: any) => (
+                    <Link
+                      key={s.id}
+                      href={`/planes/${s.plan_id}`}
+                      className="rounded-full bg-white/70 px-3 py-1 text-xs text-mint-800 hover:bg-white"
+                    >
+                      {s.students?.full_name ?? "Alumno"} · {s.title}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {org?.subscription_status === "trialing" && org.trial_ends_at && (
         <Card className="border-amber-200 bg-amber-50">

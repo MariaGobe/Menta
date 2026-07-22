@@ -191,6 +191,84 @@ export function challengeApplicationCompanyEmail(p: {
   };
 }
 
+/* ──────────────────────────────────────────────────────────────────────── */
+/* 5. Alumno sugiere cambio en su plan → email a la empresa                  */
+/* ──────────────────────────────────────────────────────────────────────── */
+export function planSuggestionCreatedEmail(p: {
+  tutorName: string | null;
+  studentName: string;
+  suggestionTitle: string;
+  suggestionDescription: string;
+  planTitle: string;
+  studentDetailUrl: string;
+}) {
+  const greet = p.tutorName ? `Hola ${p.tutorName.split(" ")[0]},` : "Hola,";
+  return {
+    subject: `${p.studentName} sugiere un cambio en su plan`,
+    html: shell(`
+      <h1 style="color: #1a1a1a; font-size: 22px; margin: 0 0 16px;">Nueva sugerencia de cambio</h1>
+      <p style="color: #555; line-height: 1.6; font-size: 15px;">${greet}</p>
+      <p style="color: #555; line-height: 1.6; font-size: 15px;">
+        <strong>${p.studentName}</strong> ha propuesto un cambio en su plan de prácticas
+        <em>"${p.planTitle}"</em>.
+      </p>
+      <div style="background: #f5f7f7; border-left: 3px solid #62A691; padding: 16px; margin: 24px 0; border-radius: 4px;">
+        <p style="margin: 0; font-weight: 600; color: #1a1a1a;">${escapeHtml(p.suggestionTitle)}</p>
+        <p style="margin: 8px 0 0; color: #555; line-height: 1.5; white-space: pre-wrap;">${escapeHtml(p.suggestionDescription)}</p>
+      </div>
+      <p style="color: #555; line-height: 1.6; font-size: 15px;">
+        Revisa la sugerencia y decide si la aceptas.
+      </p>
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="${p.studentDetailUrl}" style="${buttonStyles}">Revisar sugerencia</a>
+      </div>
+    `),
+  };
+}
+
+/* ──────────────────────────────────────────────────────────────────────── */
+/* 6. Empresa revisa sugerencia → email al alumno                            */
+/* ──────────────────────────────────────────────────────────────────────── */
+export function planSuggestionReviewedEmail(p: {
+  studentName: string;
+  suggestionTitle: string;
+  status: "accepted" | "rejected";
+  reviewNotes: string | null;
+  reviewerName: string | null;
+}) {
+  const statusText = p.status === "accepted" ? "aceptada" : "rechazada";
+  const statusColor = p.status === "accepted" ? "#62A691" : "#c94f4f";
+  return {
+    subject: `Tu sugerencia "${p.suggestionTitle}" ha sido ${statusText}`,
+    html: shell(`
+      <h1 style="color: #1a1a1a; font-size: 22px; margin: 0 0 16px;">Sugerencia ${statusText}</h1>
+      <p style="color: #555; line-height: 1.6; font-size: 15px;">
+        Hola ${p.studentName.split(" ")[0]},
+      </p>
+      <p style="color: #555; line-height: 1.6; font-size: 15px;">
+        ${p.reviewerName ? `<strong>${p.reviewerName}</strong>` : "Tu tutor"} ha
+        <strong style="color: ${statusColor};">${statusText}</strong> tu sugerencia:
+      </p>
+      <div style="background: #f5f7f7; border-left: 3px solid ${statusColor}; padding: 16px; margin: 24px 0; border-radius: 4px;">
+        <p style="margin: 0; font-weight: 600; color: #1a1a1a;">${escapeHtml(p.suggestionTitle)}</p>
+      </div>
+      ${
+        p.reviewNotes
+          ? `
+        <div style="background: #f5f7f7; padding: 16px; margin: 24px 0; border-radius: 4px;">
+          <p style="margin: 0 0 6px; font-size: 12px; text-transform: uppercase; color: #888; letter-spacing: 0.5px;">Comentario del tutor</p>
+          <p style="margin: 0; color: #1a1a1a; line-height: 1.6; white-space: pre-wrap;">${escapeHtml(p.reviewNotes)}</p>
+        </div>
+      `
+          : ""
+      }
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="${APP_URL}/student/mi-plan" style="${buttonStyles}">Ver mi plan</a>
+      </div>
+    `),
+  };
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

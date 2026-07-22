@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatDate } from "@/lib/utils";
+import { SuggestChangeCard } from "./suggest-change";
 import {
   PLAN_STATUS_LABELS,
   TASK_STATUS_LABELS,
@@ -97,6 +98,13 @@ export default async function StudentPlanPage() {
   const done = (tasks ?? []).filter((t) => t.status === "completed").length;
   const progress = total === 0 ? 0 : Math.round((done / total) * 100);
 
+  // Sugerencias de cambio del propio alumno (por RLS solo ve las suyas)
+  const { data: suggestions } = await supabase
+    .from("plan_change_suggestions")
+    .select("id, title, description, status, reviewed_at, review_notes, created_at")
+    .eq("plan_id", plan.id)
+    .order("created_at", { ascending: false });
+
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
@@ -154,6 +162,11 @@ export default async function StudentPlanPage() {
           </CardContent>
         </Card>
       </div>
+
+      <SuggestChangeCard
+        planId={plan.id}
+        initialSuggestions={(suggestions ?? []) as any}
+      />
 
       <div className="space-y-3">
         {tasksByPhase.map((ph) => (

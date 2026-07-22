@@ -9,6 +9,7 @@ import { formatDate } from "@/lib/utils";
 import { PLAN_STATUS_LABELS, type PlanStatus, type TaskStatus } from "@/types/database";
 import { ApprovePlanButton } from "./approve-button";
 import { PlanTasksSection } from "./plan-tasks-section";
+import { PlanSuggestionsPanel } from "./suggestions-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,13 @@ export default async function PlanDetailPage({
     )
     .eq("plan_id", plan.id)
     .order("order_index");
+
+  // Sugerencias del alumno sobre este plan
+  const { data: suggestions } = await supabase
+    .from("plan_change_suggestions")
+    .select("id, title, description, status, reviewed_at, review_notes, created_at")
+    .eq("plan_id", plan.id)
+    .order("created_at", { ascending: false });
 
   const student = plan.students as { full_name?: string; practice_type?: string } | null;
   const tasksByPhase = (phases ?? []).map((ph) => ({
@@ -129,6 +137,8 @@ export default async function PlanDetailPage({
           </CardContent>
         </Card>
       </div>
+
+      <PlanSuggestionsPanel suggestions={(suggestions ?? []) as any} />
 
       <PlanTasksSection
         planId={plan.id}

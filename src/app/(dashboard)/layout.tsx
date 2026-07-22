@@ -4,6 +4,8 @@ import { Sidebar } from "@/components/dashboard/sidebar";
 import { Topbar } from "@/components/dashboard/topbar";
 import { isSuperAdmin } from "@/lib/superadmin";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -18,9 +20,15 @@ export default async function DashboardLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, email, organizations(name)")
+    .select("full_name, email, role, organizations(name)")
     .eq("id", user.id)
     .single();
+
+  // Defensa en profundidad: si un alumno llega hasta aquí (middleware falló,
+  // cookie rara, cache, etc.) lo mandamos a su portal. Si no podemos leer el
+  // profile por lo que sea, forzamos login para no dejar pasar por defecto.
+  if (!profile) redirect("/login");
+  if (profile.role === "student") redirect("/student/dashboard");
 
   const superAdmin = isSuperAdmin(user.email);
 

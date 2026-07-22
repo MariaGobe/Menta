@@ -65,12 +65,24 @@ export async function updateSession(request: NextRequest) {
 
   // Con sesión → redirigir según rol cuando sea pertinente
   if (user && (isAuthRoute || isProtectedRoute)) {
-    const { data: profile } = await supabase
+    const { data: profile, error: profileErr } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.id)
       .single();
-    const isStudent = profile?.role === "student";
+
+    // Fail-safe: si no podemos determinar el rol, NO asumimos que es empresa.
+    // Al login y que se autentique otra vez.
+    if (profileErr || !profile) {
+      if (isProtectedRoute) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/login";
+        return NextResponse.redirect(url);
+      }
+      return supabaseResponse;
+    }
+
+    const isStudent = profile.role === "student";
 
     if (isAuthRoute) {
       const url = request.nextUrl.clone();

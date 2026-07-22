@@ -196,7 +196,7 @@ export default async function DashboardPage() {
                 {t("trial_message_2")}
               </p>
             </div>
-            <Button size="sm" asChild>
+            <Button size="sm" variant="warning" asChild>
               <Link href="/facturacion">{t("activate_plan")}</Link>
             </Button>
           </CardContent>

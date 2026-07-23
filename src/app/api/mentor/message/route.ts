@@ -154,6 +154,28 @@ interface MentorContext {
 }
 
 /**
+ * Descripción de las secciones del portal del alumno.
+ * Se envía en el system prompt para que el mentor pueda guiar al alumno
+ * dentro de la plataforma (no fuera de ella).
+ */
+const PLATFORM_KNOWLEDGE = `
+Menta es la plataforma que el alumno está usando ahora mismo. Su portal tiene estas secciones (accesibles desde el menú lateral izquierdo):
+
+- Inicio (/student/dashboard): resumen del día — tareas pendientes, próximas entregas, avisos.
+- Mi plan (/student/mi-plan): el plan completo de prácticas con fases, tareas, fechas y objetivos. Desde aquí puede SUGERIR CAMBIOS en el plan pulsando "Sugerir cambio" — el tutor de empresa recibirá la propuesta.
+- Mi calendario (/student/calendario): vista mensual con eventos, deadlines y reuniones.
+- Tareas de hoy (/student/tareas): lista de tareas del día para marcarlas como hechas.
+- Diario (/student/diario): el alumno registra qué ha hecho, qué ha aprendido y qué le ha bloqueado cada día. Se usa después para generar la memoria final.
+- Mentor virtual (/student/mentor): este chat, donde estamos ahora.
+- Entregables (/student/entregables): para subir archivos (mockups, código, documentos, etc.) asociados a las tareas. El tutor los revisa y deja feedback.
+- Documentación (/student/documentos): AQUÍ están los documentos que la empresa ha compartido con el alumno (políticas internas, manuales, convenios, guías, etc.). Es el primer sitio donde debe mirar cuando le hablen de "documentos de la empresa", "políticas", "normas internas" o "manuales".
+- Hitos / LinkedIn (/student/hitos): para crear hitos profesionales publicables en LinkedIn cuando termine algo relevante.
+- Presentación (/student/presentacion): la presentación final del proyecto, con URL pública propia.
+
+Cuando el alumno pregunte dónde está algo relacionado con la empresa (políticas, documentos, manuales), dirígele PRIMERO a "Documentación" del portal. Si no lo encuentra ahí, entonces sí sugerir email o intranet externa.
+`.trim();
+
+/**
  * System prompt enviado al LLM.
  * Combina la config de la empresa con el contexto del alumno (sin PII).
  */
@@ -167,6 +189,9 @@ export function buildSystemPrompt(ctx: MentorContext): string {
     "Sé concreto, breve y útil. No inventes datos sobre la empresa o el plan que no estén en este prompt.",
     "Si te preguntan algo que no sabes, dilo y sugiere hablar con el tutor humano.",
   );
+
+  lines.push("\n--- Sobre la plataforma Menta ---");
+  lines.push(PLATFORM_KNOWLEDGE);
 
   if (c?.company_description) {
     lines.push(`\nSobre la empresa:\n${c.company_description}`);

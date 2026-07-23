@@ -412,10 +412,28 @@
     "diary": "Diario",
     "mentor": "Mentor virtual",
     "deliverables": "Entregables",
+    "documents": "Documentación",
     "milestones": "Hitos / LinkedIn",
     "presentation": "Presentación",
     "portal_title": "Portal del alumno",
     "portal_hint": "Tu espacio personal de prácticas."
+  },
+  "StudentDocuments": {
+    "title": "Documentación",
+    "subtitle": "Documentos que tu empresa ha compartido contigo.",
+    "empty_title": "Aún no hay documentos compartidos",
+    "empty_hint": "Tu tutor de empresa aún no ha compartido ningún documento contigo. En cuanto lo haga aparecerá aquí.",
+    "download": "Descargar",
+    "shared_with_you": "Compartido contigo",
+    "shared_general": "Documento general",
+    "uploaded_at": "Subido el {date}"
+  },
+  "CompanyDocuments": {
+    "share_with_student_label": "Compartir con el alumno",
+    "share_with_student_hint": "El alumno podrá ver y descargar este documento desde su portal.",
+    "shared_badge": "Visible al alumno",
+    "share_toggle": "Compartir",
+    "unshare_toggle": "Dejar de compartir"
   },
   "Topbar": {
     "organization": "Organización",

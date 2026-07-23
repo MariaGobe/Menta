@@ -10,6 +10,7 @@ import {
   BookOpen,
   Sparkles,
   Upload,
+  FileText,
   Presentation,
   Award,
 } from "lucide-react";
@@ -28,6 +29,7 @@ export function StudentSidebar() {
     { href: "/student/diario", icon: BookOpen, label: t("diary") },
     { href: "/student/mentor", icon: Sparkles, label: t("mentor") },
     { href: "/student/entregables", icon: Upload, label: t("deliverables") },
+    { href: "/student/documentos", icon: FileText, label: t("documents") },
     { href: "/student/hitos", icon: Award, label: t("milestones") },
     { href: "/student/presentacion", icon: Presentation, label: t("presentation") },
   ];

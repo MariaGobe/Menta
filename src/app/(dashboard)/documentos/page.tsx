@@ -1,22 +1,26 @@
 import Link from "next/link";
-import { FileText, Download, Upload } from "lucide-react";
+import { FileText, Eye } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DOCUMENT_TYPE_LABELS } from "@/types/database";
 import { formatDate } from "@/lib/utils";
 import { UploadDocumentForm } from "./upload-form";
+import { DocumentShareToggle } from "./share-toggle";
 
 export const dynamic = "force-dynamic";
 
 export default async function DocumentosPage() {
   const supabase = createClient();
+  const tShare = await getTranslations("CompanyDocuments");
 
   const [{ data: documents }, { data: students }] = await Promise.all([
     supabase
       .from("documents")
-      .select("id, type, name, file_size, uploaded_at, student_id, students(full_name)")
+      .select(
+        "id, type, name, file_size, uploaded_at, student_id, share_with_student, students(full_name)",
+      )
       .order("uploaded_at", { ascending: false }),
     supabase.from("students").select("id, full_name").order("full_name"),
   ]);
@@ -81,9 +85,16 @@ export default async function DocumentosPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary">{DOCUMENT_TYPE_LABELS[d.type]}</Badge>
-                        <Button size="icon" variant="ghost">
-                          <Download className="h-4 w-4" />
-                        </Button>
+                        {d.share_with_student && (
+                          <Badge variant="success" className="gap-1">
+                            <Eye className="h-3 w-3" />
+                            {tShare("shared_badge")}
+                          </Badge>
+                        )}
+                        <DocumentShareToggle
+                          documentId={d.id}
+                          shared={!!d.share_with_student}
+                        />
                       </div>
                     </div>
                   );

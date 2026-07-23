@@ -412,10 +412,28 @@
     "diary": "Journal",
     "mentor": "Virtual mentor",
     "deliverables": "Deliverables",
+    "documents": "Documentation",
     "milestones": "Milestones / LinkedIn",
     "presentation": "Presentation",
     "portal_title": "Student portal",
     "portal_hint": "Your personal internship space."
+  },
+  "StudentDocuments": {
+    "title": "Documentation",
+    "subtitle": "Documents your company has shared with you.",
+    "empty_title": "No shared documents yet",
+    "empty_hint": "Your company tutor hasn't shared any documents with you yet. They'll appear here as soon as they do.",
+    "download": "Download",
+    "shared_with_you": "Shared with you",
+    "shared_general": "General document",
+    "uploaded_at": "Uploaded on {date}"
+  },
+  "CompanyDocuments": {
+    "share_with_student_label": "Share with student",
+    "share_with_student_hint": "The student will be able to view and download this document from their portal.",
+    "shared_badge": "Visible to student",
+    "share_toggle": "Share",
+    "unshare_toggle": "Stop sharing"
   },
   "Topbar": {
     "organization": "Organisation",

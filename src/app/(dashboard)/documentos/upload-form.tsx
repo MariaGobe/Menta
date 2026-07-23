@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { createClient } from "@/lib/supabase/client";
 import { DOCUMENT_TYPE_LABELS, type DocumentType } from "@/types/database";
+import { useTranslations } from "next-intl";
 
 interface Props {
   students: { id: string; full_name: string }[];
@@ -23,10 +24,12 @@ interface Props {
 export function UploadDocumentForm({ students }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const tShare = useTranslations("CompanyDocuments");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [type, setType] = useState<DocumentType>("convenio");
   const [studentId, setStudentId] = useState<string>("");
+  const [shareWithStudent, setShareWithStudent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -82,6 +85,7 @@ export function UploadDocumentForm({ students }: Props) {
       file_size: file.size,
       mime_type: file.type,
       uploaded_by: profile.id,
+      share_with_student: shareWithStudent,
     });
 
     setLoading(false);
@@ -138,6 +142,21 @@ export function UploadDocumentForm({ students }: Props) {
         <Label htmlFor="file">Archivo</Label>
         <Input id="file" name="file" type="file" required />
       </div>
+
+      <label className="flex items-start gap-3 rounded-md border bg-muted/30 p-3 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={shareWithStudent}
+          onChange={(e) => setShareWithStudent(e.target.checked)}
+          className="mt-0.5 h-4 w-4 accent-mint-600"
+        />
+        <div className="text-sm">
+          <p className="font-medium">{tShare("share_with_student_label")}</p>
+          <p className="text-xs text-muted-foreground">
+            {tShare("share_with_student_hint")}
+          </p>
+        </div>
+      </label>
 
       {error && (
         <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p>

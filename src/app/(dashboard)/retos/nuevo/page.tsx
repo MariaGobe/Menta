@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, Sparkles, CreditCard } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { checkChallengeAvailability } from "@/lib/challenges-server";
@@ -13,6 +14,7 @@ export const dynamic = "force-dynamic";
 
 export default async function NuevoRetoPage() {
   const supabase = createClient();
+  const t = await getTranslations("NewChallenge");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -31,15 +33,12 @@ export default async function NuevoRetoPage() {
         href="/retos"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="h-4 w-4" /> Volver a retos
+        <ArrowLeft className="h-4 w-4" /> {t("back")}
       </Link>
 
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Crear reto</h1>
-        <p className="text-muted-foreground">
-          Define el reto, las fechas y los criterios. Cuando lo publiques, será
-          visible públicamente y los alumnos podrán aplicar.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       {availability.hasFree ? (
@@ -47,11 +46,7 @@ export default async function NuevoRetoPage() {
           <CardContent className="flex items-start gap-3 p-4">
             <Sparkles className="h-5 w-5 shrink-0 text-mint-700" />
             <p className="text-sm text-mint-900">
-              <strong>
-                Este reto es gratis — usas tu {FREE_CHALLENGES_PER_YEAR}.º de
-                este año.
-              </strong>{" "}
-              Podrás publicarlo directamente al guardar.
+              <strong>{t("free_note", { n: FREE_CHALLENGES_PER_YEAR })}</strong>
             </p>
           </CardContent>
         </Card>
@@ -60,12 +55,7 @@ export default async function NuevoRetoPage() {
           <CardContent className="flex items-start gap-3 p-4">
             <CreditCard className="h-5 w-5 shrink-0 text-amber-700" />
             <div className="text-sm text-amber-900">
-              <p>
-                Ya has usado tu reto gratuito del año. Para publicar uno
-                adicional se aplicará un coste de{" "}
-                <strong>{CHALLENGE_ADDON_PRICE_EUR}€ + IVA</strong>. Puedes
-                crear el borrador y pagar al publicar.
-              </p>
+              <p>{t("paid_note", { price: CHALLENGE_ADDON_PRICE_EUR })}</p>
             </div>
           </CardContent>
         </Card>
@@ -73,10 +63,8 @@ export default async function NuevoRetoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Datos del reto</CardTitle>
-          <CardDescription>
-            Sé claro con el problema, los criterios y el formato de entrega.
-          </CardDescription>
+          <CardTitle className="text-base">{t("form_card_title")}</CardTitle>
+          <CardDescription>{t("form_card_subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <NewChallengeForm organizationId={orgId} />

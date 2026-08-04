@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ChevronRight, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +41,7 @@ function computeRisk(s: Omit<StudentEval, "risk">): StudentEval["risk"] {
 
 export default async function EvaluacionPage() {
   const supabase = createClient();
+  const t = await getTranslations("Evaluation");
   const { data: students } = await supabase
     .from("students")
     .select(
@@ -115,55 +117,48 @@ export default async function EvaluacionPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Evaluación</h1>
-        <p className="text-muted-foreground">
-          Vista agregada del progreso, evidencias y riesgos por alumno. Menta
-          genera una propuesta automática basada en estos datos.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="border-destructive/20 bg-destructive/5">
           <CardHeader className="pb-2">
-            <CardDescription>Alertas</CardDescription>
+            <CardDescription>{t("alerts_title")}</CardDescription>
             <CardTitle className="text-2xl">{alerts.length}</CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground">
-            Alumnos con retrasos importantes o sin actividad reciente.
+            {t("alerts_hint")}
           </CardContent>
         </Card>
         <Card className="border-amber-200 bg-amber-50">
           <CardHeader className="pb-2">
-            <CardDescription>Vigilancia</CardDescription>
+            <CardDescription>{t("watch_title")}</CardDescription>
             <CardTitle className="text-2xl">{watch.length}</CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground">
-            Alumnos con alguna señal a revisar.
+            {t("watch_hint")}
           </CardContent>
         </Card>
         <Card className="border-mint-200 bg-mint-50">
           <CardHeader className="pb-2">
-            <CardDescription>En curso</CardDescription>
+            <CardDescription>{t("on_track_title")}</CardDescription>
             <CardTitle className="text-2xl">{ok.length}</CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground">
-            Alumnos al día con el plan.
+            {t("on_track_hint")}
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Alumnos en curso</CardTitle>
-          <CardDescription>
-            Click en un alumno para ver el detalle de su evaluación.
-          </CardDescription>
+          <CardTitle className="text-base">{t("active_title")}</CardTitle>
+          <CardDescription>{t("active_subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           {evaluations.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              No hay alumnos activos en este momento.
-            </p>
+            <p className="text-sm text-muted-foreground">{t("no_active")}</p>
           ) : (
             <ul className="divide-y">
               {evaluations.map((e) => (
@@ -177,23 +172,22 @@ export default async function EvaluacionPage() {
                       <div className="flex-1">
                         <p className="text-sm font-medium">{e.name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {e.doneTasks}/{e.totalTasks} tareas ·{" "}
-                          {Math.round(e.hoursLogged)}h registradas ·{" "}
-                          {e.diaryEntries} entradas de diario ·{" "}
-                          {e.deliverables} entregables
+                          {e.doneTasks}/{e.totalTasks} {t("tasks_label").toLowerCase()} ·{" "}
+                          {Math.round(e.hoursLogged)}h ·{" "}
+                          {e.diaryEntries} {t("diary_entries")} ·{" "}
+                          {e.deliverables} {t("deliverables")}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {e.overdueTasks > 0 && (
                         <Badge variant="destructive">
-                          {e.overdueTasks} retrasada
-                          {e.overdueTasks > 1 ? "s" : ""}
+                          {t("overdue_count", { n: e.overdueTasks })}
                         </Badge>
                       )}
                       {e.daysSinceLastLog !== null && e.daysSinceLastLog > 3 && (
                         <Badge variant="warning">
-                          {e.daysSinceLastLog}d sin diario
+                          {t("days_without_diary", { n: e.daysSinceLastLog })}
                         </Badge>
                       )}
                       <ChevronRight className="h-4 w-4 text-muted-foreground" />

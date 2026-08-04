@@ -1,24 +1,27 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ReportContent } from "./report-content";
 import { PrintButton } from "./print-button";
 
 export const dynamic = "force-dynamic";
 
-const REPORT_TITLES: Record<string, string> = {
-  intermedio: "Informe intermedio",
-  final_empresa: "Informe final para empresa",
-  final_centro: "Informe final para centro educativo",
-  memoria: "Memoria de prácticas",
-};
-
 export default async function InformePage({
   params,
 }: {
   params: { studentId: string; type: string };
 }) {
+  const t = await getTranslations("Reports");
+
+  const REPORT_TITLES: Record<string, string> = {
+    intermedio: t("type_intermediate"),
+    final_empresa: t("type_final_company"),
+    final_centro: t("type_final_center"),
+    memoria: t("type_memoria"),
+  };
+
   const title = REPORT_TITLES[params.type];
   if (!title) notFound();
 
@@ -77,7 +80,7 @@ export default async function InformePage({
           href="/informes"
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4" /> Volver a informes
+          <ArrowLeft className="h-4 w-4" /> {t("back")}
         </Link>
         <PrintButton />
       </div>

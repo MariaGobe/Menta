@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar, Users, ExternalLink, Trophy } from "lucide-react";
+import { ArrowLeft, Calendar, Users, ExternalLink } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import {
   CHALLENGE_STATUS_LABELS,
-  APPLICATION_STATUS_LABELS,
   type ChallengeStatus,
   type ApplicationStatus,
 } from "@/types/database";
@@ -23,6 +23,7 @@ export default async function ChallengeDetailPage({
   params: { id: string };
 }) {
   const supabase = createClient();
+  const t = await getTranslations("ChallengeDetail");
   const { data: challenge } = await supabase
     .from("challenges")
     .select("*")
@@ -49,7 +50,7 @@ export default async function ChallengeDetailPage({
         href="/retos"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="h-4 w-4" /> Volver a retos
+        <ArrowLeft className="h-4 w-4" /> {t("back")}
       </Link>
 
       <div className="flex items-start justify-between gap-4">
@@ -83,50 +84,44 @@ export default async function ChallengeDetailPage({
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Aplicantes</CardDescription>
+            <CardDescription>{t("applicants_title")}</CardDescription>
             <CardTitle className="text-2xl">{applications?.length ?? 0}</CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground">
-            registrados al reto
+            {t("applicants_hint")}
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Han entregado</CardDescription>
+            <CardDescription>{t("delivered_title")}</CardDescription>
             <CardTitle className="text-2xl">{submitted.length}</CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground">
-            con propuesta enviada
+            {t("delivered_hint")}
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Comparten datos</CardDescription>
+            <CardDescription>{t("shared_title")}</CardDescription>
             <CardTitle className="text-2xl">{shareable.length}</CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground">
-            visibles para selección
+            {t("shared_hint")}
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Aplicantes</CardTitle>
-          <CardDescription>
-            Marca los destacados y revisa entregas. Solo los que han marcado
-            &ldquo;compartir con la empresa&rdquo; te dejan ver sus datos
-            completos.
-          </CardDescription>
+          <CardTitle className="text-base">{t("applicants_section")}</CardTitle>
+          <CardDescription>{t("applicants_section_hint")}</CardDescription>
         </CardHeader>
         <CardContent>
           {!applications?.length ? (
             <div className="rounded-lg border border-dashed p-8 text-center">
               <Users className="mx-auto h-10 w-10 text-muted-foreground" />
-              <p className="mt-3 text-sm font-medium">Aún no hay aplicantes</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Comparte el reto en LinkedIn para que llegue a más alumnos.
-              </p>
+              <p className="mt-3 text-sm font-medium">{t("no_applicants_title")}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("no_applicants_hint")}</p>
             </div>
           ) : (
             <ul className="divide-y">
@@ -154,7 +149,7 @@ export default async function ChallengeDetailPage({
       {challenge.problem_statement && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Planteamiento del reto</CardTitle>
+            <CardTitle className="text-base">{t("brief_title")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="whitespace-pre-line text-sm">
@@ -168,12 +163,12 @@ export default async function ChallengeDetailPage({
         <Card className="border-mint-200 bg-mint-50/40">
           <CardContent className="flex items-center justify-between p-4">
             <div className="text-sm">
-              <p className="font-medium">Tu reto está en abierto:</p>
+              <p className="font-medium">{t("public_open")}</p>
               <p className="text-mint-800">/r/{challenge.public_slug}</p>
             </div>
             <Button variant="outline" asChild>
               <a href={`/r/${challenge.public_slug}`} target="_blank" rel="noreferrer">
-                <ExternalLink className="h-4 w-4" /> Ver pública
+                <ExternalLink className="h-4 w-4" /> {t("view_public")}
               </a>
             </Button>
           </CardContent>

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { formatDate } from "@/lib/utils";
 import { PRACTICE_TYPE_LABELS, type PracticeType } from "@/types/database";
 
@@ -48,7 +49,7 @@ interface Props {
   }[];
 }
 
-export function ReportContent({
+export async function ReportContent({
   title,
   reportType,
   student,
@@ -58,6 +59,7 @@ export function ReportContent({
   logs,
   deliverables,
 }: Props) {
+  const t = await getTranslations("ReportPDF");
   const totalTasks = tasks.length;
   const doneTasks = tasks.filter((t) => t.status === "completed").length;
   const progressPct = totalTasks === 0 ? 0 : Math.round((doneTasks / totalTasks) * 100);
@@ -77,59 +79,56 @@ export function ReportContent({
           {student.institution_name ?? "—"} · {student.program_name ?? ""}
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Período: {formatDate(student.start_date)} – {formatDate(student.end_date)} ·{" "}
+          {t("period", { start: formatDate(student.start_date), end: formatDate(student.end_date) })} ·{" "}
           {student.total_hours ?? "—"}h
         </p>
       </header>
 
-      {/* Datos administrativos */}
       <section className="mt-6 grid gap-3 text-sm md:grid-cols-2">
         <div>
-          <p className="text-xs font-semibold uppercase text-muted-foreground">Alumno</p>
+          <p className="text-xs font-semibold uppercase text-muted-foreground">{t("student_section")}</p>
           <p>{student.full_name}</p>
-          <p className="text-xs text-muted-foreground">DNI/NIE: {student.dni ?? "—"}</p>
+          <p className="text-xs text-muted-foreground">{t("dni_prefix")} {student.dni ?? "—"}</p>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase text-muted-foreground">Empresa</p>
+          <p className="text-xs font-semibold uppercase text-muted-foreground">{t("company_section")}</p>
           <p>{student.organizations?.name ?? "—"}</p>
           <p className="text-xs text-muted-foreground">
-            {student.organizations?.nif && `NIF ${student.organizations.nif}`}
+            {student.organizations?.nif && `${t("nif_prefix")} ${student.organizations.nif}`}
             {student.organizations?.city && ` · ${student.organizations.city}`}
           </p>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase text-muted-foreground">Tutor académico</p>
+          <p className="text-xs font-semibold uppercase text-muted-foreground">{t("tutor_academic_section")}</p>
           <p>{student.tutor_academic_name ?? "—"}</p>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase text-muted-foreground">Tutor de empresa</p>
+          <p className="text-xs font-semibold uppercase text-muted-foreground">{t("tutor_company_section")}</p>
           <p>{student.tutor_company_name ?? "—"}</p>
         </div>
       </section>
 
-      {/* Resumen */}
       <section className="mt-8">
-        <h2 className="text-lg font-semibold">1. Resumen</h2>
+        <h2 className="text-lg font-semibold">{t("section_1_summary")}</h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-4">
-          <Metric label="Progreso" value={`${progressPct}%`} />
-          <Metric label="Tareas" value={`${doneTasks}/${totalTasks}`} />
-          <Metric label="Horas" value={`${Math.round(hoursLogged)}h`} />
-          <Metric label="Entregables" value={String(deliverables.length)} />
+          <Metric label={t("metric_progress")} value={`${progressPct}%`} />
+          <Metric label={t("metric_tasks")} value={`${doneTasks}/${totalTasks}`} />
+          <Metric label={t("metric_hours")} value={`${Math.round(hoursLogged)}h`} />
+          <Metric label={t("metric_deliverables")} value={String(deliverables.length)} />
         </div>
         {plan?.description && (
           <p className="mt-4 text-sm text-muted-foreground">{plan.description}</p>
         )}
       </section>
 
-      {/* Plan y objetivos */}
       {plan && (
         <section className="mt-8">
-          <h2 className="text-lg font-semibold">2. Plan de prácticas</h2>
+          <h2 className="text-lg font-semibold">{t("section_2_plan")}</h2>
           <p className="mt-1 text-sm font-medium">{plan.title}</p>
           {plan.objectives && plan.objectives.length > 0 && (
             <>
               <p className="mt-3 text-xs font-semibold uppercase text-muted-foreground">
-                Objetivos formativos
+                {t("learning_objectives")}
               </p>
               <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
                 {plan.objectives.map((o, i) => (
@@ -141,10 +140,9 @@ export function ReportContent({
         </section>
       )}
 
-      {/* Fases y tareas */}
       {phases.length > 0 && (
         <section className="mt-8">
-          <h2 className="text-lg font-semibold">3. Actividad realizada</h2>
+          <h2 className="text-lg font-semibold">{t("section_3_activity")}</h2>
           {phases.map((ph) => {
             const phTasks = tasks.filter((t) => t.phase_id === ph.id);
             return (
@@ -154,24 +152,24 @@ export function ReportContent({
                   {formatDate(ph.start_date)} – {formatDate(ph.end_date)}
                 </p>
                 <ul className="mt-2 space-y-1 text-sm">
-                  {phTasks.map((t, i) => (
+                  {phTasks.map((task, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <span
                         className={
-                          t.status === "completed"
+                          task.status === "completed"
                             ? "text-mint-700"
                             : "text-muted-foreground"
                         }
                       >
-                        {t.status === "completed" ? "✓" : "○"}
+                        {task.status === "completed" ? "✓" : "○"}
                       </span>
-                      <span className={t.status === "completed" ? "" : "text-muted-foreground"}>
-                        {t.title}
+                      <span className={task.status === "completed" ? "" : "text-muted-foreground"}>
+                        {task.title}
                         <span className="ml-2 text-xs text-muted-foreground">
-                          {t.estimated_hours && `${t.estimated_hours}h · `}
-                          {t.completed_at
-                            ? `completada ${formatDate(t.completed_at)}`
-                            : t.due_date && `vence ${formatDate(t.due_date)}`}
+                          {task.estimated_hours && `${task.estimated_hours}h · `}
+                          {task.completed_at
+                            ? t("task_completed_on", { date: formatDate(task.completed_at) })
+                            : task.due_date && t("task_due_on", { date: formatDate(task.due_date) })}
                         </span>
                       </span>
                     </li>
@@ -183,22 +181,21 @@ export function ReportContent({
         </section>
       )}
 
-      {/* Entregables */}
       {deliverables.length > 0 && (
         <section className="mt-8">
-          <h2 className="text-lg font-semibold">4. Entregables</h2>
+          <h2 className="text-lg font-semibold">{t("section_4_deliverables")}</h2>
           <ul className="mt-3 space-y-3 text-sm">
             {deliverables.map((d, i) => (
               <li key={i} className="rounded border p-3">
                 <p className="font-medium">{d.title}</p>
                 <p className="text-xs text-muted-foreground">
-                  Enviado {formatDate(d.submitted_at)}
-                  {d.reviewed_at && ` · revisado ${formatDate(d.reviewed_at)}`}
+                  {t("sent_on", { date: formatDate(d.submitted_at) })}
+                  {d.reviewed_at && ` ${t("reviewed_on", { date: formatDate(d.reviewed_at) })}`}
                 </p>
                 {d.description && <p className="mt-1 text-xs">{d.description}</p>}
                 {d.feedback && (
                   <p className="mt-1 rounded bg-mint-50 p-2 text-xs">
-                    <strong>Feedback:</strong> {d.feedback}
+                    <strong>{t("feedback_prefix")}</strong> {d.feedback}
                   </p>
                 )}
               </li>
@@ -207,11 +204,10 @@ export function ReportContent({
         </section>
       )}
 
-      {/* Diario (en memoria principalmente) */}
       {(isMemoria || reportType === "final_centro") && logs.length > 0 && (
         <section className="mt-8">
           <h2 className="text-lg font-semibold">
-            {isMemoria ? "5. Memoria personal" : "5. Diario de actividad"}
+            {isMemoria ? t("section_5_memoria") : t("section_5_diary")}
           </h2>
           <div className="mt-3 space-y-3 text-sm">
             {logs.slice(0, 20).map((l, i) => (
@@ -222,46 +218,43 @@ export function ReportContent({
                 {l.tasks_done && <p className="mt-1">{l.tasks_done}</p>}
                 {l.learnings && (
                   <p className="mt-1 text-xs text-muted-foreground">
-                    <strong>Aprendizajes:</strong> {l.learnings}
+                    <strong>{t("learnings_prefix")}</strong> {l.learnings}
                   </p>
                 )}
                 {l.difficulties && (
                   <p className="mt-1 text-xs text-muted-foreground">
-                    <strong>Dificultades:</strong> {l.difficulties}
+                    <strong>{t("difficulties_prefix")}</strong> {l.difficulties}
                   </p>
                 )}
               </div>
             ))}
             {logs.length > 20 && (
               <p className="text-xs italic text-muted-foreground">
-                ... {logs.length - 20} entradas más no mostradas.
+                {t("more_entries", { n: logs.length - 20 })}
               </p>
             )}
           </div>
         </section>
       )}
 
-      {/* Conclusiones / firma */}
       <section className="mt-8">
         <h2 className="text-lg font-semibold">
-          {reportType === "memoria" ? "6. Reflexión final" : "6. Valoración"}
+          {reportType === "memoria" ? t("section_6_reflection") : t("section_6_valuation")}
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          {reportType === "memoria"
-            ? "Este informe se ha generado automáticamente a partir de la actividad registrada. El alumno puede editarlo y completarlo con su reflexión personal."
-            : "Este informe se ha generado a partir de los datos registrados en Menta. El tutor de empresa puede añadir observaciones complementarias antes de su entrega oficial."}
+          {reportType === "memoria" ? t("footer_note_auto") : t("footer_note_data")}
         </p>
         <div className="mt-12 grid gap-12 sm:grid-cols-2">
           <div>
             <div className="border-t pt-2">
-              <p className="text-xs text-muted-foreground">Tutor de empresa</p>
+              <p className="text-xs text-muted-foreground">{t("company_tutor_role")}</p>
               <p className="text-sm">{student.tutor_company_name ?? "—"}</p>
             </div>
           </div>
           <div>
             <div className="border-t pt-2">
               <p className="text-xs text-muted-foreground">
-                {reportType === "memoria" ? "Alumno" : "Tutor académico"}
+                {reportType === "memoria" ? t("student_role") : t("academic_tutor_role")}
               </p>
               <p className="text-sm">
                 {reportType === "memoria"
@@ -274,7 +267,7 @@ export function ReportContent({
       </section>
 
       <footer className="mt-12 border-t pt-4 text-center text-xs text-muted-foreground print:fixed print:bottom-0 print:left-0 print:right-0">
-        Generado con Menta · {new Date().toLocaleDateString("es-ES")}
+        {t("generated_with")} {new Date().toLocaleDateString(t("locale"))}
       </footer>
     </article>
   );

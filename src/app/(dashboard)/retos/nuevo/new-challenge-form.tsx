@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Loader2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,7 @@ function addDays(d: string, days: number) {
 export function NewChallengeForm({ organizationId }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("ChallengeForm");
   const today = new Date().toISOString().slice(0, 10);
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(addDays(today, 30));
@@ -36,7 +38,7 @@ export function NewChallengeForm({ organizationId }: Props) {
 
     const tags = ((fd.get("tags") as string) ?? "")
       .split(",")
-      .map((t) => t.trim())
+      .map((tag) => tag.trim())
       .filter(Boolean);
 
     const { data, error: err } = await supabase
@@ -63,7 +65,7 @@ export function NewChallengeForm({ organizationId }: Props) {
 
     setLoading(false);
     if (err || !data) {
-      setError(err?.message ?? "Error al guardar");
+      setError(err?.message ?? t("error_save"));
       return;
     }
     router.push(`/retos/${data.id}`);
@@ -73,68 +75,68 @@ export function NewChallengeForm({ organizationId }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="title">Título *</Label>
+        <Label htmlFor="title">{t("title_label")}</Label>
         <Input
           id="title"
           name="title"
           required
-          placeholder="Ej. Diseña y prototipa una app de impacto social"
+          placeholder={t("title_placeholder")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="short_description">Descripción corta</Label>
+        <Label htmlFor="short_description">{t("short_desc_label")}</Label>
         <Textarea
           id="short_description"
           name="short_description"
           rows={2}
           maxLength={280}
-          placeholder="1-2 frases que enganchen. Saldrá en la previa de LinkedIn."
+          placeholder={t("short_desc_hint")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="problem_statement">Planteamiento del problema</Label>
+        <Label htmlFor="problem_statement">{t("brief_label")}</Label>
         <Textarea
           id="problem_statement"
           name="problem_statement"
           rows={5}
-          placeholder="Describe el contexto y qué problema deben resolver. Cuanto más concreto, mejor."
+          placeholder={t("brief_placeholder")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="requirements">Requisitos / perfil ideal</Label>
+        <Label htmlFor="requirements">{t("requirements_label")}</Label>
         <Textarea
           id="requirements"
           name="requirements"
           rows={3}
-          placeholder="Estudios, conocimientos, herramientas. Ej. Estudiante de DAW/DAM o Ingeniería Informática, conoce React."
+          placeholder={t("requirements_placeholder")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="evaluation_criteria">Criterios de evaluación</Label>
+        <Label htmlFor="evaluation_criteria">{t("evaluation_label")}</Label>
         <Textarea
           id="evaluation_criteria"
           name="evaluation_criteria"
           rows={3}
-          placeholder="Cómo vais a evaluar: claridad, creatividad, factibilidad, código limpio..."
+          placeholder={t("evaluation_placeholder")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="deliverable_format">Formato de entrega</Label>
+        <Label htmlFor="deliverable_format">{t("format_label")}</Label>
         <Input
           id="deliverable_format"
           name="deliverable_format"
-          placeholder="Ej. Vídeo de 3 min + repositorio público + breve memoria PDF"
+          placeholder={t("format_placeholder")}
         />
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="space-y-2">
-          <Label htmlFor="start_date">Fecha inicio</Label>
+          <Label htmlFor="start_date">{t("start_date_label")}</Label>
           <Input
             id="start_date"
             type="date"
@@ -146,33 +148,33 @@ export function NewChallengeForm({ organizationId }: Props) {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="end_date">Fecha fin</Label>
+          <Label htmlFor="end_date">{t("end_date_label")}</Label>
           <Input
             id="end_date"
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
-          <p className="text-xs text-muted-foreground">Duración típica: 30 días.</p>
+          <p className="text-xs text-muted-foreground">{t("duration_hint")}</p>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="max_applicants">Máximo aplicantes (opcional)</Label>
+          <Label htmlFor="max_applicants">{t("max_applicants_label")}</Label>
           <Input
             id="max_applicants"
             name="max_applicants"
             type="number"
             min="1"
-            placeholder="Sin límite"
+            placeholder={t("max_applicants_placeholder")}
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="tags">Tags (separados por coma)</Label>
+        <Label htmlFor="tags">{t("tags_label")}</Label>
         <Input
           id="tags"
           name="tags"
-          placeholder="React, sostenibilidad, prototipado"
+          placeholder={t("tags_placeholder")}
         />
       </div>
 
@@ -189,7 +191,7 @@ export function NewChallengeForm({ organizationId }: Props) {
           ) : (
             <Save className="h-4 w-4" />
           )}
-          Guardar borrador
+          {t("save_draft")}
         </Button>
       </div>
     </form>

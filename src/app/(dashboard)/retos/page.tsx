@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Plus, Trophy, Sparkles, ChevronRight } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ export const dynamic = "force-dynamic";
 
 export default async function RetosPage() {
   const supabase = createClient();
+  const t = await getTranslations("Challenges");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -37,7 +39,6 @@ export default async function RetosPage() {
     .eq("organization_id", orgId)
     .order("created_at", { ascending: false });
 
-  // Para cada reto activo, contar aplicantes
   const counts: Record<string, number> = {};
   if (challenges) {
     for (const c of challenges) {
@@ -55,15 +56,12 @@ export default async function RetosPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Retos abiertos</h1>
-          <p className="text-muted-foreground">
-            Publica un reto para captar talento. Los aplicantes resuelven un
-            problema real y tú decides a quién contactar.
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("subtitle")}</p>
         </div>
         <Button asChild>
           <Link href="/retos/nuevo">
-            <Plus className="h-4 w-4" /> Nuevo reto
+            <Plus className="h-4 w-4" /> {t("new_button")}
           </Link>
         </Button>
       </div>
@@ -73,26 +71,19 @@ export default async function RetosPage() {
           <Sparkles className="h-5 w-5 shrink-0 text-mint-700" />
           <div className="flex-1 text-sm text-mint-900">
             <p>
-              <strong>Tienes {FREE_CHALLENGES_PER_YEAR} reto gratis al año.</strong>{" "}
+              <strong>{t("free_first", { n: FREE_CHALLENGES_PER_YEAR })}</strong>{" "}
               {availability && (
                 <>
-                  Has publicado {availability.usedThisYear} en los últimos 12
-                  meses.{" "}
+                  {t("used_this_year", { n: availability.usedThisYear })}{" "}
                   {availability.hasFree ? (
-                    <span>Tu próximo reto es gratis.</span>
+                    <span>{t("next_free")}</span>
                   ) : (
-                    <span>
-                      Retos adicionales: {CHALLENGE_ADDON_PRICE_EUR}€ + IVA cada
-                      uno.
-                    </span>
+                    <span>{t("extra_cost", { price: CHALLENGE_ADDON_PRICE_EUR })}</span>
                   )}
                 </>
               )}
             </p>
-            <p className="mt-1 text-xs text-mint-800">
-              Cada reto dura 1 mes. Recibirás un resumen automático con los
-              aplicantes y los trabajos destacados al cerrarlo.
-            </p>
+            <p className="mt-1 text-xs text-mint-800">{t("monthly_note")}</p>
           </div>
         </CardContent>
       </Card>
@@ -101,13 +92,11 @@ export default async function RetosPage() {
         <Card>
           <CardContent className="p-12 text-center">
             <Trophy className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold">Aún no tienes retos</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Crea tu primer reto público y empieza a captar talento joven.
-            </p>
+            <h3 className="mt-4 text-lg font-semibold">{t("empty_title")}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{t("empty_hint")}</p>
             <Button className="mt-6" asChild>
               <Link href="/retos/nuevo">
-                <Plus className="h-4 w-4" /> Crear primer reto
+                <Plus className="h-4 w-4" /> {t("empty_button")}
               </Link>
             </Button>
           </CardContent>
@@ -123,8 +112,7 @@ export default async function RetosPage() {
                       <CardTitle className="text-base">{c.title}</CardTitle>
                       <CardDescription>
                         {formatDate(c.start_date)} – {formatDate(c.end_date)} ·{" "}
-                        {counts[c.id] ?? 0} aplicante
-                        {counts[c.id] === 1 ? "" : "s"}
+                        {t("applicants_count", { n: counts[c.id] ?? 0 })}
                       </CardDescription>
                     </div>
                     <div className="flex items-center gap-2">

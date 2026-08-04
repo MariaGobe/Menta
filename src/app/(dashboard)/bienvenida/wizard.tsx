@@ -80,7 +80,7 @@ export function OnboardingWizard({ initial }: Props) {
     setSaving(false);
     if (!res.ok) {
       const j = await res.json().catch(() => ({}));
-      alert(j.error ?? "Error guardando");
+      alert(j.error ?? t("saving"));
       return;
     }
     router.push("/dashboard");

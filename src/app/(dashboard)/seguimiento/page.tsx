@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ClipboardCheck, Clock, Plus, Star } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function SeguimientoPage() {
   const supabase = createClient();
+  const t = await getTranslations("Tracking");
 
   const [{ data: evaluations }, { data: hours }] = await Promise.all([
     supabase
@@ -27,31 +29,27 @@ export default async function SeguimientoPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Seguimiento y evaluación</h1>
-        <p className="text-muted-foreground">
-          Registra horas, evaluaciones e informes de cada alumno.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <div>
-              <CardTitle className="text-base">Últimas evaluaciones</CardTitle>
-              <CardDescription>Inicial, intermedia, final.</CardDescription>
+              <CardTitle className="text-base">{t("evaluations_title")}</CardTitle>
+              <CardDescription>{t("evaluations_subtitle")}</CardDescription>
             </div>
             <Button size="sm" variant="outline">
-              <Plus className="h-4 w-4" /> Nueva
+              <Plus className="h-4 w-4" /> {t("new_button")}
             </Button>
           </CardHeader>
           <CardContent>
             {!evaluations?.length ? (
               <div className="rounded-lg border border-dashed p-8 text-center">
                 <ClipboardCheck className="mx-auto h-10 w-10 text-muted-foreground" />
-                <p className="mt-3 text-sm font-medium">Sin evaluaciones</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Programa la primera evaluación de un alumno.
-                </p>
+                <p className="mt-3 text-sm font-medium">{t("evaluations_empty_title")}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{t("evaluations_empty_hint")}</p>
               </div>
             ) : (
               <div className="divide-y">
@@ -86,21 +84,19 @@ export default async function SeguimientoPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <div>
-              <CardTitle className="text-base">Registro de horas</CardTitle>
-              <CardDescription>Últimos registros.</CardDescription>
+              <CardTitle className="text-base">{t("hours_title")}</CardTitle>
+              <CardDescription>{t("hours_subtitle")}</CardDescription>
             </div>
             <Button size="sm" variant="outline">
-              <Plus className="h-4 w-4" /> Registrar
+              <Plus className="h-4 w-4" /> {t("hours_register")}
             </Button>
           </CardHeader>
           <CardContent>
             {!hours?.length ? (
               <div className="rounded-lg border border-dashed p-8 text-center">
                 <Clock className="mx-auto h-10 w-10 text-muted-foreground" />
-                <p className="mt-3 text-sm font-medium">Sin horas registradas</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Empieza a registrar las horas de tus alumnos.
-                </p>
+                <p className="mt-3 text-sm font-medium">{t("hours_empty_title")}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{t("hours_empty_hint")}</p>
               </div>
             ) : (
               <div className="divide-y">
@@ -122,9 +118,9 @@ export default async function SeguimientoPage() {
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary">{h.hours}h</Badge>
                         {h.approved ? (
-                          <Badge variant="success">Aprobado</Badge>
+                          <Badge variant="success">{t("approved_badge")}</Badge>
                         ) : (
-                          <Badge variant="warning">Pendiente</Badge>
+                          <Badge variant="warning">{t("pending_badge")}</Badge>
                         )}
                       </div>
                     </div>

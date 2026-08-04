@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Globe,
   Linkedin,
@@ -27,6 +28,7 @@ interface Props {
 export function PublishControls({ challengeId, status, publicSlug }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("PublishControls");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,7 +44,6 @@ export function PublishControls({ challengeId, status, publicSlug }: Props) {
     const data = await res.json();
 
     if (data.requiresPayment) {
-      // Lanzar Stripe Checkout
       const co = await fetch("/api/challenges/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -53,12 +54,12 @@ export function PublishControls({ challengeId, status, publicSlug }: Props) {
         window.location.href = checkoutData.url;
         return;
       }
-      setError(checkoutData.error ?? "Error al crear el pago");
+      setError(checkoutData.error ?? t("error_create_payment"));
       setLoading(false);
       return;
     }
     if (!res.ok) {
-      setError(data.error ?? "Error al publicar");
+      setError(data.error ?? t("error_publish"));
       setLoading(false);
       return;
     }
@@ -67,8 +68,7 @@ export function PublishControls({ challengeId, status, publicSlug }: Props) {
   }
 
   async function close() {
-    if (!confirm("¿Cerrar el reto? Los aplicantes ya no podrán entregar más."))
-      return;
+    if (!confirm(t("close_confirm"))) return;
     setLoading(true);
     await supabase
       .from("challenges")
@@ -88,7 +88,7 @@ export function PublishControls({ challengeId, status, publicSlug }: Props) {
       <div className="flex flex-col items-end gap-1">
         <Button onClick={publish} disabled={loading}>
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Globe className="h-4 w-4" />}
-          Publicar
+          {t("publish")}
         </Button>
         {error && <p className="text-xs text-destructive">{error}</p>}
       </div>
@@ -125,6 +125,7 @@ function ShareBox({
   onClose?: () => void;
 }) {
   const supabase = createClient();
+  const t = useTranslations("PublishControls");
   const [copied, setCopied] = useState(false);
   const [post, setPost] = useState<string | null>(null);
 
@@ -176,17 +177,17 @@ function ShareBox({
       <div className="flex gap-2">
         <Button variant="outline" onClick={copyPost}>
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-          {copied ? "Copiado" : "Copiar texto LinkedIn"}
+          {copied ? t("copied") : t("copy_linkedin")}
         </Button>
         <Button asChild>
           <a href={linkedInShareUrl(publicUrl)} target="_blank" rel="noreferrer">
             <Linkedin className="h-4 w-4" />
-            {mode === "results" ? "Compartir resultados" : "Compartir en LinkedIn"}
+            {mode === "results" ? t("share_results") : t("share_linkedin")}
           </a>
         </Button>
         {onClose && (
           <Button variant="ghost" onClick={onClose}>
-            <XCircle className="h-4 w-4" /> Cerrar reto
+            <XCircle className="h-4 w-4" /> {t("close_challenge")}
           </Button>
         )}
       </div>

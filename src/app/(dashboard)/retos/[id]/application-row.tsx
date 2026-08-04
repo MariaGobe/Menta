@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Linkedin, Star, EyeOff, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ interface Application {
 export function ApplicationRow({ application }: { application: Application }) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("ApplicationRow");
   const [highlighted, setHighlighted] = useState(application.highlighted);
 
   async function toggleHighlight() {
@@ -50,15 +52,15 @@ export function ApplicationRow({ application }: { application: Application }) {
           <p className="text-sm font-medium">
             {application.share_with_company
               ? application.applicant_name
-              : "Aplicante anónimo"}
+              : t("anonymous")}
           </p>
           {application.share_with_company ? (
             <Badge variant="success" className="gap-1 text-xs">
-              <Eye className="h-3 w-3" /> Comparte datos
+              <Eye className="h-3 w-3" /> {t("shares_data")}
             </Badge>
           ) : (
             <Badge variant="secondary" className="gap-1 text-xs">
-              <EyeOff className="h-3 w-3" /> Privado
+              <EyeOff className="h-3 w-3" /> {t("private")}
             </Badge>
           )}
         </div>
@@ -83,8 +85,8 @@ export function ApplicationRow({ application }: { application: Application }) {
             </>
           )}
           {application.submitted_at
-            ? `Entregado ${formatDate(application.submitted_at)}`
-            : "Sin entrega"}
+            ? t("delivered_on", { date: formatDate(application.submitted_at) })
+            : t("no_delivery")}
         </p>
       </div>
       <div className="flex items-center gap-2">
@@ -95,10 +97,10 @@ export function ApplicationRow({ application }: { application: Application }) {
           variant={highlighted ? "default" : "outline"}
           size="sm"
           onClick={toggleHighlight}
-          title="Destacar"
+          title={t("highlight_title")}
         >
           <Star className="h-3.5 w-3.5" />
-          {highlighted ? "Destacado" : "Destacar"}
+          {highlighted ? t("highlighted") : t("highlight")}
         </Button>
       </div>
     </li>

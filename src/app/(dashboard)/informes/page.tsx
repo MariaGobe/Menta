@@ -1,35 +1,38 @@
 import Link from "next/link";
 import { FileSpreadsheet, ArrowRight } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 
-const REPORT_TYPES = [
-  {
-    id: "intermedio",
-    title: "Informe intermedio",
-    description: "Estado del alumno a mitad de prácticas.",
-  },
-  {
-    id: "final_empresa",
-    title: "Informe final para empresa",
-    description: "Resumen interno con evaluación y observaciones.",
-  },
-  {
-    id: "final_centro",
-    title: "Informe final para centro educativo",
-    description: "Documento oficial para el centro o universidad.",
-  },
-  {
-    id: "memoria",
-    title: "Memoria de prácticas",
-    description: "Memoria personal del alumno (puede generarla él mismo).",
-  },
-];
-
 export default async function InformesPage() {
   const supabase = createClient();
+  const t = await getTranslations("Reports");
+
+  const REPORT_TYPES = [
+    {
+      id: "intermedio",
+      title: t("type_intermediate"),
+      description: t("type_intermediate_desc"),
+    },
+    {
+      id: "final_empresa",
+      title: t("type_final_company"),
+      description: t("type_final_company_desc"),
+    },
+    {
+      id: "final_centro",
+      title: t("type_final_center"),
+      description: t("type_final_center_desc"),
+    },
+    {
+      id: "memoria",
+      title: t("type_memoria"),
+      description: t("type_memoria_desc"),
+    },
+  ];
+
   const { data: students } = await supabase
     .from("students")
     .select("id, full_name, practice_type, status, start_date, end_date")
@@ -38,26 +41,18 @@ export default async function InformesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Informes</h1>
-        <p className="text-muted-foreground">
-          Genera informes exportables para empresa, centros educativos y
-          alumnos. Cada informe se genera a partir de los datos registrados en
-          Menta.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Selecciona un alumno</CardTitle>
-          <CardDescription>
-            Después podrás elegir el tipo de informe a generar.
-          </CardDescription>
+          <CardTitle className="text-base">{t("select_student")}</CardTitle>
+          <CardDescription>{t("select_student_hint")}</CardDescription>
         </CardHeader>
         <CardContent>
           {!students?.length ? (
-            <p className="text-sm text-muted-foreground">
-              Aún no hay alumnos.
-            </p>
+            <p className="text-sm text-muted-foreground">{t("no_students")}</p>
           ) : (
             <ul className="divide-y">
               {students.map((s) => (

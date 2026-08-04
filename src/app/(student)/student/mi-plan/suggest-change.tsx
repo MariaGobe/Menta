@@ -51,7 +51,7 @@ export function SuggestChangeCard({ planId, initialSuggestions }: Props) {
     setSaving(false);
     if (!res.ok) {
       const j = await res.json().catch(() => ({}));
-      setError(j.error ?? "Error enviando sugerencia");
+      setError(j.error ?? t("submitting"));
       return;
     }
     // Optimistic: reset form + refresh

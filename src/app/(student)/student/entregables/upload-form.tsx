@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ interface Props {
 export function UploadDeliverableForm({ studentId, organizationId, tasks }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("StudentDeliverables");
   const [taskId, setTaskId] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,19 +40,18 @@ export function UploadDeliverableForm({ studentId, organizationId, tasks }: Prop
     const fd = new FormData(e.currentTarget);
     const file = fd.get("file") as File;
     if (!file || file.size === 0) {
-      setError("Selecciona un archivo");
+      setError(t("form_error_no_file"));
       setLoading(false);
       return;
     }
 
-    // Subir archivo al bucket 'documents' (mismo bucket que usa la empresa)
     const path = `${organizationId}/deliverables/${studentId}/${Date.now()}-${file.name}`;
     const { error: storageErr } = await supabase.storage
       .from("documents")
       .upload(path, file);
 
     if (storageErr) {
-      setError(`Error subiendo archivo: ${storageErr.message}`);
+      setError(t("form_error_upload", { msg: storageErr.message }));
       setLoading(false);
       return;
     }
@@ -72,11 +73,10 @@ export function UploadDeliverableForm({ studentId, organizationId, tasks }: Prop
 
     if (dbErr || !inserted) {
       setLoading(false);
-      setError(dbErr?.message ?? "Error guardando el entregable");
+      setError(dbErr?.message ?? t("form_error_save"));
       return;
     }
 
-    // Notificar al tutor — fire-and-forget, no bloqueamos el flujo si falla.
     fetch("/api/notifications/deliverable-submitted", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -92,16 +92,16 @@ export function UploadDeliverableForm({ studentId, organizationId, tasks }: Prop
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="task">Tarea asociada (opcional)</Label>
+        <Label htmlFor="task">{t("form_task_label")}</Label>
         <Select value={taskId} onValueChange={setTaskId}>
           <SelectTrigger>
-            <SelectValue placeholder="Sin asociar a una tarea concreta" />
+            <SelectValue placeholder={t("form_task_placeholder")} />
           </SelectTrigger>
           <SelectContent>
-            {tasks.map((t) => (
-              <SelectItem key={t.id} value={t.id}>
-                {t.title}
-                {t.due_date && ` · vence ${formatDate(t.due_date)}`}
+            {tasks.map((task) => (
+              <SelectItem key={task.id} value={task.id}>
+                {task.title}
+                {task.due_date && ` ${t("form_task_due", { date: formatDate(task.due_date) })}`}
               </SelectItem>
             ))}
           </SelectContent>
@@ -109,22 +109,22 @@ export function UploadDeliverableForm({ studentId, organizationId, tasks }: Prop
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="title">Título</Label>
-        <Input id="title" name="title" placeholder="Ej. Mockups del dashboard" />
+        <Label htmlFor="title">{t("form_title_label")}</Label>
+        <Input id="title" name="title" placeholder={t("form_title_placeholder")} />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Descripción</Label>
+        <Label htmlFor="description">{t("form_description_label")}</Label>
         <Textarea
           id="description"
           name="description"
           rows={2}
-          placeholder="Qué incluye el entregable, notas para tu tutor..."
+          placeholder={t("form_description_placeholder")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="file">Archivo</Label>
+        <Label htmlFor="file">{t("form_file_label")}</Label>
         <Input id="file" name="file" type="file" required />
       </div>
 
@@ -140,7 +140,7 @@ export function UploadDeliverableForm({ studentId, organizationId, tasks }: Prop
         ) : (
           <Upload className="h-4 w-4" />
         )}
-        Subir entregable
+        {t("form_submit")}
       </Button>
     </form>
   );

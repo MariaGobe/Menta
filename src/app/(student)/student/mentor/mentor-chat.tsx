@@ -20,19 +20,20 @@ interface Props {
   initialMessages: Message[];
 }
 
-const SUGGESTIONS = [
-  "¿Qué tareas tengo hoy?",
-  "¿Cómo abordo mi próxima entrega?",
-  "Tengo dificultades con una tarea, ayúdame",
-  "¿Voy bien de tiempo?",
-];
-
 export function MentorChat({ studentId, studentName, initialMessages }: Props) {
-  const t = useTranslations("MentorChat");
+  const t = useTranslations("StudentMentor");
+  const tChat = useTranslations("MentorChat");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const SUGGESTIONS = [
+    t("sug_today"),
+    t("sug_delivery"),
+    t("sug_stuck"),
+    t("sug_progress"),
+  ];
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
@@ -43,7 +44,6 @@ export function MentorChat({ studentId, studentName, initialMessages }: Props) {
     setLoading(true);
     setInput("");
 
-    // Append user message inmediatamente
     const userMsg: Message = {
       id: `local-${Date.now()}`,
       role: "user",
@@ -62,7 +62,7 @@ export function MentorChat({ studentId, studentName, initialMessages }: Props) {
       const assistantMsg: Message = {
         id: `local-${Date.now() + 1}`,
         role: "assistant",
-        content: data.reply ?? "No he podido responder, intenta de nuevo.",
+        content: data.reply ?? t("error_reply"),
         created_at: new Date().toISOString(),
       };
       setMessages((m) => [...m, assistantMsg]);
@@ -72,7 +72,7 @@ export function MentorChat({ studentId, studentName, initialMessages }: Props) {
         {
           id: `local-err-${Date.now()}`,
           role: "assistant",
-          content: "He tenido un problema. Inténtalo de nuevo en un momento.",
+          content: t("error_generic"),
           created_at: new Date().toISOString(),
         },
       ]);
@@ -91,11 +91,9 @@ export function MentorChat({ studentId, studentName, initialMessages }: Props) {
           <div className="flex h-full flex-col items-center justify-center text-center">
             <Sparkles className="h-10 w-10 text-primary" />
             <p className="mt-3 text-sm font-medium">
-              Hola {studentName.split(" ")[0]}, soy tu mentor.
+              {t("welcome", { name: studentName.split(" ")[0] })}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Hazme cualquier pregunta sobre tus prácticas o elige una sugerencia.
-            </p>
+            <p className="mt-1 text-xs text-muted-foreground">{t("welcome_hint")}</p>
           </div>
         ) : (
           messages.map((m) => (
@@ -152,7 +150,7 @@ export function MentorChat({ studentId, studentName, initialMessages }: Props) {
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Escribe tu mensaje..."
+          placeholder={t("input_placeholder")}
           rows={2}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
@@ -168,7 +166,7 @@ export function MentorChat({ studentId, studentName, initialMessages }: Props) {
 
       <p className="flex items-start gap-2 text-xs text-muted-foreground">
         <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-        <span>{t("disclaimer")}</span>
+        <span>{tChat("disclaimer")}</span>
       </p>
     </div>
   );

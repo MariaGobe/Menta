@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
@@ -7,6 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function StudentDiarioPage() {
   const supabase = createClient();
+  const t = await getTranslations("StudentDiary");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -36,19 +38,14 @@ export default async function StudentDiarioPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Diario de prácticas</h1>
-        <p className="text-muted-foreground">
-          Registra cada día lo que has hecho. Esto alimenta tus informes y memoria
-          final.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Entrada de hoy · {formatDate(today)}</CardTitle>
-          <CardDescription>
-            Rellena lo que has trabajado hoy. Se guarda automáticamente.
-          </CardDescription>
+          <CardTitle className="text-base">{t("today_entry", { date: formatDate(today) })}</CardTitle>
+          <CardDescription>{t("today_hint")}</CardDescription>
         </CardHeader>
         <CardContent>
           {studentId && profile?.organization_id && (
@@ -64,14 +61,12 @@ export default async function StudentDiarioPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Histórico</CardTitle>
-          <CardDescription>Tus últimas entradas.</CardDescription>
+          <CardTitle className="text-base">{t("history_title")}</CardTitle>
+          <CardDescription>{t("history_hint")}</CardDescription>
         </CardHeader>
         <CardContent>
           {!history?.length ? (
-            <p className="text-sm text-muted-foreground">
-              Todavía no has registrado ningún día.
-            </p>
+            <p className="text-sm text-muted-foreground">{t("empty")}</p>
           ) : (
             <div className="space-y-4">
               {history.map((h) => (
@@ -84,19 +79,19 @@ export default async function StudentDiarioPage() {
                   </div>
                   {h.tasks_done && (
                     <p className="mt-2 whitespace-pre-line text-sm">
-                      <strong>Tareas: </strong>
+                      <strong>{t("tasks_label")} </strong>
                       {h.tasks_done}
                     </p>
                   )}
                   {h.learnings && (
                     <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">
-                      <strong>Aprendizajes: </strong>
+                      <strong>{t("learnings_label")} </strong>
                       {h.learnings}
                     </p>
                   )}
                   {h.difficulties && (
                     <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">
-                      <strong>Dificultades: </strong>
+                      <strong>{t("difficulties_label")} </strong>
                       {h.difficulties}
                     </p>
                   )}

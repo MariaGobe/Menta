@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Check, Eye, Globe, Loader2, Lock, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +45,7 @@ export function PresentationEditor({
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("StudentPresentation");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +70,7 @@ export function PresentationEditor({
       .split("\n")
       .map((l) => l.trim())
       .filter(Boolean)
-      .map((title) => ({ title }));
+      .map((titleText) => ({ title: titleText }));
     const competencies = competenciesText
       .split("\n")
       .map((l) => l.trim())
@@ -95,11 +97,8 @@ export function PresentationEditor({
 
     setSaving(false);
     if (err) {
-      // Posible conflicto de slug único
       if (err.message.includes("public_slug")) {
-        setError(
-          "El enlace público ya está en uso. Cambia el final del slug e inténtalo de nuevo.",
-        );
+        setError(t("slug_conflict"));
       } else {
         setError(err.message);
       }
@@ -119,45 +118,45 @@ export function PresentationEditor({
   return (
     <div className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="title">Título</Label>
+        <Label htmlFor="title">{t("form_title_label")}</Label>
         <Input
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Ej. Mis prácticas como desarrolladora frontend en X"
+          placeholder={t("form_title_placeholder")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="summary">Resumen</Label>
+        <Label htmlFor="summary">{t("form_summary_label")}</Label>
         <Textarea
           id="summary"
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
           rows={4}
-          placeholder="Qué hiciste, qué aprendiste, qué destacarías..."
+          placeholder={t("form_summary_placeholder")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="achievements">Logros principales (uno por línea)</Label>
+        <Label htmlFor="achievements">{t("form_highlights_label")}</Label>
         <Textarea
           id="achievements"
           value={achievementsText}
           onChange={(e) => setAchievementsText(e.target.value)}
           rows={5}
-          placeholder={`Implementé el dashboard de admin\nDiseñé los flujos de onboarding\nParticipé en 3 sprints completos`}
+          placeholder={t("form_highlights_placeholder")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="competencies">Competencias desarrolladas (una por línea)</Label>
+        <Label htmlFor="competencies">{t("form_competencies_label")}</Label>
         <Textarea
           id="competencies"
           value={competenciesText}
           onChange={(e) => setCompetenciesText(e.target.value)}
           rows={4}
-          placeholder={`React\nTrabajo en equipo\nGit y revisión de PRs\nComunicación`}
+          placeholder={t("form_competencies_placeholder")}
         />
       </div>
 
@@ -179,25 +178,23 @@ export function PresentationEditor({
             <span className="flex items-center gap-2 font-medium">
               {isPublic ? (
                 <>
-                  <Globe className="h-4 w-4 text-mint-700" /> Pública
-                  (portfolio)
+                  <Globe className="h-4 w-4 text-mint-700" /> {t("public_option")}
                 </>
               ) : (
                 <>
-                  <Lock className="h-4 w-4" /> Privada
+                  <Lock className="h-4 w-4" /> {t("private_option")}
                 </>
               )}
             </span>
             <span className="mt-1 block text-xs text-muted-foreground">
-              Si la haces pública, obtendrás un enlace que puedes compartir como
-              portfolio profesional.
+              {t("public_hint")}
             </span>
           </label>
         </div>
 
         {isPublic && (
           <div className="mt-3 space-y-2">
-            <Label htmlFor="slug">URL pública</Label>
+            <Label htmlFor="slug">{t("public_url_label")}</Label>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">
                 {typeof window !== "undefined" ? window.location.origin : ""}
@@ -207,7 +204,7 @@ export function PresentationEditor({
                 id="slug"
                 value={slug}
                 onChange={(e) => setSlug(slugify(e.target.value))}
-                placeholder="tu-nombre-empresa-2026"
+                placeholder={t("public_url_placeholder")}
                 className="flex-1"
               />
             </div>
@@ -234,19 +231,19 @@ export function PresentationEditor({
       <div className="flex items-center justify-end gap-3">
         {saved && (
           <span className="flex items-center gap-1 text-sm text-mint-700">
-            <Check className="h-4 w-4" /> Guardado
+            <Check className="h-4 w-4" /> {t("saved")}
           </span>
         )}
         {publicUrl && (
           <Button variant="outline" asChild>
             <a href={publicUrl} target="_blank" rel="noreferrer">
-              <Eye className="h-4 w-4" /> Ver pública
+              <Eye className="h-4 w-4" /> {t("view_public")}
             </a>
           </Button>
         )}
         <Button onClick={save} disabled={saving}>
           {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-          Guardar presentación
+          {t("save")}
         </Button>
       </div>
     </div>

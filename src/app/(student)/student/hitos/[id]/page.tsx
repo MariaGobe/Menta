@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Award } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ export default async function MilestoneDetailPage({
   params: { id: string };
 }) {
   const supabase = createClient();
+  const t = await getTranslations("StudentMilestones");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -48,7 +50,7 @@ export default async function MilestoneDetailPage({
         href="/student/hitos"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="h-4 w-4" /> Volver a hitos
+        <ArrowLeft className="h-4 w-4" /> {t("back")}
       </Link>
 
       <div>
@@ -63,7 +65,7 @@ export default async function MilestoneDetailPage({
           </Badge>
           {milestone.endorsed_at && (
             <Badge variant="success" className="gap-1">
-              <Award className="h-3 w-3" /> Recomendado por la empresa
+              <Award className="h-3 w-3" /> {t("endorsed_by_company")}
             </Badge>
           )}
         </p>
@@ -74,11 +76,9 @@ export default async function MilestoneDetailPage({
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <Award className="h-4 w-4 text-mint-700" />
-              Recomendación recibida
+              {t("endorsement_received_title")}
             </CardTitle>
-            <CardDescription>
-              Texto escrito por la empresa que te acoge.
-            </CardDescription>
+            <CardDescription>{t("endorsement_received_hint")}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="whitespace-pre-line italic text-mint-900">
@@ -90,11 +90,8 @@ export default async function MilestoneDetailPage({
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Editar hito</CardTitle>
-          <CardDescription>
-            Cuando lo marques como público, podrás compartirlo en LinkedIn con
-            previsualización.
-          </CardDescription>
+          <CardTitle className="text-base">{t("editor_title")}</CardTitle>
+          <CardDescription>{t("editor_hint")}</CardDescription>
         </CardHeader>
         <CardContent>
           <MilestoneEditor

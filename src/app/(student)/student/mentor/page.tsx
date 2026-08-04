@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { MentorChat } from "./mentor-chat";
@@ -6,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function StudentMentorPage() {
   const supabase = createClient();
+  const t = await getTranslations("StudentMentor");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -26,25 +28,20 @@ export default async function StudentMentorPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Mentor virtual</h1>
-        <p className="text-muted-foreground">
-          Tu asistente para resolver dudas, planificar el día y desbloquear
-          problemas.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Conversación</CardTitle>
-          <CardDescription>
-            Pregúntale al mentor cualquier duda sobre tus tareas o aprendizaje.
-          </CardDescription>
+          <CardTitle className="text-base">{t("conversation_title")}</CardTitle>
+          <CardDescription>{t("conversation_hint")}</CardDescription>
         </CardHeader>
         <CardContent>
           {studentId && (
             <MentorChat
               studentId={studentId}
-              studentName={profile?.full_name ?? "alumno"}
+              studentName={profile?.full_name ?? t("student_fallback")}
               initialMessages={history ?? []}
             />
           )}

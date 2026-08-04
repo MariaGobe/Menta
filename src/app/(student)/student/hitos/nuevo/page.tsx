@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { NewMilestoneForm } from "./new-milestone-form";
@@ -8,6 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function NuevoHitoPage() {
   const supabase = createClient();
+  const t = await getTranslations("StudentMilestones");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -23,23 +25,18 @@ export default async function NuevoHitoPage() {
         href="/student/hitos"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="h-4 w-4" /> Volver a hitos
+        <ArrowLeft className="h-4 w-4" /> {t("back")}
       </Link>
 
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Crear hito</h1>
-        <p className="text-muted-foreground">
-          Elige el tipo, redacta el contenido y, cuando estés listo, publícalo
-          para compartirlo en LinkedIn.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("create_title")}</h1>
+        <p className="text-muted-foreground">{t("create_subtitle")}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Datos del hito</CardTitle>
-          <CardDescription>
-            Puedes guardarlo como borrador y editarlo más tarde.
-          </CardDescription>
+          <CardTitle className="text-base">{t("form_card_title")}</CardTitle>
+          <CardDescription>{t("form_card_subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           {profile?.student_id && profile?.organization_id && (

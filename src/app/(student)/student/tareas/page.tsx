@@ -1,4 +1,5 @@
 import { ClipboardList } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function StudentTasksPage() {
   const supabase = createClient();
+  const t = await getTranslations("StudentTasks");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -26,40 +28,38 @@ export default async function StudentTasksPage() {
     .eq("student_id", studentId)
     .order("due_date", { ascending: true, nullsFirst: false });
 
-  const pending = (tasks ?? []).filter((t) => t.status !== "completed");
-  const done = (tasks ?? []).filter((t) => t.status === "completed");
+  const pending = (tasks ?? []).filter((task) => task.status !== "completed");
+  const done = (tasks ?? []).filter((task) => task.status === "completed");
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Tareas</h1>
-        <p className="text-muted-foreground">
-          Marca tus tareas como completadas a medida que avances.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Pendientes ({pending.length})</CardTitle>
-          <CardDescription>Ordenadas por fecha límite.</CardDescription>
+          <CardTitle className="text-base">{t("pending_title", { n: pending.length })}</CardTitle>
+          <CardDescription>{t("pending_hint")}</CardDescription>
         </CardHeader>
         <CardContent>
           {!pending.length ? (
-            <p className="text-sm text-muted-foreground">No tienes tareas pendientes.</p>
+            <p className="text-sm text-muted-foreground">{t("no_pending")}</p>
           ) : (
             <ul className="divide-y">
-              {pending.map((t) => (
+              {pending.map((task) => (
                 <TaskRow
-                  key={t.id}
+                  key={task.id}
                   task={{
-                    id: t.id,
-                    title: t.title,
-                    description: t.description,
-                    due_date: t.due_date,
-                    status: t.status as TaskStatus,
-                    estimated_hours: t.estimated_hours,
+                    id: task.id,
+                    title: task.title,
+                    description: task.description,
+                    due_date: task.due_date,
+                    status: task.status as TaskStatus,
+                    estimated_hours: task.estimated_hours,
                     phase_name:
-                      (t.practice_phases as { name?: string } | null)?.name ?? null,
+                      (task.practice_phases as { name?: string } | null)?.name ?? null,
                   }}
                 />
               ))}
@@ -71,19 +71,19 @@ export default async function StudentTasksPage() {
       {done.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Completadas ({done.length})</CardTitle>
+            <CardTitle className="text-base">{t("completed_title", { n: done.length })}</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="divide-y">
-              {done.map((t) => (
+              {done.map((task) => (
                 <li
-                  key={t.id}
+                  key={task.id}
                   className="flex items-center justify-between py-3 opacity-60"
                 >
                   <div>
-                    <p className="text-sm font-medium line-through">{t.title}</p>
+                    <p className="text-sm font-medium line-through">{task.title}</p>
                     <p className="text-xs text-muted-foreground">
-                      {formatDate(t.due_date)}
+                      {formatDate(task.due_date)}
                     </p>
                   </div>
                   <Badge variant="success">{TASK_STATUS_LABELS.completed}</Badge>

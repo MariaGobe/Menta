@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Calendar as CalIcon, Target, ClipboardList } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -18,6 +19,7 @@ export const dynamic = "force-dynamic";
 
 export default async function StudentPlanPage() {
   const supabase = createClient();
+  const t = await getTranslations("StudentMyPlan");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -40,21 +42,14 @@ export default async function StudentPlanPage() {
     return (
       <div className="mx-auto max-w-3xl space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Mi plan</h1>
-          <p className="text-muted-foreground">
-            Aquí verás tu plan de prácticas completo.
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("subtitle")}</p>
         </div>
         <Card>
           <CardContent className="p-12 text-center">
             <ClipboardList className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold">
-              Tu plan aún no está disponible
-            </h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Tu tutor de empresa está preparando tu plan de prácticas. En
-              cuanto lo apruebe, aparecerá aquí.
-            </p>
+            <h3 className="mt-4 text-lg font-semibold">{t("unavailable_title")}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{t("unavailable_hint")}</p>
           </CardContent>
         </Card>
       </div>
@@ -67,11 +62,8 @@ export default async function StudentPlanPage() {
         <Card>
           <CardContent className="p-12 text-center">
             <ClipboardList className="mx-auto h-12 w-12 text-amber-500" />
-            <h3 className="mt-4 text-lg font-semibold">Plan en revisión</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Tu empresa está revisando tu plan. Cuando lo aprueben podrás
-              verlo aquí.
-            </p>
+            <h3 className="mt-4 text-lg font-semibold">{t("review_title")}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{t("review_hint")}</p>
           </CardContent>
         </Card>
       </div>
@@ -114,14 +106,14 @@ export default async function StudentPlanPage() {
         </div>
         <p className="mt-1 text-muted-foreground">
           {formatDate(plan.start_date)} – {formatDate(plan.end_date)} ·{" "}
-          {plan.total_hours} h totales
+          {plan.total_hours} {t("hours_short")}
         </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="md:col-span-2">
           <CardHeader>
-            <CardTitle className="text-base">Sobre tu plan</CardTitle>
+            <CardTitle className="text-base">{t("about_title")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <p className="text-muted-foreground">{plan.description}</p>
@@ -130,7 +122,7 @@ export default async function StudentPlanPage() {
                 <Separator />
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
-                    Objetivos
+                    {t("objectives")}
                   </p>
                   <ul className="space-y-1">
                     {plan.objectives.map((o: string, i: number) => (
@@ -148,8 +140,8 @@ export default async function StudentPlanPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Tu progreso</CardTitle>
-            <CardDescription>{done} / {total} tareas</CardDescription>
+            <CardTitle className="text-base">{t("progress_title")}</CardTitle>
+            <CardDescription>{t("progress_subtitle", { done, total })}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{progress}%</p>
@@ -157,7 +149,7 @@ export default async function StudentPlanPage() {
               <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
             </div>
             <Button className="mt-4 w-full" variant="outline" size="sm" asChild>
-              <Link href="/student/tareas">Ir a tareas</Link>
+              <Link href="/student/tareas">{t("go_to_tasks")}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -182,20 +174,20 @@ export default async function StudentPlanPage() {
             <CardContent>
               {ph.tasks.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  Esta fase aún no tiene tareas.
+                  {t("phase_empty")}
                 </p>
               ) : (
                 <ul className="divide-y">
-                  {ph.tasks.map((t) => (
+                  {ph.tasks.map((task) => (
                     <li
-                      key={t.id}
+                      key={task.id}
                       className="flex items-center justify-between gap-3 py-3"
                     >
                       <div className="flex-1">
-                        <p className="text-sm font-medium">{t.title}</p>
+                        <p className="text-sm font-medium">{task.title}</p>
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          Vence {formatDate(t.due_date)} · {t.estimated_hours} h
-                          {t.deliverable_required && " · con entregable"}
+                          {t("due_on", { date: formatDate(task.due_date) })} · {task.estimated_hours} {t("hours_short")}
+                          {task.deliverable_required && ` · ${t("with_deliverable")}`}
                         </p>
                       </div>
                       <Badge

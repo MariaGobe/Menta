@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Loader2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +37,7 @@ const TYPES_FOR_STUDENT: MilestoneType[] = [
 export function NewMilestoneForm({ studentId, organizationId }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("StudentMilestones");
   const [type, setType] = useState<MilestoneType>("problem_solved");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +51,7 @@ export function NewMilestoneForm({ studentId, organizationId }: Props) {
     const tagsRaw = (fd.get("tags") as string) || "";
     const tags = tagsRaw
       .split(",")
-      .map((t) => t.trim())
+      .map((tag) => tag.trim())
       .filter(Boolean);
 
     const { data: created, error: err } = await supabase
@@ -67,7 +69,7 @@ export function NewMilestoneForm({ studentId, organizationId }: Props) {
 
     setLoading(false);
     if (err || !created) {
-      setError(err?.message ?? "Error al guardar");
+      setError(err?.message ?? t("form_error_save"));
       return;
     }
     router.push(`/student/hitos/${created.id}`);
@@ -79,15 +81,15 @@ export function NewMilestoneForm({ studentId, organizationId }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="type">Tipo de hito</Label>
+        <Label htmlFor="type">{t("form_type_label")}</Label>
         <Select value={type} onValueChange={(v) => setType(v as MilestoneType)}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {TYPES_FOR_STUDENT.map((t) => (
-              <SelectItem key={t} value={t}>
-                {MILESTONE_TYPE_LABELS[t]}
+            {TYPES_FOR_STUDENT.map((tp) => (
+              <SelectItem key={tp} value={tp}>
+                {MILESTONE_TYPE_LABELS[tp]}
               </SelectItem>
             ))}
           </SelectContent>
@@ -95,21 +97,19 @@ export function NewMilestoneForm({ studentId, organizationId }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="title">Título</Label>
+        <Label htmlFor="title">{t("form_title_label")}</Label>
         <Input
           id="title"
           name="title"
           required
           maxLength={140}
-          placeholder="Ej. Reduje en 60% el tiempo de carga del dashboard"
+          placeholder={t("form_title_placeholder")}
         />
-        <p className="text-xs text-muted-foreground">
-          Corto, concreto y enfocado al resultado.
-        </p>
+        <p className="text-xs text-muted-foreground">{t("form_title_hint")}</p>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Descripción</Label>
+        <Label htmlFor="description">{t("form_description_label")}</Label>
         <Textarea
           id="description"
           name="description"
@@ -119,17 +119,13 @@ export function NewMilestoneForm({ studentId, organizationId }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="tags">
-          Tags (separados por coma, opcional)
-        </Label>
+        <Label htmlFor="tags">{t("form_tags_label")}</Label>
         <Input
           id="tags"
           name="tags"
-          placeholder="React, performance, optimización"
+          placeholder={t("form_tags_placeholder")}
         />
-        <p className="text-xs text-muted-foreground">
-          Se convertirán en hashtags al compartir en LinkedIn.
-        </p>
+        <p className="text-xs text-muted-foreground">{t("form_tags_hint")}</p>
       </div>
 
       {error && (
@@ -141,7 +137,7 @@ export function NewMilestoneForm({ studentId, organizationId }: Props) {
       <div className="flex justify-end gap-2">
         <Button type="submit" disabled={loading}>
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          Guardar borrador
+          {t("form_save_draft")}
         </Button>
       </div>
     </form>

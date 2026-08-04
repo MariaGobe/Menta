@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Check,
   Copy,
@@ -34,6 +35,7 @@ interface Props {
 export function MilestoneEditor({ milestone, studentName, companyName }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("StudentMilestones");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +58,7 @@ export function MilestoneEditor({ milestone, studentName, companyName }: Props) 
 
     const tags = tagsText
       .split(",")
-      .map((t) => t.trim())
+      .map((tag) => tag.trim())
       .filter(Boolean);
 
     const finalSlug = isPublished
@@ -80,9 +82,7 @@ export function MilestoneEditor({ milestone, studentName, companyName }: Props) 
     setSaving(false);
     if (err) {
       if (err.message.includes("public_slug")) {
-        setError(
-          "Ese enlace público ya está en uso. Cambia el final del slug.",
-        );
+        setError(t("slug_conflict"));
       } else {
         setError(err.message);
       }
@@ -95,8 +95,7 @@ export function MilestoneEditor({ milestone, studentName, companyName }: Props) 
   }
 
   async function remove() {
-    if (!confirm("¿Eliminar este hito? Esta acción no se puede deshacer."))
-      return;
+    if (!confirm(t("delete_confirm"))) return;
     await supabase.from("milestones").delete().eq("id", milestone.id);
     router.push("/student/hitos");
     router.refresh();
@@ -118,7 +117,7 @@ export function MilestoneEditor({ milestone, studentName, companyName }: Props) 
         publicUrl,
         tags: tagsText
           .split(",")
-          .map((t) => t.trim())
+          .map((tag) => tag.trim())
           .filter(Boolean),
       })
     : null;
@@ -133,7 +132,7 @@ export function MilestoneEditor({ milestone, studentName, companyName }: Props) 
   return (
     <div className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="title">Título</Label>
+        <Label htmlFor="title">{t("form_title_label")}</Label>
         <Input
           id="title"
           value={title}
@@ -143,7 +142,7 @@ export function MilestoneEditor({ milestone, studentName, companyName }: Props) 
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Descripción</Label>
+        <Label htmlFor="description">{t("form_description_label")}</Label>
         <Textarea
           id="description"
           value={description}
@@ -154,16 +153,14 @@ export function MilestoneEditor({ milestone, studentName, companyName }: Props) 
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="tags">Tags</Label>
+        <Label htmlFor="tags">{t("form_tags_label")}</Label>
         <Input
           id="tags"
           value={tagsText}
           onChange={(e) => setTagsText(e.target.value)}
-          placeholder="React, performance, optimización"
+          placeholder={t("form_tags_placeholder")}
         />
-        <p className="text-xs text-muted-foreground">
-          Se convertirán en hashtags al compartir en LinkedIn.
-        </p>
+        <p className="text-xs text-muted-foreground">{t("form_tags_hint")}</p>
       </div>
 
       <div className="rounded-lg border bg-muted/30 p-4">
@@ -184,23 +181,22 @@ export function MilestoneEditor({ milestone, studentName, companyName }: Props) 
             <span className="flex items-center gap-2 font-medium">
               {isPublished ? (
                 <>
-                  <Globe className="h-4 w-4 text-mint-700" /> Publicado
+                  <Globe className="h-4 w-4 text-mint-700" /> {t("published_label")}
                 </>
               ) : (
                 <>
-                  <Lock className="h-4 w-4" /> Borrador (no visible)
+                  <Lock className="h-4 w-4" /> {t("draft_label")}
                 </>
               )}
             </span>
             <span className="mt-1 block text-xs text-muted-foreground">
-              Al publicarlo se genera una URL única que muestra una preview
-              elegante en LinkedIn.
+              {t("public_hint")}
             </span>
           </label>
         </div>
         {isPublished && (
           <div className="mt-3 space-y-2">
-            <Label htmlFor="slug">URL pública</Label>
+            <Label htmlFor="slug">{t("public_url_label")}</Label>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">
                 {typeof window !== "undefined" ? window.location.origin : ""}
@@ -241,17 +237,17 @@ export function MilestoneEditor({ milestone, studentName, companyName }: Props) 
           className="text-destructive hover:text-destructive"
           onClick={remove}
         >
-          <Trash2 className="h-4 w-4" /> Eliminar
+          <Trash2 className="h-4 w-4" /> {t("delete_button")}
         </Button>
         <div className="flex items-center gap-3">
           {saved && (
             <span className="flex items-center gap-1 text-sm text-mint-700">
-              <Check className="h-4 w-4" /> Guardado
+              <Check className="h-4 w-4" /> {t("saved")}
             </span>
           )}
           <Button onClick={save} disabled={saving}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            Guardar
+            {t("save")}
           </Button>
         </div>
       </div>
@@ -260,16 +256,13 @@ export function MilestoneEditor({ milestone, studentName, companyName }: Props) 
         <div className="rounded-2xl border bg-card p-5">
           <div className="flex items-center gap-2">
             <Linkedin className="h-5 w-5 text-[#0a66c2]" />
-            <h3 className="text-base font-semibold">Compartir en LinkedIn</h3>
+            <h3 className="text-base font-semibold">{t("share_linkedin")}</h3>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Pulsa el botón para abrir LinkedIn con tu hito previsualizado.
-            Pega el texto sugerido cuando se abra el editor.
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("share_hint")}</p>
 
           <div className="mt-4 rounded-lg border bg-muted/30 p-3">
             <p className="text-xs font-semibold uppercase text-muted-foreground">
-              Texto sugerido
+              {t("suggested_text_label")}
             </p>
             <pre className="mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap text-sm">
               {linkedInPost}
@@ -283,12 +276,12 @@ export function MilestoneEditor({ milestone, studentName, companyName }: Props) 
                 target="_blank"
                 rel="noreferrer"
               >
-                <Linkedin className="h-4 w-4" /> Abrir LinkedIn
+                <Linkedin className="h-4 w-4" /> {t("open_linkedin")}
               </a>
             </Button>
             <Button variant="outline" onClick={copyPost}>
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              {copied ? "Copiado" : "Copiar texto"}
+              {copied ? t("copied") : t("copy_text")}
             </Button>
           </div>
         </div>

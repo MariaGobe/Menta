@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,7 @@ interface Props {
 export function TaskRow({ task }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("StudentTasks");
   const [loading, setLoading] = useState(false);
 
   async function markCompleted() {
@@ -45,8 +47,8 @@ export function TaskRow({ task }: Props) {
         )}
         <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           {task.phase_name && <span>{task.phase_name}</span>}
-          {task.due_date && <span>· Vence {formatDate(task.due_date)}</span>}
-          {task.estimated_hours && <span>· {task.estimated_hours} h estimadas</span>}
+          {task.due_date && <span>{t("due_on", { date: formatDate(task.due_date) })}</span>}
+          {task.estimated_hours && <span>{t("estimated_hours", { h: task.estimated_hours })}</span>}
         </div>
       </div>
       <div className="flex items-center gap-2">
@@ -58,14 +60,14 @@ export function TaskRow({ task }: Props) {
           variant="outline"
           onClick={markCompleted}
           disabled={loading}
-          title="Marcar como completada"
+          title={t("mark_done_title")}
         >
           {loading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <Check className="h-4 w-4" />
           )}
-          Hecha
+          {t("done_label")}
         </Button>
       </div>
     </li>

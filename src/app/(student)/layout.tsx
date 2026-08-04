@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { StudentSidebar } from "@/components/student/student-sidebar";
 import { StudentTopbar } from "@/components/student/student-topbar";
@@ -24,7 +25,8 @@ export default async function StudentLayout({
 
   if (!profile || profile.role !== "student") redirect("/dashboard");
 
-  let studentName = profile.full_name ?? profile.email ?? "Alumno";
+  const tLayout = await getTranslations("StudentLayout");
+  let studentName = profile.full_name ?? profile.email ?? tLayout("student_fallback");
   if (profile.student_id) {
     const { data: student } = await supabase
       .from("students")
@@ -41,7 +43,7 @@ export default async function StudentLayout({
         <StudentTopbar
           studentName={studentName}
           organizationName={
-            (profile.organizations as { name?: string } | null)?.name ?? "Empresa"
+            (profile.organizations as { name?: string } | null)?.name ?? tLayout("company_fallback")
           }
         />
         <main className="flex-1 overflow-y-auto p-6 lg:p-8">{children}</main>

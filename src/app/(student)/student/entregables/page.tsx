@@ -1,4 +1,5 @@
 import { Upload } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function StudentEntregablesPage() {
   const supabase = createClient();
+  const t = await getTranslations("StudentDeliverables");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -21,7 +23,6 @@ export default async function StudentEntregablesPage() {
   const studentId = profile?.student_id;
   const orgId = profile?.organization_id;
 
-  // Tareas que requieren entregable
   const { data: tasks } = await supabase
     .from("practice_tasks")
     .select("id, title, due_date, status")
@@ -29,7 +30,6 @@ export default async function StudentEntregablesPage() {
     .eq("deliverable_required", true)
     .order("due_date", { ascending: true, nullsFirst: false });
 
-  // Entregables ya subidos
   const { data: deliverables } = await supabase
     .from("deliverables")
     .select(
@@ -41,18 +41,14 @@ export default async function StudentEntregablesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Entregables</h1>
-        <p className="text-muted-foreground">
-          Sube los archivos asociados a tus tareas con entregable.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Subir entregable</CardTitle>
-          <CardDescription>
-            Selecciona una tarea y adjunta el archivo.
-          </CardDescription>
+          <CardTitle className="text-base">{t("upload_title")}</CardTitle>
+          <CardDescription>{t("upload_hint")}</CardDescription>
         </CardHeader>
         <CardContent>
           {studentId && orgId && (
@@ -67,16 +63,14 @@ export default async function StudentEntregablesPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Histórico</CardTitle>
-          <CardDescription>
-            {deliverables?.length ?? 0} entregables enviados.
-          </CardDescription>
+          <CardTitle className="text-base">{t("history_title")}</CardTitle>
+          <CardDescription>{t("history_count", { n: deliverables?.length ?? 0 })}</CardDescription>
         </CardHeader>
         <CardContent>
           {!deliverables?.length ? (
             <div className="rounded-lg border border-dashed p-8 text-center">
               <Upload className="mx-auto h-10 w-10 text-muted-foreground" />
-              <p className="mt-3 text-sm font-medium">Sin entregables todavía</p>
+              <p className="mt-3 text-sm font-medium">{t("empty")}</p>
             </div>
           ) : (
             <ul className="divide-y">
@@ -89,19 +83,17 @@ export default async function StudentEntregablesPage() {
                         <p className="text-sm font-medium">{d.title}</p>
                         <p className="text-xs text-muted-foreground">
                           {task?.title && <span>{task.title} · </span>}
-                          Enviado {formatDate(d.submitted_at)}
+                          {t("sent_at", { date: formatDate(d.submitted_at) })}
                         </p>
                         {d.feedback && (
                           <p className="mt-2 rounded bg-mint-50 p-2 text-xs">
-                            <strong>Feedback: </strong>
+                            <strong>{t("feedback_prefix")} </strong>
                             {d.feedback}
                           </p>
                         )}
                       </div>
-                      <Badge
-                        variant={d.reviewed_at ? "success" : "secondary"}
-                      >
-                        {d.reviewed_at ? "Revisado" : "En revisión"}
+                      <Badge variant={d.reviewed_at ? "success" : "secondary"}>
+                        {d.reviewed_at ? t("status_reviewed") : t("status_pending_review")}
                       </Badge>
                     </div>
                   </li>

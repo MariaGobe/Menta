@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ interface Props {
 export function DailyLogForm({ studentId, organizationId, date, existing }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("StudentDiary");
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -62,17 +64,17 @@ export function DailyLogForm({ studentId, organizationId, date, existing }: Prop
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="tasks_done">¿Qué tareas has realizado hoy?</Label>
+          <Label htmlFor="tasks_done">{t("form_tasks_label")}</Label>
           <Textarea
             id="tasks_done"
             name="tasks_done"
             rows={3}
             defaultValue={existing?.tasks_done ?? ""}
-            placeholder="Descripción de tareas realizadas..."
+            placeholder={t("form_tasks_placeholder")}
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="hours_worked">Horas dedicadas</Label>
+          <Label htmlFor="hours_worked">{t("form_hours_label")}</Label>
           <Input
             id="hours_worked"
             name="hours_worked"
@@ -84,45 +86,45 @@ export function DailyLogForm({ studentId, organizationId, date, existing }: Prop
           />
         </div>
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="learnings">Aprendizajes</Label>
+          <Label htmlFor="learnings">{t("form_learnings_label")}</Label>
           <Textarea
             id="learnings"
             name="learnings"
             rows={2}
             defaultValue={existing?.learnings ?? ""}
-            placeholder="¿Qué has aprendido hoy?"
+            placeholder={t("form_learnings_placeholder")}
           />
         </div>
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="difficulties">Dificultades</Label>
+          <Label htmlFor="difficulties">{t("form_difficulties_label")}</Label>
           <Textarea
             id="difficulties"
             name="difficulties"
             rows={2}
             defaultValue={existing?.difficulties ?? ""}
-            placeholder="¿Qué te ha costado? ¿Qué te ha bloqueado?"
+            placeholder={t("form_difficulties_placeholder")}
           />
         </div>
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="next_steps">Próximos pasos</Label>
+          <Label htmlFor="next_steps">{t("form_next_label")}</Label>
           <Textarea
             id="next_steps"
             name="next_steps"
             rows={2}
             defaultValue={existing?.next_steps ?? ""}
-            placeholder="¿Qué vas a hacer mañana?"
+            placeholder={t("form_next_placeholder")}
           />
         </div>
       </div>
       <div className="flex items-center justify-end gap-3">
         {saved && (
           <span className="flex items-center gap-1 text-sm text-mint-700">
-            <Check className="h-4 w-4" /> Guardado
+            <Check className="h-4 w-4" /> {t("saved")}
           </span>
         )}
         <Button type="submit" disabled={loading}>
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-          Guardar entrada
+          {t("save_entry")}
         </Button>
       </div>
     </form>

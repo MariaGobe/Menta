@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Plus, Award, Sparkles, Globe, Lock } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ export const dynamic = "force-dynamic";
 
 export default async function StudentHitosPage() {
   const supabase = createClient();
+  const t = await getTranslations("StudentMilestones");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -36,15 +38,12 @@ export default async function StudentHitosPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Hitos</h1>
-          <p className="text-muted-foreground">
-            Comparte tus logros y recomendaciones en LinkedIn para que tu
-            trabajo sea visible profesionalmente.
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("subtitle")}</p>
         </div>
         <Button asChild>
           <Link href="/student/hitos/nuevo">
-            <Plus className="h-4 w-4" /> Nuevo hito
+            <Plus className="h-4 w-4" /> {t("new_button")}
           </Link>
         </Button>
       </div>
@@ -53,14 +52,11 @@ export default async function StudentHitosPage() {
         <Card>
           <CardContent className="p-12 text-center">
             <Award className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold">Aún no tienes hitos</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Cada vez que resuelvas un problema, completes un proyecto o
-              recibas una recomendación, crea un hito y compártelo en LinkedIn.
-            </p>
+            <h3 className="mt-4 text-lg font-semibold">{t("empty_title")}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{t("empty_hint")}</p>
             <Button className="mt-6" asChild>
               <Link href="/student/hitos/nuevo">
-                <Plus className="h-4 w-4" /> Crear primer hito
+                <Plus className="h-4 w-4" /> {t("empty_button")}
               </Link>
             </Button>
           </CardContent>
@@ -82,21 +78,21 @@ export default async function StudentHitosPage() {
                         <Badge variant="secondary" className="mr-2">
                           {MILESTONE_TYPE_LABELS[m.type as MilestoneType]}
                         </Badge>
-                        Creado {formatDate(m.created_at)}
+                        {t("created_at", { date: formatDate(m.created_at) })}
                         {m.endorsed_at && (
                           <span className="ml-2 text-mint-700">
-                            · Recomendado por tu empresa
+                            {t("endorsed_suffix")}
                           </span>
                         )}
                       </CardDescription>
                     </div>
                     {m.is_published ? (
                       <Badge variant="success" className="gap-1">
-                        <Globe className="h-3 w-3" /> Público
+                        <Globe className="h-3 w-3" /> {t("public_badge")}
                       </Badge>
                     ) : (
                       <Badge variant="secondary" className="gap-1">
-                        <Lock className="h-3 w-3" /> Privado
+                        <Lock className="h-3 w-3" /> {t("private_badge")}
                       </Badge>
                     )}
                   </div>
@@ -117,11 +113,7 @@ export default async function StudentHitosPage() {
       <Card className="border-mint-200 bg-mint-50/50">
         <CardContent className="flex items-center gap-3 p-4">
           <Sparkles className="h-5 w-5 text-mint-700" />
-          <p className="text-sm text-mint-900">
-            <strong>Tip:</strong> los hitos publicados se muestran en una página
-            propia con previsualización en LinkedIn. Es tu portfolio
-            profesional vivo.
-          </p>
+          <p className="text-sm text-mint-900">{t("tip")}</p>
         </CardContent>
       </Card>
     </div>

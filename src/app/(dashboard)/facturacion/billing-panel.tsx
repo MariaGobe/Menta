@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Loader2, Minus, Plus, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +29,7 @@ export function BillingPanel({
   currentPlanId,
   currentCycle,
 }: Props) {
+  const t = useTranslations("Billing");
   const [planId, setPlanId] = useState<PlanId>(currentPlanId ?? "base");
   const [cycle, setCycle] = useState<BillingCycle>(currentCycle ?? "yearly");
   const plan = PLANS.find((p) => p.id === planId)!;
@@ -63,10 +65,8 @@ export function BillingPanel({
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Gestionar suscripción</CardTitle>
-          <CardDescription>
-            Cambia tu método de pago, descarga facturas o cancela tu plan.
-          </CardDescription>
+          <CardTitle className="text-base">{t("manage_title")}</CardTitle>
+          <CardDescription>{t("manage_subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={openPortal} disabled={loading}>
@@ -75,7 +75,7 @@ export function BillingPanel({
             ) : (
               <ExternalLink className="h-4 w-4" />
             )}
-            Abrir portal de cliente
+            {t("open_portal")}
           </Button>
         </CardContent>
       </Card>
@@ -85,13 +85,10 @@ export function BillingPanel({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Activar plan</CardTitle>
-        <CardDescription>
-          Elige plan, ciclo de facturación y número de alumnos.
-        </CardDescription>
+        <CardTitle className="text-base">{t("activate_title")}</CardTitle>
+        <CardDescription>{t("activate_subtitle")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
-        {/* Selector de plan */}
         <div className="grid gap-3 sm:grid-cols-3">
           {PLANS.map((p) => {
             const isCustom = p.id === "custom";
@@ -112,11 +109,11 @@ export function BillingPanel({
               >
                 <p className="text-sm font-semibold">{p.name}</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {isCustom ? "Contacto directo" : `Hasta ${p.includedStudents} alumnos`}
+                  {isCustom ? t("custom_contact") : t("up_to_students", { n: p.includedStudents })}
                 </p>
                 {p.highlight && !isCustom && (
                   <Badge className="absolute right-2 top-2 text-[10px]">
-                    Recomendado
+                    {t("recommended")}
                   </Badge>
                 )}
               </button>
@@ -124,31 +121,29 @@ export function BillingPanel({
           })}
         </div>
 
-        {/* Toggle ciclo */}
         <div className="inline-flex items-center rounded-full border bg-card p-1 text-sm">
           <button
             type="button"
             onClick={() => setCycle("monthly")}
             className={`rounded-full px-3 py-1 transition ${cycle === "monthly" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
           >
-            Mensual
+            {t("monthly")}
           </button>
           <button
             type="button"
             onClick={() => setCycle("yearly")}
             className={`rounded-full px-3 py-1 transition ${cycle === "yearly" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
           >
-            Anual (ahorra ~10%)
+            {t("yearly")}
           </button>
         </div>
 
-        {/* Selector alumnos */}
         <div className="rounded-lg border bg-muted/30 p-4">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">
-              Alumnos previstos
+              {t("students_planned")}
               <span className="ml-1 text-xs text-muted-foreground">
-                ({plan.includedStudents} incluidos)
+                {t("students_included", { n: plan.includedStudents })}
               </span>
             </span>
             <div className="flex items-center gap-2">
@@ -180,24 +175,24 @@ export function BillingPanel({
           <div className="mt-4 space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {plan.name} ({cycle === "yearly" ? "anual" : "mensual"})
+                {plan.name} {t("cycle_label", { cycle: cycle === "yearly" ? t("cycle_yearly") : t("cycle_monthly") })}
               </span>
               <span>{formatCurrency(breakdown.basePrice ?? 0)}</span>
             </div>
             {extras > 0 && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
-                  + {extras} alumno{extras > 1 ? "s" : ""} extra
+                  {t("extra_students", { n: extras })}
                 </span>
                 <span>+ {formatCurrency(breakdown.extraCost)}</span>
               </div>
             )}
             <div className="flex justify-between border-t pt-2 font-semibold">
-              <span>Total {cycle === "yearly" ? "/ año" : "/ mes"}</span>
+              <span>{cycle === "yearly" ? t("total_yearly") : t("total_monthly")}</span>
               <span>
                 {formatCurrency(breakdown.total ?? 0)}{" "}
                 <span className="text-xs font-normal text-muted-foreground">
-                  + IVA
+                  {t("plus_iva")}
                 </span>
               </span>
             </div>
@@ -211,12 +206,9 @@ export function BillingPanel({
           disabled={loading}
         >
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-          Continuar al pago seguro
+          {t("continue_payment")}
         </Button>
-        <p className="text-xs text-muted-foreground">
-          Pago con Stripe. Podrás cambiar de plan o cancelar en cualquier
-          momento desde el portal de cliente.
-        </p>
+        <p className="text-xs text-muted-foreground">{t("footer_note")}</p>
       </CardContent>
     </Card>
   );

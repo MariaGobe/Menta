@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Loader2, Sparkles, FileText, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -33,6 +34,7 @@ interface Props {
 
 export function GeneratePlanWizard({ students }: Props) {
   const router = useRouter();
+  const t = useTranslations("PlanWizard");
   const [studentId, setStudentId] = useState<string>("");
   const [objectives, setObjectives] = useState<string>("");
   const [companyContext, setCompanyContext] = useState<string>("");
@@ -47,15 +49,11 @@ export function GeneratePlanWizard({ students }: Props) {
 
   async function generate(useAi: boolean) {
     if (!studentId) {
-      setError("Selecciona un alumno");
+      setError(t("error_no_student"));
       return;
     }
     setError(null);
     setLoading(true);
-    // Parsear "tareas del proyecto": formato libre tipo
-    //   "Implementar pantalla X · 8h"
-    //   "Conectar API Y (12 h)"
-    //   "Tests" (sin horas)
     const projectTasks = projectTasksText
       .split("\n")
       .map((line) => line.trim())
@@ -85,7 +83,7 @@ export function GeneratePlanWizard({ students }: Props) {
     setLoading(false);
     if (!res.ok) {
       const err = (await res.json()) as { error?: string };
-      setError(err.error ?? "Error al generar el plan");
+      setError(err.error ?? t("error_generate"));
       return;
     }
     const data = (await res.json()) as { plan: GeneratedPlan; organizationId: string };
@@ -104,7 +102,7 @@ export function GeneratePlanWizard({ students }: Props) {
     setSaving(false);
     if (!res.ok) {
       const err = (await res.json()) as { error?: string };
-      setError(err.error ?? "Error al guardar el plan");
+      setError(err.error ?? t("error_save"));
       return;
     }
     const data = (await res.json()) as { planId: string };
@@ -115,10 +113,10 @@ export function GeneratePlanWizard({ students }: Props) {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="student">Alumno *</Label>
+        <Label htmlFor="student">{t("student_label")}</Label>
         <Select value={studentId} onValueChange={setStudentId}>
           <SelectTrigger>
-            <SelectValue placeholder="Selecciona un alumno..." />
+            <SelectValue placeholder={t("student_placeholder")} />
           </SelectTrigger>
           <SelectContent>
             {students.map((s) => (
@@ -129,10 +127,7 @@ export function GeneratePlanWizard({ students }: Props) {
           </SelectContent>
         </Select>
         {selected && (!selected.start_date || !selected.end_date) && (
-          <p className="text-xs text-destructive">
-            ⚠ Este alumno no tiene fecha de inicio/fin. Edítalo antes de
-            generar el plan.
-          </p>
+          <p className="text-xs text-destructive">{t("no_dates_warning")}</p>
         )}
       </div>
 
@@ -140,19 +135,19 @@ export function GeneratePlanWizard({ students }: Props) {
         <div className="rounded-lg border bg-muted/30 p-4 text-sm">
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <p className="text-xs text-muted-foreground">Tipo</p>
+              <p className="text-xs text-muted-foreground">{t("type_label")}</p>
               <p className="font-medium">
                 {PRACTICE_TYPE_LABELS[selected.practice_type]}
               </p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Período</p>
+              <p className="text-xs text-muted-foreground">{t("period_label")}</p>
               <p className="font-medium">
                 {formatDate(selected.start_date)} – {formatDate(selected.end_date)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Horas</p>
+              <p className="text-xs text-muted-foreground">{t("hours_label")}</p>
               <p className="font-medium">{selected.total_hours ?? "—"} h</p>
             </div>
           </div>
@@ -160,49 +155,38 @@ export function GeneratePlanWizard({ students }: Props) {
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="objectives">
-          Objetivos formativos (uno por línea, opcional)
-        </Label>
+        <Label htmlFor="objectives">{t("objectives_label")}</Label>
         <Textarea
           id="objectives"
           value={objectives}
           onChange={(e) => setObjectives(e.target.value)}
           rows={4}
-          placeholder="Aplicar React en proyectos reales&#10;Aprender git y workflows de equipo&#10;Documentar el trabajo realizado"
+          placeholder={t("objectives_placeholder")}
         />
-        <p className="text-xs text-muted-foreground">
-          Si lo dejas vacío, usaremos los objetivos por defecto de la plantilla.
-        </p>
+        <p className="text-xs text-muted-foreground">{t("objectives_hint")}</p>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="context">Contexto / proyecto de empresa (opcional)</Label>
+        <Label htmlFor="context">{t("context_label")}</Label>
         <Textarea
           id="context"
           value={companyContext}
           onChange={(e) => setCompanyContext(e.target.value)}
           rows={3}
-          placeholder="Describe brevemente el área en la que trabajará el alumno y el proyecto principal"
+          placeholder={t("context_placeholder")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="project_tasks">
-          Tareas del proyecto / reto (opcional, una por línea)
-        </Label>
+        <Label htmlFor="project_tasks">{t("tasks_label")}</Label>
         <Textarea
           id="project_tasks"
           value={projectTasksText}
           onChange={(e) => setProjectTasksText(e.target.value)}
           rows={5}
-          placeholder={`Implementar pantalla de login · 8h\nConectar con API de pagos · 12h\nDiseñar dashboard de admin · 10h\nPruebas y QA · 6h`}
+          placeholder={t("tasks_placeholder")}
         />
-        <p className="text-xs text-muted-foreground">
-          Si lo rellenas, sustituiremos la tarea genérica "Desarrollo del
-          proyecto" por estas tareas concretas. Puedes indicar horas con
-          formato <code>· 8h</code> o <code>(8 h)</code>. Si no las indicas,
-          repartiremos las horas equitativamente.
-        </p>
+        <p className="text-xs text-muted-foreground">{t("tasks_hint")}</p>
       </div>
 
       {error && (
@@ -215,14 +199,14 @@ export function GeneratePlanWizard({ students }: Props) {
         <div className="flex flex-wrap gap-3">
           <Button onClick={() => generate(false)} disabled={loading || !studentId}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
-            Generar desde plantilla
+            {t("generate_template")}
           </Button>
           <Button
             variant="outline"
             onClick={() => generate(true)}
             disabled={loading || !studentId}
           >
-            <Sparkles className="h-4 w-4" /> Generar con IA
+            <Sparkles className="h-4 w-4" /> {t("generate_ai")}
           </Button>
         </div>
       )}
@@ -237,13 +221,13 @@ export function GeneratePlanWizard({ students }: Props) {
                 {formatDate(plan.start_date)} – {formatDate(plan.end_date)}
               </span>
               <span className="rounded-full bg-white px-2 py-1">
-                {plan.total_hours} h
+                {t("hours_unit", { h: plan.total_hours })}
               </span>
               <span className="rounded-full bg-white px-2 py-1">
-                {plan.phases.length} fases
+                {t("phases_count", { n: plan.phases.length })}
               </span>
               <span className="rounded-full bg-white px-2 py-1">
-                {plan.phases.reduce((sum, p) => sum + p.tasks.length, 0)} tareas
+                {t("tasks_count", { n: plan.phases.reduce((sum, p) => sum + p.tasks.length, 0) })}
               </span>
             </div>
           </div>
@@ -254,23 +238,23 @@ export function GeneratePlanWizard({ students }: Props) {
                 <summary className="cursor-pointer text-sm font-semibold">
                   {p.name}{" "}
                   <span className="text-xs font-normal text-muted-foreground">
-                    ({p.tasks.length} tareas)
+                    {t("phase_tasks_count", { n: p.tasks.length })}
                   </span>
                 </summary>
                 {p.description && (
                   <p className="mt-2 text-xs text-muted-foreground">{p.description}</p>
                 )}
                 <ul className="mt-3 space-y-2 text-xs">
-                  {p.tasks.map((t, ti) => (
+                  {p.tasks.map((task, ti) => (
                     <li
                       key={ti}
                       className="flex items-center justify-between gap-3 rounded border bg-muted/30 px-3 py-2"
                     >
                       <div>
-                        <p className="font-medium">{t.title}</p>
+                        <p className="font-medium">{task.title}</p>
                         <p className="text-muted-foreground">
-                          Vence {formatDate(t.due_date)} · {t.estimated_hours} h
-                          {t.deliverable_required && " · con entregable"}
+                          {t("due_hours", { date: formatDate(task.due_date), h: task.estimated_hours })}
+                          {task.deliverable_required && ` ${t("with_deliverable")}`}
                         </p>
                       </div>
                     </li>
@@ -283,10 +267,10 @@ export function GeneratePlanWizard({ students }: Props) {
           <div className="flex flex-wrap gap-3">
             <Button onClick={save} disabled={saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              Guardar como borrador
+              {t("save_draft")}
             </Button>
             <Button variant="outline" onClick={() => setPlan(null)}>
-              Volver a generar
+              {t("regenerate")}
             </Button>
           </div>
         </div>

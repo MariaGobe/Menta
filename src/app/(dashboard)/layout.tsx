@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { Topbar } from "@/components/dashboard/topbar";
@@ -31,6 +32,7 @@ export default async function DashboardLayout({
   if (profile.role === "student") redirect("/student/dashboard");
 
   const superAdmin = isSuperAdmin(user.email);
+  const tCommon = await getTranslations("DashboardCommon");
 
   return (
     <div className="flex h-screen bg-background">
@@ -38,9 +40,9 @@ export default async function DashboardLayout({
       <div className="flex flex-1 flex-col overflow-hidden">
         <Topbar
           organizationName={
-            (profile?.organizations as { name?: string } | null)?.name ?? "Mi empresa"
+            (profile?.organizations as { name?: string } | null)?.name ?? tCommon("my_company_fallback")
           }
-          userName={profile?.full_name ?? profile?.email ?? "Usuario"}
+          userName={profile?.full_name ?? profile?.email ?? tCommon("user_fallback")}
         />
         <main className="flex-1 overflow-y-auto p-6 lg:p-8">{children}</main>
       </div>

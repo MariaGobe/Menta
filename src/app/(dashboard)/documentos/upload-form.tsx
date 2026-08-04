@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,6 @@ import {
 } from "@/components/ui/select";
 import { createClient } from "@/lib/supabase/client";
 import { DOCUMENT_TYPE_LABELS, type DocumentType } from "@/types/database";
-import { useTranslations } from "next-intl";
 
 interface Props {
   students: { id: string; full_name: string }[];
@@ -24,6 +24,7 @@ interface Props {
 export function UploadDocumentForm({ students }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("CompanyDocumentsPage");
   const tShare = useTranslations("CompanyDocuments");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +40,7 @@ export function UploadDocumentForm({ students }: Props) {
     const formData = new FormData(e.currentTarget);
     const file = formData.get("file") as File;
     if (!file || file.size === 0) {
-      setError("Selecciona un archivo.");
+      setError(t("form_error_no_file"));
       setLoading(false);
       return;
     }
@@ -48,7 +49,7 @@ export function UploadDocumentForm({ students }: Props) {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      setError("Sesión expirada. Vuelve a entrar.");
+      setError(t("form_error_session"));
       setLoading(false);
       return;
     }
@@ -60,7 +61,7 @@ export function UploadDocumentForm({ students }: Props) {
       .single();
 
     if (!profile?.organization_id) {
-      setError("No se pudo obtener tu organización.");
+      setError(t("form_error_org"));
       setLoading(false);
       return;
     }
@@ -71,7 +72,7 @@ export function UploadDocumentForm({ students }: Props) {
       .upload(filePath, file);
 
     if (storageError) {
-      setError(`Error subiendo archivo: ${storageError.message}`);
+      setError(t("form_error_upload", { msg: storageError.message }));
       setLoading(false);
       return;
     }
@@ -102,10 +103,10 @@ export function UploadDocumentForm({ students }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="student">Alumno</Label>
+        <Label htmlFor="student">{t("form_student_label")}</Label>
         <Select value={studentId} onValueChange={setStudentId}>
           <SelectTrigger>
-            <SelectValue placeholder="Documento general (sin alumno)" />
+            <SelectValue placeholder={t("form_student_placeholder")} />
           </SelectTrigger>
           <SelectContent>
             {students.map((s) => (
@@ -118,7 +119,7 @@ export function UploadDocumentForm({ students }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="type">Tipo de documento</Label>
+        <Label htmlFor="type">{t("form_type_label")}</Label>
         <Select value={type} onValueChange={(v) => setType(v as DocumentType)}>
           <SelectTrigger>
             <SelectValue />
@@ -134,12 +135,12 @@ export function UploadDocumentForm({ students }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="name">Nombre (opcional)</Label>
-        <Input id="name" name="name" placeholder="Convenio firmado" />
+        <Label htmlFor="name">{t("form_name_label")}</Label>
+        <Input id="name" name="name" placeholder={t("form_name_placeholder")} />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="file">Archivo</Label>
+        <Label htmlFor="file">{t("form_file_label")}</Label>
         <Input id="file" name="file" type="file" required />
       </div>
 
@@ -164,7 +165,7 @@ export function UploadDocumentForm({ students }: Props) {
 
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-        Subir documento
+        {t("form_submit")}
       </Button>
     </form>
   );

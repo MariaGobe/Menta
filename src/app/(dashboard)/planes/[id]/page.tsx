@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ArrowLeft, Target } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -19,6 +20,7 @@ export default async function PlanDetailPage({
   params: { id: string };
 }) {
   const supabase = createClient();
+  const t = await getTranslations("PlanDetail");
 
   const { data: plan } = await supabase
     .from("practice_plans")
@@ -66,7 +68,7 @@ export default async function PlanDetailPage({
         href="/planes"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="h-4 w-4" /> Volver a planes
+        <ArrowLeft className="h-4 w-4" /> {t("back")}
       </Link>
 
       <div className="flex items-start justify-between gap-4">
@@ -94,7 +96,7 @@ export default async function PlanDetailPage({
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="md:col-span-2">
           <CardHeader>
-            <CardTitle className="text-base">Descripción</CardTitle>
+            <CardTitle className="text-base">{t("description")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <p className="text-muted-foreground">{plan.description}</p>
@@ -103,7 +105,7 @@ export default async function PlanDetailPage({
                 <Separator />
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
-                    Objetivos formativos
+                    {t("objectives_formation")}
                   </p>
                   <ul className="space-y-1">
                     {plan.objectives.map((o: string, i: number) => (
@@ -121,9 +123,9 @@ export default async function PlanDetailPage({
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Progreso</CardTitle>
+            <CardTitle className="text-base">{t("progress")}</CardTitle>
             <CardDescription>
-              {completed} / {totalTasks} tareas
+              {t("progress_subtitle", { done: completed, total: totalTasks })}
             </CardDescription>
           </CardHeader>
           <CardContent>

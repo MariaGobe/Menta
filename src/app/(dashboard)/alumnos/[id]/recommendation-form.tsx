@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Award, Check, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,7 @@ interface Props {
 export function CompanyRecommendationButton({ studentId, organizationId }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("Recommendation");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +34,7 @@ export function CompanyRecommendationButton({ studentId, organizationId }: Props
     const endorsement = (fd.get("endorsement") as string).trim();
 
     if (!endorsement) {
-      setError("Escribe el texto de la recomendación");
+      setError(t("empty_text_error"));
       setLoading(false);
       return;
     }
@@ -43,7 +45,7 @@ export function CompanyRecommendationButton({ studentId, organizationId }: Props
       organization_id: organizationId,
       student_id: studentId,
       type: "company_recommendation",
-      title: title || "Recomendación de la empresa",
+      title: title || t("default_title"),
       description: null,
       company_endorsement: endorsement,
       endorsed_by: user?.id ?? null,
@@ -66,7 +68,7 @@ export function CompanyRecommendationButton({ studentId, organizationId }: Props
   if (!open) {
     return (
       <Button variant="outline" onClick={() => setOpen(true)}>
-        <Award className="h-4 w-4" /> Escribir recomendación
+        <Award className="h-4 w-4" /> {t("write_button")}
       </Button>
     );
   }
@@ -76,7 +78,7 @@ export function CompanyRecommendationButton({ studentId, organizationId }: Props
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Award className="h-5 w-5 text-mint-700" />
-          <h3 className="text-base font-semibold">Recomendación al alumno</h3>
+          <h3 className="text-base font-semibold">{t("title")}</h3>
         </div>
         <Button
           variant="ghost"
@@ -87,28 +89,25 @@ export function CompanyRecommendationButton({ studentId, organizationId }: Props
           <X className="h-4 w-4" />
         </Button>
       </div>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Este texto quedará vinculado al alumno como un hito. Él podrá
-        publicarlo y compartirlo en LinkedIn cuando quiera.
-      </p>
+      <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
 
       <form onSubmit={handleSubmit} className="mt-4 space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="title">Título (opcional)</Label>
+          <Label htmlFor="title">{t("title_label")}</Label>
           <Input
             id="title"
             name="title"
-            placeholder="Ej. Una incorporación brillante a nuestro equipo"
+            placeholder={t("title_placeholder")}
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="endorsement">Recomendación *</Label>
+          <Label htmlFor="endorsement">{t("text_label")}</Label>
           <Textarea
             id="endorsement"
             name="endorsement"
             rows={6}
             required
-            placeholder="Cuenta lo que ha aportado el alumno, qué actitud has visto, qué valores destacas. Hablamos en primera persona como empresa."
+            placeholder={t("text_placeholder")}
           />
         </div>
 
@@ -125,7 +124,7 @@ export function CompanyRecommendationButton({ studentId, organizationId }: Props
             onClick={() => setOpen(false)}
             disabled={loading}
           >
-            Cancelar
+            {t("cancel")}
           </Button>
           <Button type="submit" disabled={loading || done}>
             {loading ? (
@@ -135,7 +134,7 @@ export function CompanyRecommendationButton({ studentId, organizationId }: Props
             ) : (
               <Award className="h-4 w-4" />
             )}
-            {done ? "Recomendación enviada" : "Enviar recomendación"}
+            {done ? t("sent") : t("send")}
           </Button>
         </div>
       </form>

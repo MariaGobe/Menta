@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ interface Props {
 export function OrganizationForm({ organization }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("OrganizationForm");
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -53,43 +55,43 @@ export function OrganizationForm({ organization }: Props) {
   return (
     <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
       <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="name">Nombre de la empresa *</Label>
+        <Label htmlFor="name">{t("name_label")}</Label>
         <Input id="name" name="name" defaultValue={organization.name} required />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="nif">NIF / CIF</Label>
+        <Label htmlFor="nif">{t("nif_label")}</Label>
         <Input id="nif" name="nif" defaultValue={organization.nif ?? ""} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="email">Email de contacto</Label>
+        <Label htmlFor="email">{t("email_label")}</Label>
         <Input id="email" type="email" name="email" defaultValue={organization.email ?? ""} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="phone">Teléfono</Label>
+        <Label htmlFor="phone">{t("phone_label")}</Label>
         <Input id="phone" name="phone" defaultValue={organization.phone ?? ""} />
       </div>
       <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="address">Dirección</Label>
+        <Label htmlFor="address">{t("address_label")}</Label>
         <Input id="address" name="address" defaultValue={organization.address ?? ""} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="postal_code">Código postal</Label>
+        <Label htmlFor="postal_code">{t("postal_code_label")}</Label>
         <Input id="postal_code" name="postal_code" defaultValue={organization.postal_code ?? ""} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="city">Población</Label>
+        <Label htmlFor="city">{t("city_label")}</Label>
         <Input id="city" name="city" defaultValue={organization.city ?? ""} />
       </div>
 
       <div className="md:col-span-2 flex items-center justify-end gap-3">
         {saved && (
           <span className="flex items-center gap-1 text-sm text-mint-700">
-            <Check className="h-4 w-4" /> Cambios guardados
+            <Check className="h-4 w-4" /> {t("saved")}
           </span>
         )}
         <Button type="submit" disabled={loading}>
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-          Guardar cambios
+          {t("save")}
         </Button>
       </div>
     </form>

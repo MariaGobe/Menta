@@ -30,6 +30,7 @@ interface Props {
 export function MentorConfigForm({ organizationId, config }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("MentorConfigForm");
   const tWarn = useTranslations("MentorConfig");
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -84,31 +85,29 @@ export function MentorConfigForm({ organizationId, config }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="company_description">Sobre la empresa</Label>
+        <Label htmlFor="company_description">{t("company_label")}</Label>
         <Textarea
           id="company_description"
           name="company_description"
           rows={3}
           defaultValue={config?.company_description ?? ""}
-          placeholder="A qué se dedica tu empresa, equipo, valores y forma de trabajar"
+          placeholder={t("company_placeholder")}
         />
-        <p className="text-xs text-muted-foreground">
-          El mentor lo usará para situar al alumno y responder con coherencia.
-        </p>
+        <p className="text-xs text-muted-foreground">{t("company_hint")}</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="industry">Sector o área</Label>
+          <Label htmlFor="industry">{t("industry_label")}</Label>
           <Input
             id="industry"
             name="industry"
             defaultValue={config?.industry ?? ""}
-            placeholder="SaaS, marketing digital, automoción..."
+            placeholder={t("industry_placeholder")}
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="tone">Tono del mentor</Label>
+          <Label htmlFor="tone">{t("tone_label")}</Label>
           <Select
             name="tone"
             value={tone}
@@ -118,9 +117,9 @@ export function MentorConfigForm({ organizationId, config }: Props) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {(Object.keys(MENTOR_TONE_LABELS) as MentorTone[]).map((t) => (
-                <SelectItem key={t} value={t}>
-                  {MENTOR_TONE_LABELS[t]}
+              {(Object.keys(MENTOR_TONE_LABELS) as MentorTone[]).map((tp) => (
+                <SelectItem key={tp} value={tp}>
+                  {MENTOR_TONE_LABELS[tp]}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -129,13 +128,13 @@ export function MentorConfigForm({ organizationId, config }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="mentor_personality">Personalidad del mentor</Label>
+        <Label htmlFor="mentor_personality">{t("personality_label")}</Label>
         <Textarea
           id="mentor_personality"
           name="mentor_personality"
           rows={2}
           defaultValue={config?.mentor_personality ?? ""}
-          placeholder="Ej. paciente, directo, motivador, exigente con la calidad pero comprensivo con el aprendizaje"
+          placeholder={t("personality_placeholder")}
         />
       </div>
 
@@ -148,64 +147,48 @@ export function MentorConfigForm({ organizationId, config }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="knowledge_base">
-          Base de conocimiento (procesos, herramientas, normas internas)
-        </Label>
+        <Label htmlFor="knowledge_base">{t("knowledge_label")}</Label>
         <Textarea
           id="knowledge_base"
           name="knowledge_base"
           rows={6}
           defaultValue={config?.knowledge_base ?? ""}
-          placeholder={`Herramientas que usamos: Slack, GitHub, Notion, Figma.
-Cómo se hace una PR aquí: rama feature/, descripción clara, revisor asignado, mergea quien aprueba.
-Horario: 9-18 con flexibilidad. Lunes daily a las 10.
-Quién es quién: Ana (CTO), Luis (Lead), Marta (Product).`}
+          placeholder={t("knowledge_placeholder")}
         />
-        <p className="text-xs text-muted-foreground">
-          Cualquier información práctica que el alumno necesitará. Puede ser
-          extensa: cuanto más, mejor.
-        </p>
+        <p className="text-xs text-muted-foreground">{t("knowledge_hint")}</p>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="resources_text">
-          Recursos útiles (uno por línea, formato: nombre URL)
-        </Label>
+        <Label htmlFor="resources_text">{t("resources_label")}</Label>
         <Textarea
           id="resources_text"
           name="resources_text"
           rows={3}
           defaultValue={resourcesText}
-          placeholder={`Wiki interna https://wiki.miempresa.com
-Guía de estilo https://miempresa.notion.site/style
-Repo principal https://github.com/miempresa/app`}
+          placeholder={t("resources_placeholder")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="custom_instructions">
-          Instrucciones específicas para el mentor
-        </Label>
+        <Label htmlFor="custom_instructions">{t("custom_label")}</Label>
         <Textarea
           id="custom_instructions"
           name="custom_instructions"
           rows={3}
           defaultValue={config?.custom_instructions ?? ""}
-          placeholder={`Si el alumno pregunta por algo confidencial, redirígelo al tutor humano.
-No respondas dudas legales ni de contrato.
-Anima al alumno a redactar el diario al final del día.`}
+          placeholder={t("custom_placeholder")}
         />
       </div>
 
       <div className="flex items-center justify-end gap-3">
         {saved && (
           <span className="flex items-center gap-1 text-sm text-mint-700">
-            <Check className="h-4 w-4" /> Mentor actualizado
+            <Check className="h-4 w-4" /> {t("updated")}
           </span>
         )}
         <Button type="submit" disabled={loading}>
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-          Guardar configuración
+          {t("save")}
         </Button>
       </div>
     </form>

@@ -13,6 +13,7 @@ export const dynamic = "force-dynamic";
 
 export default async function DocumentosPage() {
   const supabase = createClient();
+  const t = await getTranslations("CompanyDocumentsPage");
   const tShare = await getTranslations("CompanyDocuments");
 
   const [{ data: documents }, { data: students }] = await Promise.all([
@@ -28,17 +29,15 @@ export default async function DocumentosPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Documentos</h1>
-        <p className="text-muted-foreground">
-          Centraliza convenios, seguros, PFI (cuando aplique) y demás documentación.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle className="text-base">Subir documento</CardTitle>
-            <CardDescription>Adjunta un nuevo documento.</CardDescription>
+            <CardTitle className="text-base">{t("upload_title")}</CardTitle>
+            <CardDescription>{t("upload_subtitle")}</CardDescription>
           </CardHeader>
           <CardContent>
             <UploadDocumentForm students={students ?? []} />
@@ -47,17 +46,15 @@ export default async function DocumentosPage() {
 
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-base">Histórico</CardTitle>
-            <CardDescription>{documents?.length ?? 0} documentos.</CardDescription>
+            <CardTitle className="text-base">{t("history_title")}</CardTitle>
+            <CardDescription>{t("history_count", { n: documents?.length ?? 0 })}</CardDescription>
           </CardHeader>
           <CardContent>
             {!documents?.length ? (
               <div className="rounded-lg border border-dashed p-8 text-center">
                 <FileText className="mx-auto h-10 w-10 text-muted-foreground" />
-                <p className="mt-3 text-sm font-medium">Aún no hay documentos</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Sube el primer documento usando el formulario.
-                </p>
+                <p className="mt-3 text-sm font-medium">{t("empty_title")}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{t("empty_hint")}</p>
               </div>
             ) : (
               <div className="divide-y">
@@ -77,7 +74,7 @@ export default async function DocumentosPage() {
                                 {student.full_name}
                               </Link>
                             ) : (
-                              "General"
+                              t("general_label")
                             )}{" "}
                             · {formatDate(d.uploaded_at)}
                           </p>

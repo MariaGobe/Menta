@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,6 +54,7 @@ interface Props {
 export function StudentForm({ mode, initial }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("StudentForm");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [practiceType, setPracticeType] = useState<PracticeType>(
@@ -92,7 +94,7 @@ export function StudentForm({ mode, initial }: Props) {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) {
-        setError("Sesión expirada. Vuelve a entrar.");
+        setError(t("error_session"));
         setLoading(false);
         return;
       }
@@ -102,7 +104,7 @@ export function StudentForm({ mode, initial }: Props) {
         .eq("id", user.id)
         .single();
       if (!profile?.organization_id) {
-        setError("No se pudo obtener tu organización.");
+        setError(t("error_org"));
         setLoading(false);
         return;
       }
@@ -113,14 +115,14 @@ export function StudentForm({ mode, initial }: Props) {
         .single();
       setLoading(false);
       if (err || !data) {
-        setError(err?.message ?? "Error al crear el alumno");
+        setError(err?.message ?? t("error_create"));
         return;
       }
       router.push(`/alumnos/${data.id}`);
       router.refresh();
     } else {
       if (!initial?.id) {
-        setError("Falta el identificador del alumno.");
+        setError(t("error_no_id"));
         setLoading(false);
         return;
       }
@@ -139,23 +141,27 @@ export function StudentForm({ mode, initial }: Props) {
   }
 
   const institutionLabel: Record<PracticeType, string> = {
-    fp: "Centro de FP",
-    university: "Universidad",
-    internal: "Departamento interno",
+    fp: t("institution_fp"),
+    university: t("institution_university"),
+    internal: t("institution_internal"),
+  };
+
+  const programLabel: Record<PracticeType, string> = {
+    fp: t("program_label_fp"),
+    university: t("program_label_university"),
+    internal: t("program_label_internal"),
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Tipo de práctica</CardTitle>
-          <CardDescription>
-            Elige el itinerario. Los documentos requeridos se adaptarán automáticamente.
-          </CardDescription>
+          <CardTitle>{t("practice_type_card_title")}</CardTitle>
+          <CardDescription>{t("practice_type_card_subtitle")}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="practice_type">Tipo de práctica</Label>
+            <Label htmlFor="practice_type">{t("practice_type_label")}</Label>
             <Select
               name="practice_type"
               value={practiceType}
@@ -173,13 +179,11 @@ export function StudentForm({ mode, initial }: Props) {
               </SelectContent>
             </Select>
             {practiceType === "fp" && (
-              <p className="text-xs text-muted-foreground">
-                Para alumnos de FP se solicitará el PFI (Programa Formativo Individual).
-              </p>
+              <p className="text-xs text-muted-foreground">{t("fp_hint")}</p>
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="status">Estado</Label>
+            <Label htmlFor="status">{t("status_label")}</Label>
             <Select
               name="status"
               value={status}
@@ -202,23 +206,23 @@ export function StudentForm({ mode, initial }: Props) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Datos personales</CardTitle>
+          <CardTitle>{t("personal_data")}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="full_name">Nombre completo *</Label>
+            <Label htmlFor="full_name">{t("full_name_label")}</Label>
             <Input id="full_name" name="full_name" required defaultValue={initial?.full_name ?? ""} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="dni">DNI / NIE</Label>
+            <Label htmlFor="dni">{t("dni_label")}</Label>
             <Input id="dni" name="dni" defaultValue={initial?.dni ?? ""} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">Teléfono</Label>
+            <Label htmlFor="phone">{t("phone_label")}</Label>
             <Input id="phone" name="phone" defaultValue={initial?.phone ?? ""} />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("email_label")}</Label>
             <Input id="email" type="email" name="email" defaultValue={initial?.email ?? ""} />
           </div>
         </CardContent>
@@ -226,7 +230,7 @@ export function StudentForm({ mode, initial }: Props) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Datos académicos</CardTitle>
+          <CardTitle>{t("academic_data")}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
@@ -234,25 +238,23 @@ export function StudentForm({ mode, initial }: Props) {
             <Input id="institution_name" name="institution_name" defaultValue={initial?.institution_name ?? ""} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="program_name">
-              {practiceType === "fp" ? "Ciclo formativo" : practiceType === "university" ? "Grado" : "Programa"}
-            </Label>
+            <Label htmlFor="program_name">{programLabel[practiceType]}</Label>
             <Input id="program_name" name="program_name" defaultValue={initial?.program_name ?? ""} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="tutor_academic_name">Tutor académico</Label>
+            <Label htmlFor="tutor_academic_name">{t("tutor_academic_label")}</Label>
             <Input id="tutor_academic_name" name="tutor_academic_name" defaultValue={initial?.tutor_academic_name ?? ""} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="tutor_academic_email">Email tutor académico</Label>
+            <Label htmlFor="tutor_academic_email">{t("tutor_academic_email_label")}</Label>
             <Input id="tutor_academic_email" type="email" name="tutor_academic_email" defaultValue={initial?.tutor_academic_email ?? ""} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="tutor_company_name">Tutor de empresa</Label>
+            <Label htmlFor="tutor_company_name">{t("tutor_company_label")}</Label>
             <Input id="tutor_company_name" name="tutor_company_name" defaultValue={initial?.tutor_company_name ?? ""} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="tutor_company_email">Email tutor de empresa</Label>
+            <Label htmlFor="tutor_company_email">{t("tutor_company_email_label")}</Label>
             <Input id="tutor_company_email" type="email" name="tutor_company_email" defaultValue={initial?.tutor_company_email ?? ""} />
           </div>
         </CardContent>
@@ -260,19 +262,19 @@ export function StudentForm({ mode, initial }: Props) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Período de prácticas</CardTitle>
+          <CardTitle>{t("period_title")}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="start_date">Fecha inicio</Label>
+            <Label htmlFor="start_date">{t("start_date_label")}</Label>
             <Input id="start_date" type="date" name="start_date" defaultValue={initial?.start_date ?? ""} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="end_date">Fecha fin</Label>
+            <Label htmlFor="end_date">{t("end_date_label")}</Label>
             <Input id="end_date" type="date" name="end_date" defaultValue={initial?.end_date ?? ""} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="total_hours">Total de horas</Label>
+            <Label htmlFor="total_hours">{t("total_hours_label")}</Label>
             <Input
               id="total_hours"
               type="number"
@@ -282,7 +284,7 @@ export function StudentForm({ mode, initial }: Props) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="weekly_hours">Horas/semana</Label>
+            <Label htmlFor="weekly_hours">{t("weekly_hours_label")}</Label>
             <Input
               id="weekly_hours"
               type="number"
@@ -292,7 +294,7 @@ export function StudentForm({ mode, initial }: Props) {
             />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="notes">Notas internas</Label>
+            <Label htmlFor="notes">{t("notes_label")}</Label>
             <Textarea id="notes" name="notes" rows={3} defaultValue={initial?.notes ?? ""} />
           </div>
         </CardContent>
@@ -305,12 +307,12 @@ export function StudentForm({ mode, initial }: Props) {
       <div className="flex justify-end gap-3">
         <Button variant="outline" type="button" asChild>
           <Link href={mode === "edit" && initial?.id ? `/alumnos/${initial.id}` : "/alumnos"}>
-            Cancelar
+            {t("cancel")}
           </Link>
         </Button>
         <Button type="submit" disabled={loading}>
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-          {mode === "create" ? "Crear alumno" : "Guardar cambios"}
+          {mode === "create" ? t("create") : t("save")}
         </Button>
       </div>
     </form>

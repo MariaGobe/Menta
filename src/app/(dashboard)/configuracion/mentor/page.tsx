@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, Sparkles } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { MentorConfigForm } from "./mentor-config-form";
@@ -8,6 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function MentorConfigPage() {
   const supabase = createClient();
+  const t = await getTranslations("MentorConfigPage");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -30,7 +32,7 @@ export default async function MentorConfigPage() {
         href="/configuracion"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="h-4 w-4" /> Volver a configuración
+        <ArrowLeft className="h-4 w-4" /> {t("back")}
       </Link>
 
       <div>
@@ -39,33 +41,22 @@ export default async function MentorConfigPage() {
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Mentor virtual</h1>
-            <p className="text-muted-foreground">
-              Alimenta al mentor con la información que necesita para acompañar
-              a tus alumnos.
-            </p>
+            <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+            <p className="text-muted-foreground">{t("subtitle")}</p>
           </div>
         </div>
       </div>
 
       <Card className="border-mint-200 bg-mint-50/40">
         <CardContent className="p-4 text-sm">
-          <p className="text-mint-900">
-            <strong>Por qué importa:</strong> el mentor virtual atiende al alumno
-            día a día (dudas, planificación, desbloqueos). Cuanta más
-            información concreta le des aquí, menos tiempo necesitarás dedicarle
-            personalmente a cada alumno.
-          </p>
+          <p className="text-mint-900">{t("why_matters")}</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Configuración del mentor</CardTitle>
-          <CardDescription>
-            Todo lo que escribas aquí se usará como contexto en cada conversación
-            del mentor con tus alumnos.
-          </CardDescription>
+          <CardTitle className="text-base">{t("config_title")}</CardTitle>
+          <CardDescription>{t("config_subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           {orgId && (

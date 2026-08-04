@@ -258,7 +258,7 @@ export default async function DashboardPage() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{d.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        {d.students?.full_name} · {t("submitted_at")}{" "}
+                        {d.students?.full_name ?? ""} · {t("submitted_at")}{" "}
                         {d.submitted_at ? formatDate(d.submitted_at) : "—"}
                       </p>
                     </div>

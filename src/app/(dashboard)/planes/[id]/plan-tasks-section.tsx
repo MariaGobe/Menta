@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Calendar as CalIcon,
   Pencil,
@@ -51,7 +52,6 @@ interface Props {
   organizationId: string;
   studentId: string;
   phases: Phase[];
-  /** Si el plan está aprobado, solo se permite ver y completar; no editar */
   readOnly?: boolean;
 }
 
@@ -91,6 +91,7 @@ function PhaseCard({
   phase: Phase;
   readOnly: boolean;
 }) {
+  const t = useTranslations("PlanTasks");
   const [adding, setAdding] = useState(false);
 
   return (
@@ -105,13 +106,11 @@ function PhaseCard({
       </CardHeader>
       <CardContent>
         {phase.tasks.length === 0 && !adding && (
-          <p className="text-sm text-muted-foreground">
-            Esta fase aún no tiene tareas.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("phase_empty")}</p>
         )}
         <ul className="divide-y">
-          {phase.tasks.map((t) => (
-            <TaskRow key={t.id} task={t} readOnly={readOnly} />
+          {phase.tasks.map((task) => (
+            <TaskRow key={task.id} task={task} readOnly={readOnly} />
           ))}
         </ul>
         {adding && (
@@ -133,7 +132,7 @@ function PhaseCard({
             className="mt-3"
             onClick={() => setAdding(true)}
           >
-            <Plus className="h-3 w-3" /> Añadir tarea
+            <Plus className="h-3 w-3" /> {t("add_task")}
           </Button>
         )}
       </CardContent>
@@ -144,13 +143,13 @@ function PhaseCard({
 function TaskRow({ task, readOnly }: { task: Task; readOnly: boolean }) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("PlanTasks");
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   async function remove() {
-    if (!confirm(`¿Eliminar la tarea "${task.title}"?`)) return;
+    if (!confirm(t("delete_confirm", { title: task.title }))) return;
     setDeleting(true);
-    // Borrar también el calendar_event asociado (si lo hay)
     await supabase.from("calendar_events").delete().eq("task_id", task.id);
     await supabase.from("practice_tasks").delete().eq("id", task.id);
     setDeleting(false);
@@ -181,8 +180,8 @@ function TaskRow({ task, readOnly }: { task: Task; readOnly: boolean }) {
           </p>
         )}
         <p className="mt-0.5 text-xs text-muted-foreground">
-          Vence {formatDate(task.due_date)} · {task.estimated_hours ?? "—"} h
-          {task.deliverable_required && " · con entregable"}
+          {t("due_on", { date: formatDate(task.due_date) })} · {task.estimated_hours ?? "—"} h
+          {task.deliverable_required && ` ${t("with_deliverable")}`}
         </p>
       </div>
       <div className="flex items-center gap-2">
@@ -204,7 +203,7 @@ function TaskRow({ task, readOnly }: { task: Task; readOnly: boolean }) {
               size="icon"
               className="h-8 w-8"
               onClick={() => setEditing(true)}
-              title="Editar"
+              title={t("edit_title")}
             >
               <Pencil className="h-3.5 w-3.5" />
             </Button>
@@ -214,7 +213,7 @@ function TaskRow({ task, readOnly }: { task: Task; readOnly: boolean }) {
               className="h-8 w-8 text-destructive hover:text-destructive"
               onClick={remove}
               disabled={deleting}
-              title="Eliminar"
+              title={t("delete_title")}
             >
               {deleting ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -230,13 +229,11 @@ function TaskRow({ task, readOnly }: { task: Task; readOnly: boolean }) {
 }
 
 interface TaskFormProps {
-  // Creación
   planId?: string;
   phaseId?: string;
   organizationId?: string;
   studentId?: string;
   defaultDueDate?: string | null;
-  // Edición
   editingTask?: Task;
   onDone: () => void;
 }
@@ -244,6 +241,7 @@ interface TaskFormProps {
 function TaskForm(props: TaskFormProps) {
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("PlanTasks");
   const isEdit = !!props.editingTask;
   const [loading, setLoading] = useState(false);
 
@@ -265,7 +263,6 @@ function TaskForm(props: TaskFormProps) {
     if (isEdit && props.editingTask) {
       const taskId = props.editingTask.id;
       await supabase.from("practice_tasks").update(payload).eq("id", taskId);
-      // Mantener el calendar_event sincronizado
       await supabase
         .from("calendar_events")
         .update({
@@ -290,7 +287,6 @@ function TaskForm(props: TaskFormProps) {
         .select("id")
         .single();
 
-      // Crear evento de calendario si tiene fecha
       if (created?.id && payload.due_date) {
         await supabase.from("calendar_events").insert({
           organization_id: props.organizationId,
@@ -309,48 +305,48 @@ function TaskForm(props: TaskFormProps) {
     props.onDone();
   }
 
-  const t = props.editingTask;
+  const editing = props.editingTask;
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="space-y-1">
-        <Label htmlFor="title">Título *</Label>
+        <Label htmlFor="title">{t("form_title_label")}</Label>
         <Input
           id="title"
           name="title"
           required
-          defaultValue={t?.title ?? ""}
-          placeholder="Ej. Implementar pantalla de login"
+          defaultValue={editing?.title ?? ""}
+          placeholder={t("form_title_placeholder")}
         />
       </div>
       <div className="space-y-1">
-        <Label htmlFor="description">Descripción</Label>
+        <Label htmlFor="description">{t("form_description_label")}</Label>
         <Textarea
           id="description"
           name="description"
           rows={2}
-          defaultValue={t?.description ?? ""}
-          placeholder="Detalle de qué incluye esta tarea, requisitos, criterios de aceptación..."
+          defaultValue={editing?.description ?? ""}
+          placeholder={t("form_description_placeholder")}
         />
       </div>
       <div className="grid gap-3 md:grid-cols-3">
         <div className="space-y-1">
-          <Label htmlFor="due_date">Fecha límite</Label>
+          <Label htmlFor="due_date">{t("form_due_label")}</Label>
           <Input
             id="due_date"
             name="due_date"
             type="date"
-            defaultValue={t?.due_date ?? props.defaultDueDate ?? ""}
+            defaultValue={editing?.due_date ?? props.defaultDueDate ?? ""}
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="estimated_hours">Horas estimadas</Label>
+          <Label htmlFor="estimated_hours">{t("form_hours_label")}</Label>
           <Input
             id="estimated_hours"
             name="estimated_hours"
             type="number"
             min="0"
             step="0.5"
-            defaultValue={t?.estimated_hours ?? ""}
+            defaultValue={editing?.estimated_hours ?? ""}
             placeholder="8"
           />
         </div>
@@ -360,10 +356,10 @@ function TaskForm(props: TaskFormProps) {
             <input
               type="checkbox"
               name="deliverable_required"
-              defaultChecked={t?.deliverable_required ?? false}
+              defaultChecked={editing?.deliverable_required ?? false}
               className="h-4 w-4"
             />
-            Requiere entregable
+            {t("form_deliverable_label")}
           </label>
         </div>
       </div>
@@ -375,7 +371,7 @@ function TaskForm(props: TaskFormProps) {
           onClick={props.onDone}
           disabled={loading}
         >
-          <X className="h-3.5 w-3.5" /> Cancelar
+          <X className="h-3.5 w-3.5" /> {t("cancel")}
         </Button>
         <Button type="submit" size="sm" disabled={loading}>
           {loading ? (
@@ -383,7 +379,7 @@ function TaskForm(props: TaskFormProps) {
           ) : (
             <Check className="h-3.5 w-3.5" />
           )}
-          {isEdit ? "Guardar cambios" : "Crear tarea"}
+          {isEdit ? t("save_changes") : t("create_task")}
         </Button>
       </div>
     </form>

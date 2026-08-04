@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, Calendar as CalIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,8 +30,6 @@ interface Props {
   initialDate?: string;
 }
 
-const WEEKDAY_LABELS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
-
 const EVENT_TONE: Record<CalendarEventType, string> = {
   task: "bg-mint-100 text-mint-800 border-mint-200",
   milestone: "bg-amber-100 text-amber-900 border-amber-200",
@@ -56,6 +55,16 @@ function toIso(d: Date): string {
 }
 
 export function MonthCalendar({ events, showStudent = false, initialDate }: Props) {
+  const t = useTranslations("MonthCalendar");
+  const WEEKDAY_LABELS = [
+    t("weekday_mon"),
+    t("weekday_tue"),
+    t("weekday_wed"),
+    t("weekday_thu"),
+    t("weekday_fri"),
+    t("weekday_sat"),
+    t("weekday_sun"),
+  ];
   const [cursor, setCursor] = useState<Date>(
     initialDate ? new Date(initialDate) : new Date(),
   );
@@ -112,7 +121,7 @@ export function MonthCalendar({ events, showStudent = false, initialDate }: Prop
     setSelectedDay(toIso(new Date()));
   }
 
-  const monthLabel = cursor.toLocaleDateString("es-ES", {
+  const monthLabel = cursor.toLocaleDateString(t("locale"), {
     month: "long",
     year: "numeric",
   });
@@ -126,7 +135,7 @@ export function MonthCalendar({ events, showStudent = false, initialDate }: Prop
           <CardTitle className="text-base capitalize">{monthLabel}</CardTitle>
           <div className="flex items-center gap-1">
             <Button variant="outline" size="sm" onClick={goToday}>
-              Hoy
+              {t("today")}
             </Button>
             <Button
               variant="ghost"
@@ -198,7 +207,7 @@ export function MonthCalendar({ events, showStudent = false, initialDate }: Prop
                     ))}
                     {dayEvents.length > 3 && (
                       <span className="text-[10px] text-muted-foreground">
-                        +{dayEvents.length - 3} más
+                        {t("more_events", { n: dayEvents.length - 3 })}
                       </span>
                     )}
                   </div>
@@ -222,7 +231,7 @@ export function MonthCalendar({ events, showStudent = false, initialDate }: Prop
               <div className="rounded-lg border border-dashed p-6 text-center">
                 <CalIcon className="mx-auto h-8 w-8 text-muted-foreground" />
                 <p className="mt-2 text-sm text-muted-foreground">
-                  No hay eventos este día.
+                  {t("no_events")}
                 </p>
               </div>
             ) : (

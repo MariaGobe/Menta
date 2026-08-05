@@ -1264,7 +1264,9 @@
     "mentor_card_title": "Configurar mentor virtual",
     "mentor_card_desc": "Alimenta al mentor con información sobre tu empresa, herramientas y forma de trabajar. Lo usará para acompañar a tus alumnos día a día sin necesidad de tu intervención.",
     "company_card_title": "Datos de la empresa",
-    "company_card_desc": "Esta información aparecerá en convenios y documentos generados."
+    "company_card_desc": "Esta información aparecerá en convenios y documentos generados.",
+    "language_card_title": "Idioma",
+    "language_card_desc": "Elige el idioma de la plataforma. Se aplica a todos los usuarios de tu cuenta al recargar la página."
   },
   "Facturacion": {
     "title": "Facturación",

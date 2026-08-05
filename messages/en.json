@@ -1264,7 +1264,9 @@
     "mentor_card_title": "Configure virtual mentor",
     "mentor_card_desc": "Feed the mentor with information about your company, tools and way of working. It will support your students daily without needing your intervention.",
     "company_card_title": "Company details",
-    "company_card_desc": "This information will appear on internship agreements and generated documents."
+    "company_card_desc": "This information will appear on internship agreements and generated documents.",
+    "language_card_title": "Language",
+    "language_card_desc": "Choose the platform language. It applies to all users of your account after reloading the page."
   },
   "Facturacion": {
     "title": "Billing",

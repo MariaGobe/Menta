@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight, Globe } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrganizationForm } from "./organization-form";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +38,21 @@ export default async function ConfiguracionPage() {
           <ArrowRight className="h-5 w-5 self-center text-muted-foreground" />
         </div>
       </Link>
+
+      <Card>
+        <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-mint-100 text-mint-700">
+              <Globe className="h-4 w-4" />
+            </div>
+            <div>
+              <CardTitle className="text-base">{t("language_card_title")}</CardTitle>
+              <CardDescription>{t("language_card_desc")}</CardDescription>
+            </div>
+          </div>
+          <LanguageSwitcher variant="compact" />
+        </CardHeader>
+      </Card>
 
       <Card>
         <CardHeader>

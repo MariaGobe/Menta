@@ -1,6 +1,7 @@
 import { LogOut } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 
 interface Props {
   studentName: string;
@@ -16,6 +17,7 @@ export async function StudentTopbar({ studentName, organizationName }: Props) {
         <p className="text-sm font-semibold">{organizationName}</p>
       </div>
       <div className="flex items-center gap-3">
+        <LanguageSwitcher variant="compact" />
         <div className="text-right">
           <p className="text-sm font-medium">{studentName}</p>
           <p className="text-xs text-muted-foreground">{t("student")}</p>

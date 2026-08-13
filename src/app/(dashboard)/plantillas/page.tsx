@@ -1,16 +1,19 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { FileStack, ArrowRight, Target } from "lucide-react";
+import { FileStack, ArrowRight, Target, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLAN_TEMPLATES } from "@/lib/plan-templates";
 import type { PracticeType } from "@/types/database";
+import { createClient } from "@/lib/supabase/server";
+import { UseTemplateButton } from "./use-template-button";
 
 export const dynamic = "force-dynamic";
 
 export default async function PlantillasPage() {
   const t = await getTranslations("Templates");
+  const supabase = createClient();
 
   const typeLabelKey: Record<PracticeType, string> = {
     fp: "type_fp",
@@ -28,6 +31,37 @@ export default async function PlantillasPage() {
     type: k,
     template: PLAN_TEMPLATES[k],
   }));
+
+  // Plantillas custom de la organización
+  const [{ data: customTemplates }, { data: students }] = await Promise.all([
+    supabase
+      .from("practice_plans")
+      .select("id, title, description, template_name, created_at")
+      .eq("is_template", true)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("students")
+      .select("id, full_name")
+      .eq("status", "active")
+      .order("full_name"),
+  ]);
+
+  // Contar fases y tareas por plantilla custom
+  const customWithCounts = await Promise.all(
+    (customTemplates ?? []).map(async (tpl) => {
+      const [{ count: phasesCount }, { count: tasksCount }] = await Promise.all([
+        supabase
+          .from("practice_phases")
+          .select("*", { count: "exact", head: true })
+          .eq("plan_id", tpl.id),
+        supabase
+          .from("practice_tasks")
+          .select("*", { count: "exact", head: true })
+          .eq("plan_id", tpl.id),
+      ]);
+      return { ...tpl, phasesCount: phasesCount ?? 0, tasksCount: tasksCount ?? 0 };
+    }),
+  );
 
   return (
     <div className="space-y-8">
@@ -120,18 +154,58 @@ export default async function PlantillasPage() {
         </div>
       </div>
 
-      {/* Plantillas propias (placeholder para futuro) */}
+      {/* Plantillas propias de la empresa */}
       <div className="space-y-4">
         <div>
           <h2 className="text-xl font-semibold">{t("custom_title")}</h2>
           <p className="text-sm text-muted-foreground">{t("custom_hint")}</p>
         </div>
-        <Card>
-          <CardContent className="py-10 text-center">
-            <FileStack className="mx-auto h-10 w-10 text-muted-foreground" />
-            <p className="mt-3 text-sm text-muted-foreground">{t("custom_empty")}</p>
-          </CardContent>
-        </Card>
+        {customWithCounts.length === 0 ? (
+          <Card>
+            <CardContent className="py-10 text-center">
+              <FileStack className="mx-auto h-10 w-10 text-muted-foreground" />
+              <p className="mt-3 text-sm text-muted-foreground">{t("custom_empty")}</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {customWithCounts.map((tpl) => (
+              <Card key={tpl.id} className="flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-lg line-clamp-2">
+                    {tpl.template_name ?? tpl.title}
+                  </CardTitle>
+                  {tpl.description && (
+                    <CardDescription className="mt-1 line-clamp-3">
+                      {tpl.description}
+                    </CardDescription>
+                  )}
+                </CardHeader>
+                <CardContent className="flex flex-1 flex-col justify-between space-y-4">
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <span className="rounded-full bg-muted px-2 py-1 font-medium">
+                      {t("phases_count", { n: tpl.phasesCount })}
+                    </span>
+                    <span className="rounded-full bg-muted px-2 py-1 font-medium">
+                      {t("tasks_count", { n: tpl.tasksCount })}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    <UseTemplateButton
+                      templateId={tpl.id}
+                      students={students ?? []}
+                    />
+                    <Button variant="ghost" size="sm" className="w-full" asChild>
+                      <Link href={`/planes/${tpl.id}`}>
+                        <Target className="h-3.5 w-3.5" /> Ver / editar
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

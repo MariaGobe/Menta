@@ -11,6 +11,9 @@ import { PLAN_STATUS_LABELS, type PlanStatus, type TaskStatus } from "@/types/da
 import { ApprovePlanButton } from "./approve-button";
 import { PlanTasksSection } from "./plan-tasks-section";
 import { PlanSuggestionsPanel } from "./suggestions-panel";
+import { PlanMetaEditor } from "./plan-meta-editor";
+import { AddPhaseButton } from "./add-phase";
+import { SaveTemplateButton } from "./save-template-button";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +28,7 @@ export default async function PlanDetailPage({
   const { data: plan } = await supabase
     .from("practice_plans")
     .select(
-      "id, title, description, status, start_date, end_date, total_hours, objectives, student_id, organization_id, approved_at, students(full_name, practice_type)",
+      "id, title, description, status, start_date, end_date, total_hours, objectives, student_id, organization_id, approved_at, is_template, students(full_name, practice_type)",
     )
     .eq("id", params.id)
     .single();
@@ -41,12 +44,11 @@ export default async function PlanDetailPage({
   const { data: tasks } = await supabase
     .from("practice_tasks")
     .select(
-      "id, phase_id, title, description, due_date, status, estimated_hours, deliverable_required, order_index",
+      "id, phase_id, title, description, due_date, status, estimated_hours, deliverable_required, deliverable_description, order_index",
     )
     .eq("plan_id", plan.id)
     .order("order_index");
 
-  // Sugerencias del alumno sobre este plan
   const { data: suggestions } = await supabase
     .from("plan_change_suggestions")
     .select("id, title, description, status, reviewed_at, review_notes, created_at")
@@ -61,6 +63,10 @@ export default async function PlanDetailPage({
   const totalTasks = tasks?.length ?? 0;
   const completed = (tasks ?? []).filter((t) => t.status === "completed").length;
   const progress = totalTasks === 0 ? 0 : Math.round((completed / totalTasks) * 100);
+
+  const isDraft = plan.status === "draft";
+  const nextPhaseIndex =
+    (phases ?? []).reduce((max, p) => Math.max(max, p.order_index ?? 0), -1) + 1;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -90,62 +96,81 @@ export default async function PlanDetailPage({
             {plan.end_date && formatDate(plan.end_date)} · {plan.total_hours}h
           </p>
         </div>
-        {plan.status === "draft" && <ApprovePlanButton planId={plan.id} />}
+        <div className="flex flex-wrap items-start gap-2">
+          {!plan.is_template && <SaveTemplateButton planId={plan.id} />}
+          {isDraft && <ApprovePlanButton planId={plan.id} />}
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-base">{t("description")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <p className="text-muted-foreground">{plan.description}</p>
-            {plan.objectives && plan.objectives.length > 0 && (
-              <>
-                <Separator />
-                <div>
-                  <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
-                    {t("objectives_formation")}
-                  </p>
-                  <ul className="space-y-1">
-                    {plan.objectives.map((o: string, i: number) => (
-                      <li key={i} className="flex gap-2">
-                        <Target className="h-4 w-4 shrink-0 text-primary" />
-                        <span>{o}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
+      {/* Editor completo si borrador; vista compacta si aprobado */}
+      {isDraft ? (
+        <PlanMetaEditor
+          planId={plan.id}
+          initial={{
+            title: plan.title,
+            description: plan.description,
+            objectives: plan.objectives,
+            start_date: plan.start_date,
+            end_date: plan.end_date,
+            total_hours: plan.total_hours,
+          }}
+        />
+      ) : (
+        <div className="grid gap-6 md:grid-cols-3">
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle className="text-base">{t("description")}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              <p className="text-muted-foreground">{plan.description}</p>
+              {plan.objectives && plan.objectives.length > 0 && (
+                <>
+                  <Separator />
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
+                      {t("objectives_formation")}
+                    </p>
+                    <ul className="space-y-1">
+                      {plan.objectives.map((o: string, i: number) => (
+                        <li key={i} className="flex gap-2">
+                          <Target className="h-4 w-4 shrink-0 text-primary" />
+                          <span>{o}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{t("progress")}</CardTitle>
-            <CardDescription>
-              {t("progress_subtitle", { done: completed, total: totalTasks })}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{progress}%</p>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
-              <div
-                className="h-full bg-primary"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">{t("progress")}</CardTitle>
+              <CardDescription>
+                {t("progress_subtitle", { done: completed, total: totalTasks })}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">{progress}%</p>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full bg-primary"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
-      <PlanSuggestionsPanel suggestions={(suggestions ?? []) as any} />
+      {!plan.is_template && <PlanSuggestionsPanel suggestions={(suggestions ?? []) as any} />}
 
       <PlanTasksSection
         planId={plan.id}
         organizationId={plan.organization_id}
         studentId={plan.student_id}
+        allowDeletePhases={isDraft}
         phases={tasksByPhase.map((ph) => ({
           id: ph.id,
           name: ph.name,
@@ -162,10 +187,19 @@ export default async function PlanDetailPage({
             status: t.status as TaskStatus,
             estimated_hours: t.estimated_hours,
             deliverable_required: t.deliverable_required,
+            deliverable_description: (t as any).deliverable_description ?? null,
             order_index: t.order_index ?? 0,
           })),
         }))}
       />
+
+      {isDraft && (
+        <AddPhaseButton
+          planId={plan.id}
+          organizationId={plan.organization_id}
+          nextOrderIndex={nextPhaseIndex}
+        />
+      )}
     </div>
   );
 }

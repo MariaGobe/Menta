@@ -19,6 +19,7 @@ export default async function PlanesPage() {
     .select(
       "id, title, status, start_date, end_date, total_hours, student_id, students(full_name, practice_type)",
     )
+    .eq("is_template", false)
     .order("created_at", { ascending: false });
 
   const n = plans?.length ?? 0;

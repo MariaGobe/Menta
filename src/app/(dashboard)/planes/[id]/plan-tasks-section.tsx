@@ -34,6 +34,7 @@ interface Task {
   status: TaskStatus;
   estimated_hours: number | null;
   deliverable_required: boolean;
+  deliverable_description: string | null;
   order_index: number;
 }
 
@@ -50,9 +51,11 @@ interface Phase {
 interface Props {
   planId: string;
   organizationId: string;
-  studentId: string;
+  studentId: string | null;
   phases: Phase[];
   readOnly?: boolean;
+  /** Si true, permite eliminar la fase entera (con sus tareas) */
+  allowDeletePhases?: boolean;
 }
 
 export function PlanTasksSection({
@@ -61,6 +64,7 @@ export function PlanTasksSection({
   studentId,
   phases,
   readOnly = false,
+  allowDeletePhases = false,
 }: Props) {
   return (
     <div className="space-y-3">
@@ -72,6 +76,7 @@ export function PlanTasksSection({
           studentId={studentId}
           phase={ph}
           readOnly={readOnly}
+          allowDelete={allowDeletePhases}
         />
       ))}
     </div>
@@ -84,25 +89,62 @@ function PhaseCard({
   studentId,
   phase,
   readOnly,
+  allowDelete,
 }: {
   planId: string;
   organizationId: string;
-  studentId: string;
+  studentId: string | null;
   phase: Phase;
   readOnly: boolean;
+  allowDelete: boolean;
 }) {
+  const router = useRouter();
+  const supabase = createClient();
   const t = useTranslations("PlanTasks");
+  const tEditor = useTranslations("PlanEditor");
   const [adding, setAdding] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function deletePhase() {
+    if (!confirm(tEditor("delete_phase_confirm", { name: phase.name }))) return;
+    setDeleting(true);
+    await supabase.from("calendar_events").delete().in(
+      "task_id",
+      phase.tasks.map((tk) => tk.id),
+    );
+    await supabase.from("practice_tasks").delete().eq("phase_id", phase.id);
+    await supabase.from("practice_phases").delete().eq("id", phase.id);
+    setDeleting(false);
+    router.refresh();
+  }
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{phase.name}</CardTitle>
-        <CardDescription className="flex items-center gap-1">
-          <CalIcon className="h-3 w-3" />
-          {formatDate(phase.start_date)} – {formatDate(phase.end_date)}
-          {phase.description && <span> · {phase.description}</span>}
-        </CardDescription>
+      <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
+        <div className="flex-1">
+          <CardTitle className="text-base">{phase.name}</CardTitle>
+          <CardDescription className="flex items-center gap-1">
+            <CalIcon className="h-3 w-3" />
+            {formatDate(phase.start_date)} – {formatDate(phase.end_date)}
+            {phase.description && <span> · {phase.description}</span>}
+          </CardDescription>
+        </div>
+        {allowDelete && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-destructive hover:text-destructive"
+            onClick={deletePhase}
+            disabled={deleting}
+            title={tEditor("delete_phase")}
+          >
+            {deleting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Trash2 className="h-3.5 w-3.5" />
+            )}
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         {phase.tasks.length === 0 && !adding && (
@@ -183,6 +225,12 @@ function TaskRow({ task, readOnly }: { task: Task; readOnly: boolean }) {
           {t("due_on", { date: formatDate(task.due_date) })} · {task.estimated_hours ?? "—"} h
           {task.deliverable_required && ` ${t("with_deliverable")}`}
         </p>
+        {task.deliverable_required && task.deliverable_description && (
+          <p className="mt-1 rounded bg-mint-50 p-2 text-xs text-mint-900">
+            <strong>{t("form_deliverable_desc_label")}:</strong>{" "}
+            {task.deliverable_description}
+          </p>
+        )}
       </div>
       <div className="flex items-center gap-2">
         <Badge
@@ -244,6 +292,9 @@ function TaskForm(props: TaskFormProps) {
   const t = useTranslations("PlanTasks");
   const isEdit = !!props.editingTask;
   const [loading, setLoading] = useState(false);
+  const [deliverableOn, setDeliverableOn] = useState(
+    props.editingTask?.deliverable_required ?? false,
+  );
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -258,6 +309,10 @@ function TaskForm(props: TaskFormProps) {
         ? Number(fd.get("estimated_hours"))
         : null,
       deliverable_required: fd.get("deliverable_required") === "on",
+      deliverable_description:
+        fd.get("deliverable_required") === "on"
+          ? (fd.get("deliverable_description") as string) || null
+          : null,
     };
 
     if (isEdit && props.editingTask) {
@@ -356,13 +411,28 @@ function TaskForm(props: TaskFormProps) {
             <input
               type="checkbox"
               name="deliverable_required"
-              defaultChecked={editing?.deliverable_required ?? false}
+              checked={deliverableOn}
+              onChange={(e) => setDeliverableOn(e.target.checked)}
               className="h-4 w-4"
             />
             {t("form_deliverable_label")}
           </label>
         </div>
       </div>
+      {deliverableOn && (
+        <div className="space-y-1 rounded-md border border-mint-200 bg-mint-50/40 p-3">
+          <Label htmlFor="deliverable_description">
+            {t("form_deliverable_desc_label")}
+          </Label>
+          <Textarea
+            id="deliverable_description"
+            name="deliverable_description"
+            rows={2}
+            defaultValue={editing?.deliverable_description ?? ""}
+            placeholder={t("form_deliverable_desc_placeholder")}
+          />
+        </div>
+      )}
       <div className="flex justify-end gap-2 pt-1">
         <Button
           type="button"

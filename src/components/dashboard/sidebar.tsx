@@ -152,18 +152,30 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
       </nav>
 
       {isSuperAdmin && (
-        <div className="border-t p-4">
+        <div className="border-t p-4 space-y-1">
           <Link
             href="/admin"
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-              pathname.startsWith("/admin")
+              pathname === "/admin"
                 ? "bg-amber-100 text-amber-900"
                 : "text-amber-700 hover:bg-amber-50",
             )}
           >
             <ShieldCheck className="h-4 w-4" />
             Super admin
+          </Link>
+          <Link
+            href="/admin/solicitudes"
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              pathname.startsWith("/admin/solicitudes")
+                ? "bg-amber-100 text-amber-900"
+                : "text-amber-700 hover:bg-amber-50",
+            )}
+          >
+            <Inbox className="h-4 w-4" />
+            Solicitudes
           </Link>
         </div>
       )}

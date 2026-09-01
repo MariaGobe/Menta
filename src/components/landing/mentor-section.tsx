@@ -27,7 +27,7 @@ export async function MentorSection() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild>
-                <Link href="/registro">{t("cta_try")}</Link>
+                <Link href="/solicitar-acceso">{t("cta_try")}</Link>
               </Button>
               <Button variant="outline" asChild>
                 <Link href="/#caracteristicas">{t("cta_features")}</Link>

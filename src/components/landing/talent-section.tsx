@@ -51,7 +51,7 @@ export async function TalentSection() {
 
       <div className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-3">
         <Button asChild>
-          <Link href="/registro">
+          <Link href="/solicitar-acceso">
             {c("free_trial_cta")} <Sparkles className="h-4 w-4" />
           </Link>
         </Button>

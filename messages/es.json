@@ -1,10 +1,10 @@
 {
   "Common": {
-    "free_trial_cta": "Empieza gratis 1 mes",
+    "free_trial_cta": "Solicitar acceso",
     "see_pricing": "Ver precios",
     "how_it_works": "Cómo funciona",
     "log_in": "Iniciar sesión",
-    "sign_up": "Prueba gratis",
+    "sign_up": "Solicitar acceso",
     "no_card": "Sin tarjeta de crédito",
     "ready_in_minutes": "Listo en minutos",
     "cancel_anytime": "Cancela cuando quieras",
@@ -41,7 +41,7 @@
     "feature_chat_desc": "Resuelve dudas, planifica el día, desbloquea problemas y recuerda deadlines.",
     "feature_summary_title": "Tú recibes el resumen",
     "feature_summary_desc": "Sin atender mil consultas: tú revisas la evaluación automática y firmas los informes.",
-    "cta_try": "Probar el mentor gratis",
+    "cta_try": "Solicitar acceso",
     "cta_features": "Ver todas las funcionalidades",
     "chat_status": "en línea",
     "chat_name": "Mentor virtual",
@@ -314,7 +314,7 @@
     "error_invalid": "Credenciales incorrectas. Verifica email y contraseña.",
     "error_otp_expired": "El enlace de invitación ha caducado o ya se ha usado. Pide a tu empresa que te envíe una nueva invitación.",
     "no_account": "¿Aún no tienes cuenta?",
-    "start_free": "Empieza gratis"
+    "start_free": "Solicitar acceso"
   },
   "Recover": {
     "title": "Recuperar contraseña",
@@ -1114,6 +1114,66 @@
   },
   "OnboardingExtra": {
     "error_save": "Error guardando"
+  },
+  "AccessRequest": {
+    "title": "Solicitar acceso a Menta",
+    "subtitle": "Menta está en fase de test controlado. Cuéntanos brevemente cómo lo usarías y te contactamos en 2-3 días laborables para darte acceso gratuito y ayudarte a configurar tu cuenta.",
+    "company_label": "Empresa *",
+    "company_placeholder": "Nombre de tu empresa",
+    "contact_name_label": "Tu nombre *",
+    "contact_name_placeholder": "Nombre y apellidos",
+    "contact_email_label": "Email de contacto *",
+    "contact_phone_label": "Teléfono (opcional)",
+    "contact_role_label": "Tu cargo",
+    "contact_role_placeholder": "Ej. Responsable de RRHH, CEO, tutor...",
+    "sector_label": "Sector",
+    "sector_placeholder": "Ej. Diseño, tecnología, salud, industrial...",
+    "practice_types_label": "Tipo de prácticas / formación",
+    "practice_types_hint": "Marca todos los que apliquen.",
+    "type_fp": "Alumnos de FP",
+    "type_university": "Alumnos de universidad",
+    "type_internal": "Formación interna del equipo",
+    "estimated_students_label": "¿Cuántos alumnos previstos al año?",
+    "estimated_students_placeholder": "Ej. 3",
+    "duration_label": "Duración media (meses)",
+    "duration_placeholder": "Ej. 3",
+    "starts_when_label": "¿Cuándo empezáis?",
+    "starts_when_placeholder": "Ej. Septiembre, ya tenemos alumno en curso...",
+    "notes_label": "Cuéntanos más (opcional)",
+    "notes_placeholder": "Cualquier detalle que nos ayude a preparar tu cuenta: proyectos concretos, dudas, necesidades específicas...",
+    "submit": "Enviar solicitud",
+    "submitting": "Enviando...",
+    "success_title": "¡Solicitud enviada!",
+    "success_body": "Hemos recibido tu solicitud. Te escribiremos en 2-3 días laborables al email indicado. Mientras tanto, si tienes preguntas urgentes puedes contactar en menta@gobesoluciones.com.",
+    "back_home": "Volver al inicio",
+    "error_generic": "No hemos podido enviar la solicitud. Inténtalo de nuevo en unos minutos."
+  },
+  "AccessRequestsAdmin": {
+    "title": "Solicitudes de acceso",
+    "subtitle": "Empresas que quieren probar Menta durante la fase de test. Revísalas y decide.",
+    "no_requests": "No hay solicitudes por ahora.",
+    "th_company": "Empresa",
+    "th_contact": "Contacto",
+    "th_details": "Detalles",
+    "th_status": "Estado",
+    "th_date": "Fecha",
+    "th_actions": "Acciones",
+    "status_pending": "Pendiente",
+    "status_contacted": "Contactada",
+    "status_approved": "Aprobada",
+    "status_rejected": "Rechazada",
+    "mark_contacted": "Marcar contactada",
+    "mark_approved": "Aprobar",
+    "mark_rejected": "Rechazar",
+    "students_count": "{n} alumnos",
+    "duration_months": "{n} meses",
+    "types_prefix": "Tipos:"
+  },
+  "RegistroClosed": {
+    "title": "Registro cerrado durante la fase de test",
+    "subtitle": "Menta está en beta y de momento damos acceso solo a empresas seleccionadas. Rellena la solicitud y te contactamos en 2-3 días.",
+    "request_button": "Solicitar acceso",
+    "already_have_account": "Ya tengo cuenta"
   },
   "MentorChat": {
     "disclaimer": "Tus mensajes se procesan con inteligencia artificial (Anthropic). No compartas contraseñas ni datos confidenciales de personas reales."

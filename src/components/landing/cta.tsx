@@ -13,7 +13,7 @@ export async function FinalCta() {
         <p className="mx-auto mt-4 max-w-xl text-base opacity-95 md:text-lg">{t("subtitle")}</p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Button size="lg" variant="secondary" asChild>
-            <Link href="/registro">
+            <Link href="/solicitar-acceso">
               {c("free_trial_cta")} <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>

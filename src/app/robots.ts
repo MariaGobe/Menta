@@ -28,6 +28,8 @@ export default function robots(): MetadataRoute.Robots {
           "/bienvenida",
           "/admin",
           "/admin/",
+          "/registro",
+          "/solicitar-acceso",
           "/student",
           "/student/",
           "/auth",

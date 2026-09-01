@@ -1,10 +1,10 @@
 {
   "Common": {
-    "free_trial_cta": "Start free for 1 month",
+    "free_trial_cta": "Request access",
     "see_pricing": "See pricing",
     "how_it_works": "How it works",
     "log_in": "Log in",
-    "sign_up": "Free trial",
+    "sign_up": "Request access",
     "no_card": "No credit card",
     "ready_in_minutes": "Ready in minutes",
     "cancel_anytime": "Cancel anytime",
@@ -41,7 +41,7 @@
     "feature_chat_desc": "Resolves doubts, plans the day, unblocks problems and reminds deadlines.",
     "feature_summary_title": "You get the summary",
     "feature_summary_desc": "No need to answer a thousand questions: you review the automatic evaluation and sign the reports.",
-    "cta_try": "Try the mentor for free",
+    "cta_try": "Request access",
     "cta_features": "See all features",
     "chat_status": "online",
     "chat_name": "Virtual mentor",
@@ -314,7 +314,7 @@
     "error_invalid": "Wrong credentials. Check your email and password.",
     "error_otp_expired": "The invitation link has expired or has already been used. Ask your company to send you a new invitation.",
     "no_account": "Don't have an account yet?",
-    "start_free": "Start free"
+    "start_free": "Request access"
   },
   "Recover": {
     "title": "Recover password",
@@ -1114,6 +1114,66 @@
   },
   "OnboardingExtra": {
     "error_save": "Error saving"
+  },
+  "AccessRequest": {
+    "title": "Request access to Menta",
+    "subtitle": "Menta is in controlled beta. Tell us briefly how you'd use it and we'll get back to you in 2-3 business days to grant free access and help you set up your account.",
+    "company_label": "Company *",
+    "company_placeholder": "Your company name",
+    "contact_name_label": "Your name *",
+    "contact_name_placeholder": "Full name",
+    "contact_email_label": "Contact email *",
+    "contact_phone_label": "Phone (optional)",
+    "contact_role_label": "Your role",
+    "contact_role_placeholder": "E.g. HR manager, CEO, tutor...",
+    "sector_label": "Industry",
+    "sector_placeholder": "E.g. Design, tech, healthcare, industrial...",
+    "practice_types_label": "Type of internship / training",
+    "practice_types_hint": "Check all that apply.",
+    "type_fp": "Vocational students",
+    "type_university": "University students",
+    "type_internal": "Internal team training",
+    "estimated_students_label": "Estimated students per year?",
+    "estimated_students_placeholder": "E.g. 3",
+    "duration_label": "Average duration (months)",
+    "duration_placeholder": "E.g. 3",
+    "starts_when_label": "When do you start?",
+    "starts_when_placeholder": "E.g. September, we already have a student...",
+    "notes_label": "Tell us more (optional)",
+    "notes_placeholder": "Any detail that helps us prepare your account: specific projects, questions, particular needs...",
+    "submit": "Send request",
+    "submitting": "Sending...",
+    "success_title": "Request sent!",
+    "success_body": "We've received your request. We'll write to you within 2-3 business days at the email provided. Meanwhile, for urgent questions contact us at menta@gobesoluciones.com.",
+    "back_home": "Back to home",
+    "error_generic": "We couldn't send your request. Please try again in a few minutes."
+  },
+  "AccessRequestsAdmin": {
+    "title": "Access requests",
+    "subtitle": "Companies wanting to try Menta during the beta phase. Review and decide.",
+    "no_requests": "No requests yet.",
+    "th_company": "Company",
+    "th_contact": "Contact",
+    "th_details": "Details",
+    "th_status": "Status",
+    "th_date": "Date",
+    "th_actions": "Actions",
+    "status_pending": "Pending",
+    "status_contacted": "Contacted",
+    "status_approved": "Approved",
+    "status_rejected": "Rejected",
+    "mark_contacted": "Mark contacted",
+    "mark_approved": "Approve",
+    "mark_rejected": "Reject",
+    "students_count": "{n} students",
+    "duration_months": "{n} months",
+    "types_prefix": "Types:"
+  },
+  "RegistroClosed": {
+    "title": "Registration closed during beta",
+    "subtitle": "Menta is in beta and currently grants access only to selected companies. Fill in the request form and we'll get back to you in 2-3 days.",
+    "request_button": "Request access",
+    "already_have_account": "I already have an account"
   },
   "MentorChat": {
     "disclaimer": "Your messages are processed by artificial intelligence (Anthropic). Do not share passwords or confidential data of real individuals."

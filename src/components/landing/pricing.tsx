@@ -152,7 +152,7 @@ function PlanCard({
           variant={plan.highlight ? "default" : "outline"}
           asChild
         >
-          <Link href="/registro">{c("free_trial_cta")}</Link>
+          <Link href="/solicitar-acceso">{c("free_trial_cta")}</Link>
         </Button>
       )}
     </Card>

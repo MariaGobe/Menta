@@ -31,7 +31,7 @@ export async function Hero() {
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Button size="lg" asChild>
-              <Link href="/registro">
+              <Link href="/solicitar-acceso">
                 {c("free_trial_cta")} <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

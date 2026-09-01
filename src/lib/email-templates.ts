@@ -269,6 +269,75 @@ export function planSuggestionReviewedEmail(p: {
   };
 }
 
+/* ──────────────────────────────────────────────────────────────────────── */
+/* 7. Solicitud de acceso recibida → email al equipo Menta                   */
+/* ──────────────────────────────────────────────────────────────────────── */
+export function accessRequestInternalEmail(p: {
+  companyName: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string | null;
+  contactRole: string | null;
+  practiceTypes: string[];
+  estimatedStudents: number | null;
+  durationMonths: number | null;
+  startsWhen: string | null;
+  sector: string | null;
+  notes: string | null;
+  adminUrl: string;
+}) {
+  return {
+    subject: `Nueva solicitud de acceso: ${p.companyName}`,
+    html: shell(`
+      <h1 style="color: #1a1a1a; font-size: 22px; margin: 0 0 16px;">Nueva solicitud de acceso</h1>
+      <p style="color: #555; line-height: 1.6; font-size: 15px;">
+        <strong>${escapeHtml(p.companyName)}</strong> quiere probar Menta.
+      </p>
+      <div style="background: #f5f7f7; border-left: 3px solid #62A691; padding: 16px; margin: 24px 0; border-radius: 4px;">
+        <p style="margin: 0 0 6px;"><strong>Contacto:</strong> ${escapeHtml(p.contactName)}${p.contactRole ? ` (${escapeHtml(p.contactRole)})` : ""}</p>
+        <p style="margin: 0 0 6px;"><strong>Email:</strong> ${escapeHtml(p.contactEmail)}</p>
+        ${p.contactPhone ? `<p style="margin: 0 0 6px;"><strong>Teléfono:</strong> ${escapeHtml(p.contactPhone)}</p>` : ""}
+        ${p.sector ? `<p style="margin: 0 0 6px;"><strong>Sector:</strong> ${escapeHtml(p.sector)}</p>` : ""}
+        <p style="margin: 0 0 6px;"><strong>Tipo:</strong> ${p.practiceTypes.join(", ") || "—"}</p>
+        <p style="margin: 0 0 6px;"><strong>Alumnos previstos:</strong> ${p.estimatedStudents ?? "—"}</p>
+        <p style="margin: 0 0 6px;"><strong>Duración:</strong> ${p.durationMonths ? `${p.durationMonths} meses` : "—"}</p>
+        ${p.startsWhen ? `<p style="margin: 0 0 6px;"><strong>Cuándo empiezan:</strong> ${escapeHtml(p.startsWhen)}</p>` : ""}
+        ${p.notes ? `<p style="margin: 12px 0 0;"><strong>Notas:</strong><br>${escapeHtml(p.notes).replace(/\n/g, "<br>")}</p>` : ""}
+      </div>
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="${p.adminUrl}" style="${buttonStyles}">Revisar en el panel</a>
+      </div>
+    `),
+  };
+}
+
+/* ──────────────────────────────────────────────────────────────────────── */
+/* 8. Confirmación de solicitud → email al solicitante                       */
+/* ──────────────────────────────────────────────────────────────────────── */
+export function accessRequestConfirmationEmail(p: {
+  contactName: string;
+  companyName: string;
+}) {
+  return {
+    subject: `Hemos recibido tu solicitud para probar Menta`,
+    html: shell(`
+      <h1 style="color: #1a1a1a; font-size: 22px; margin: 0 0 16px;">¡Solicitud recibida!</h1>
+      <p style="color: #555; line-height: 1.6; font-size: 15px;">
+        Hola ${escapeHtml(p.contactName.split(" ")[0])},
+      </p>
+      <p style="color: #555; line-height: 1.6; font-size: 15px;">
+        Hemos recibido tu solicitud para probar Menta con <strong>${escapeHtml(p.companyName)}</strong>. Menta está actualmente en fase de test controlado, así que revisamos cada solicitud personalmente antes de dar acceso.
+      </p>
+      <p style="color: #555; line-height: 1.6; font-size: 15px;">
+        Nos pondremos en contacto contigo en un plazo de <strong>2-3 días laborables</strong> para confirmar el acceso y ayudarte a configurar tu cuenta.
+      </p>
+      <p style="color: #888; font-size: 13px; line-height: 1.6;">
+        Si tienes alguna pregunta mientras tanto, contáctanos en menta@gobesoluciones.com.
+      </p>
+    `),
+  };
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

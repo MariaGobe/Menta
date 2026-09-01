@@ -39,7 +39,7 @@ export async function Navbar() {
             <Link href="/login">{tCommon("log_in")}</Link>
           </Button>
           <Button size="sm" asChild>
-            <Link href="/registro">{tCommon("sign_up")}</Link>
+            <Link href="/solicitar-acceso">{tCommon("sign_up")}</Link>
           </Button>
         </div>
       </div>

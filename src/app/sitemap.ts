@@ -11,10 +11,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
   const publicRoutes = [
     "",
-    "/precios",
     "/login",
-    "/registro",
     "/recuperar",
+    "/solicitar-acceso",
     "/aviso-legal",
     "/privacidad",
     "/cookies",

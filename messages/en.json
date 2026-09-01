@@ -17,7 +17,7 @@
     "mentor": "Virtual mentor",
     "talent": "Talent",
     "features": "Features",
-    "pricing": "Pricing",
+    "pricing": "Get started",
     "faq": "FAQ"
   },
   "Hero": {
@@ -109,26 +109,21 @@
     "challenges_b4": "Automatic summary of standout applicants at close"
   },
   "Pricing": {
-    "badge": "Clear pricing, no surprises",
-    "title": "Start free. Pick the plan that fits.",
-    "subtitle": "1 month free trial on any plan. No lock-in. Cancel anytime.",
-    "monthly": "Monthly",
-    "yearly": "Yearly",
-    "save_badge": "Save up to 10%",
-    "per_year": "/ year",
-    "per_month": "/ month",
-    "vat_excluded": "+ VAT · up to {n} students included",
-    "save_label": "You save {amount} per year",
+    "badge": "Controlled beta phase",
+    "title": "Menta is in closed beta",
+    "subtitle": "We're granting free access to selected companies while we validate the product. Tell us how you'd use it and we'll get back to you in 2-3 days to set up your account.",
+    "request_cta": "Request access",
+    "already_account_prefix": "Already have an account?",
+    "already_account_link": "Sign in",
+    "modes_title": "For every type of company",
+    "modes_subtitle": "Menta adapts to the volume and type of internships you manage.",
+    "included_students": "Up to {n} students",
     "custom_label": "Custom",
-    "custom_hint": "Let's talk and build your plan.",
+    "custom_hint": "Let's talk and build your setup.",
     "most_popular": "Most popular",
-    "footnote": "All prices without VAT. Additional students: €49/year above the ones included in each plan.",
     "plan_base_tagline": "For companies hosting interns occasionally.",
     "plan_pro_tagline": "For companies training several students a year.",
-    "plan_custom_tagline": "For large companies with specific needs.",
-    "plan_base_includes_students": "Up to 2 students",
-    "plan_pro_includes_students": "Up to 10 students",
-    "plan_custom_includes_students": "Custom"
+    "plan_custom_tagline": "For large companies with specific needs."
   },
   "Faq": {
     "title": "Frequently asked questions",

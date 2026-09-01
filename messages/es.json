@@ -17,7 +17,7 @@
     "mentor": "Mentor virtual",
     "talent": "Talento",
     "features": "Características",
-    "pricing": "Precios",
+    "pricing": "Empezar",
     "faq": "FAQ"
   },
   "Hero": {
@@ -109,26 +109,21 @@
     "challenges_b4": "Resumen automático de aplicantes destacados al cerrar"
   },
   "Pricing": {
-    "badge": "Precios claros y sin sorpresas",
-    "title": "Empieza gratis. Elige el plan que encaje contigo.",
-    "subtitle": "1 mes de prueba gratuita en cualquier plan. Sin permanencia. Cancela cuando quieras.",
-    "monthly": "Pago mensual",
-    "yearly": "Pago anual",
-    "save_badge": "Ahorra hasta 10%",
-    "per_year": "/ año",
-    "per_month": "/ mes",
-    "vat_excluded": "+ IVA · hasta {n} alumnos incluidos",
-    "save_label": "Ahorras {amount} al año",
+    "badge": "Fase de test controlado",
+    "title": "Menta en beta cerrada",
+    "subtitle": "Estamos dando acceso gratuito a empresas seleccionadas mientras validamos el producto. Cuéntanos cómo lo usarías y te contactamos en 2-3 días para configurar tu cuenta.",
+    "request_cta": "Solicitar acceso",
+    "already_account_prefix": "¿Ya tienes cuenta?",
+    "already_account_link": "Acceder",
+    "modes_title": "Para todo tipo de empresa",
+    "modes_subtitle": "Menta se adapta al volumen y tipo de prácticas que gestionas.",
+    "included_students": "Hasta {n} alumnos",
     "custom_label": "A medida",
-    "custom_hint": "Hablemos para construir tu plan.",
+    "custom_hint": "Hablemos para construir tu configuración.",
     "most_popular": "Más popular",
-    "footnote": "Todos los precios sin IVA. Alumnos adicionales: 49€/año por encima de los incluidos en cada plan.",
     "plan_base_tagline": "Para empresas que reciben alumnos puntualmente.",
     "plan_pro_tagline": "Para empresas que forman a varios alumnos al año.",
-    "plan_custom_tagline": "Para empresas grandes con necesidades específicas.",
-    "plan_base_includes_students": "Hasta 2 alumnos",
-    "plan_pro_includes_students": "Hasta 10 alumnos",
-    "plan_custom_includes_students": "A medida"
+    "plan_custom_tagline": "Para empresas grandes con necesidades específicas."
   },
   "Faq": {
     "title": "Preguntas frecuentes",

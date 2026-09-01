@@ -1,88 +1,69 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useTranslations, useLocale } from "next-intl";
-import { Check } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Check, Send, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  PLANS,
-  annualSavings,
-  type BillingCycle,
-  type PlanDefinition,
-} from "@/lib/utils";
-
-function fmtCurrency(value: number, locale: string) {
-  return new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-GB", {
-    style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: 0,
-  }).format(value);
-}
+import { PLANS, type PlanDefinition } from "@/lib/utils";
 
 export function Pricing() {
   const t = useTranslations("Pricing");
-  const c = useTranslations("Common");
-  const locale = useLocale();
-  const [cycle, setCycle] = useState<BillingCycle>("yearly");
 
   return (
     <section id="precios" className="container py-20 md:py-28">
       <div className="mx-auto max-w-2xl text-center">
-        <Badge variant="success" className="mb-4">
+        <Badge variant="warning" className="mb-4">
           {t("badge")}
         </Badge>
-        <h2 className="text-3xl font-bold tracking-tight md:text-4xl">{t("title")}</h2>
+        <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+          {t("title")}
+        </h2>
         <p className="mt-4 text-lg text-muted-foreground">{t("subtitle")}</p>
 
-        <div className="mt-8 inline-flex items-center rounded-full border bg-card p-1 text-sm">
-          <button
-            onClick={() => setCycle("monthly")}
-            className={`rounded-full px-4 py-1.5 transition ${cycle === "monthly" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
-          >
-            {t("monthly")}
-          </button>
-          <button
-            onClick={() => setCycle("yearly")}
-            className={`relative rounded-full px-4 py-1.5 transition ${cycle === "yearly" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
-          >
-            {t("yearly")}
-            <span className="ml-2 rounded-full bg-mint-100 px-2 py-0.5 text-[10px] font-semibold text-mint-800">
-              {t("save_badge")}
-            </span>
-          </button>
+        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <Button size="lg" asChild>
+            <Link href="/solicitar-acceso">
+              <Send className="h-4 w-4" />
+              {t("request_cta")}
+            </Link>
+          </Button>
+          <p className="text-sm text-muted-foreground">
+            {t("already_account_prefix")}{" "}
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+            >
+              <LogIn className="h-3.5 w-3.5" />
+              {t("already_account_link")}
+            </Link>
+          </p>
         </div>
       </div>
 
-      <div className="mx-auto mt-12 grid max-w-6xl gap-6 lg:grid-cols-3">
-        {PLANS.map((p) => (
-          <PlanCard key={p.id} plan={p} cycle={cycle} locale={locale} />
-        ))}
+      {/* Modalidades de uso — sin precios */}
+      <div className="mx-auto mt-16 max-w-2xl text-center">
+        <h3 className="text-xl font-semibold">{t("modes_title")}</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {t("modes_subtitle")}
+        </p>
       </div>
 
-      <p className="mt-10 text-center text-sm text-muted-foreground">{t("footnote")}</p>
+      <div className="mx-auto mt-8 grid max-w-6xl gap-6 lg:grid-cols-3">
+        {PLANS.map((p) => (
+          <PlanCard key={p.id} plan={p} />
+        ))}
+      </div>
     </section>
   );
 }
 
-function PlanCard({
-  plan,
-  cycle,
-  locale,
-}: {
-  plan: PlanDefinition;
-  cycle: BillingCycle;
-  locale: string;
-}) {
+function PlanCard({ plan }: { plan: PlanDefinition }) {
   const t = useTranslations("Pricing");
-  const c = useTranslations("Common");
   const isCustom = plan.id === "custom";
-  const price = cycle === "yearly" ? plan.yearlyPrice : plan.monthlyPrice;
-  const savings = annualSavings(plan);
 
-  const taglineKey = (`plan_${plan.id}_tagline`) as
+  const taglineKey = `plan_${plan.id}_tagline` as
     | "plan_base_tagline"
     | "plan_pro_tagline"
     | "plan_custom_tagline";
@@ -91,7 +72,7 @@ function PlanCard({
     <Card
       className={
         plan.highlight
-          ? "relative flex flex-col border-primary/40 bg-mint-50/40 p-8 shadow-md"
+          ? "relative flex flex-col border-primary/40 bg-mint-50/30 p-8"
           : "flex flex-col p-8"
       }
     >
@@ -108,27 +89,13 @@ function PlanCard({
 
       <div className="mt-6">
         {isCustom ? (
-          <div>
-            <span className="text-4xl font-bold">{t("custom_label")}</span>
-            <p className="mt-1 text-xs text-muted-foreground">{t("custom_hint")}</p>
-          </div>
+          <p className="text-sm font-medium text-muted-foreground">
+            {t("custom_hint")}
+          </p>
         ) : (
-          <>
-            <div className="flex items-baseline gap-1">
-              <span className="text-5xl font-bold">{fmtCurrency(price ?? 0, locale)}</span>
-              <span className="text-muted-foreground">
-                {cycle === "yearly" ? t("per_year") : t("per_month")}
-              </span>
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {t("vat_excluded", { n: plan.includedStudents })}
-            </p>
-            {cycle === "yearly" && savings > 0 && (
-              <p className="mt-2 text-xs font-medium text-mint-700">
-                {t("save_label", { amount: fmtCurrency(savings, locale) })}
-              </p>
-            )}
-          </>
+          <p className="text-sm font-medium">
+            {t("included_students", { n: plan.includedStudents })}
+          </p>
         )}
       </div>
 
@@ -140,21 +107,6 @@ function PlanCard({
           </li>
         ))}
       </ul>
-
-      {isCustom ? (
-        <Button className="mt-8" variant="outline" size="lg" asChild>
-          <a href="mailto:menta@gobesoluciones.com">{c("contact")}</a>
-        </Button>
-      ) : (
-        <Button
-          className="mt-8"
-          size="lg"
-          variant={plan.highlight ? "default" : "outline"}
-          asChild
-        >
-          <Link href="/solicitar-acceso">{c("free_trial_cta")}</Link>
-        </Button>
-      )}
     </Card>
   );
 }

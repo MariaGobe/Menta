@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Loader2,
   Search,
@@ -9,6 +10,7 @@ import {
   Clock,
   CheckCircle2,
   RotateCcw,
+  Users,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -175,6 +177,14 @@ export function AdminOrgsTable({ rows }: Props) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuLabel>Miembros</DropdownMenuLabel>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/admin/${row.id}/miembros`}>
+                          <Users className="mr-2 h-4 w-4" />
+                          Gestionar miembros
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuLabel>Trial</DropdownMenuLabel>
                       <DropdownMenuItem
                         onClick={() =>

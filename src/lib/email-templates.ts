@@ -338,6 +338,33 @@ export function accessRequestConfirmationEmail(p: {
   };
 }
 
+/* ──────────────────────────────────────────────────────────────────────── */
+/* 9. Password reset (super admin manual)                                    */
+/* ──────────────────────────────────────────────────────────────────────── */
+export function passwordResetEmail(p: {
+  userName: string | null;
+  resetUrl: string;
+}) {
+  const greet = p.userName ? `Hola ${p.userName.split(" ")[0]},` : "Hola,";
+  return {
+    subject: `Restablece tu contraseña de Menta`,
+    html: shell(`
+      <h1 style="color: #1a1a1a; font-size: 22px; margin: 0 0 16px;">Restablecer contraseña</h1>
+      <p style="color: #555; line-height: 1.6; font-size: 15px;">${greet}</p>
+      <p style="color: #555; line-height: 1.6; font-size: 15px;">
+        Hemos generado un enlace para que puedas establecer una nueva contraseña en Menta.
+        El enlace caduca en 1 hora.
+      </p>
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="${p.resetUrl}" style="${buttonStyles}">Establecer nueva contraseña</a>
+      </div>
+      <p style="color: #888; font-size: 13px; line-height: 1.6;">
+        Si no esperabas este email puedes ignorarlo con seguridad.
+      </p>
+    `),
+  };
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

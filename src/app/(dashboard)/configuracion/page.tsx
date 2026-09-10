@@ -5,16 +5,32 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrganizationForm } from "./organization-form";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { TeamPanel } from "./team-panel";
 
 export const dynamic = "force-dynamic";
 
 export default async function ConfiguracionPage() {
   const supabase = createClient();
   const t = await getTranslations("Configuracion");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { data: org } = await supabase
     .from("organizations")
     .select("id, name, nif, email, phone, address, city, postal_code")
     .single();
+
+  const { data: myProfile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user!.id)
+    .single();
+
+  const { data: members } = await supabase
+    .from("profiles")
+    .select("id, email, full_name, role")
+    .order("role", { ascending: false });
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -38,6 +54,12 @@ export default async function ConfiguracionPage() {
           <ArrowRight className="h-5 w-5 self-center text-muted-foreground" />
         </div>
       </Link>
+
+      <TeamPanel
+        currentUserId={user!.id}
+        currentRole={(myProfile?.role as "owner" | "admin" | "student") ?? "admin"}
+        members={(members ?? []) as any}
+      />
 
       <Card>
         <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">

@@ -1110,6 +1110,38 @@
   "OnboardingExtra": {
     "error_save": "Error guardando"
   },
+  "Team": {
+    "card_title": "Equipo de la organización",
+    "card_desc": "Añade otras personas de tu empresa para gestionar alumnos. Reciben un email para crear su contraseña.",
+    "invite_button": "Invitar miembro",
+    "email_label": "Email",
+    "name_label": "Nombre (opcional)",
+    "role_label": "Rol",
+    "role_admin": "Administrador",
+    "role_owner": "Propietario",
+    "cancel": "Cancelar",
+    "send": "Enviar invitación",
+    "sending": "Enviando...",
+    "sent": "Invitación enviada",
+    "error": "No se pudo enviar la invitación",
+    "no_permission": "Solo los propietarios y administradores pueden invitar.",
+    "members_title": "Miembros actuales",
+    "you": "(tú)"
+  },
+  "AdminNewOrg": {
+    "button": "Nueva organización",
+    "title": "Crear organización + invitar propietario",
+    "org_name_label": "Nombre de la empresa *",
+    "org_email_label": "Email general de la empresa",
+    "owner_email_label": "Email del propietario *",
+    "owner_name_label": "Nombre del propietario",
+    "trial_months_label": "Duración del trial (meses)",
+    "cancel": "Cancelar",
+    "create": "Crear e invitar",
+    "creating": "Creando...",
+    "success": "Organización creada e invitación enviada",
+    "error": "Error creando la organización"
+  },
   "AccessRequest": {
     "title": "Solicitar acceso a Menta",
     "subtitle": "Menta está en fase de test controlado. Cuéntanos brevemente cómo lo usarías y te contactamos en 2-3 días laborables para darte acceso gratuito y ayudarte a configurar tu cuenta.",

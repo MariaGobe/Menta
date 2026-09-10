@@ -1110,6 +1110,38 @@
   "OnboardingExtra": {
     "error_save": "Error saving"
   },
+  "Team": {
+    "card_title": "Organization team",
+    "card_desc": "Add other people from your company to manage students. They'll receive an email to create their password.",
+    "invite_button": "Invite member",
+    "email_label": "Email",
+    "name_label": "Name (optional)",
+    "role_label": "Role",
+    "role_admin": "Administrator",
+    "role_owner": "Owner",
+    "cancel": "Cancel",
+    "send": "Send invitation",
+    "sending": "Sending...",
+    "sent": "Invitation sent",
+    "error": "Could not send invitation",
+    "no_permission": "Only owners and administrators can invite.",
+    "members_title": "Current members",
+    "you": "(you)"
+  },
+  "AdminNewOrg": {
+    "button": "New organization",
+    "title": "Create organization + invite owner",
+    "org_name_label": "Company name *",
+    "org_email_label": "Company email",
+    "owner_email_label": "Owner email *",
+    "owner_name_label": "Owner name",
+    "trial_months_label": "Trial length (months)",
+    "cancel": "Cancel",
+    "create": "Create and invite",
+    "creating": "Creating...",
+    "success": "Organization created and invitation sent",
+    "error": "Error creating the organization"
+  },
   "AccessRequest": {
     "title": "Request access to Menta",
     "subtitle": "Menta is in controlled beta. Tell us briefly how you'd use it and we'll get back to you in 2-3 business days to grant free access and help you set up your account.",

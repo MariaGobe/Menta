@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { isSuperAdmin } from "@/lib/superadmin";
 import { AdminOrgsTable } from "./orgs-table";
+import { NewOrgButton } from "./new-org-button";
 import { ShieldCheck } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -98,17 +99,20 @@ export default async function AdminPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-mint-100">
-          <ShieldCheck className="h-5 w-5 text-mint-700" />
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-mint-100">
+            <ShieldCheck className="h-5 w-5 text-mint-700" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Super admin</h1>
+            <p className="text-muted-foreground">
+              Gestión interna de organizaciones. Solo visible para usuarios en la
+              whitelist.
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Super admin</h1>
-          <p className="text-muted-foreground">
-            Gestión interna de organizaciones. Solo visible para usuarios en la
-            whitelist.
-          </p>
-        </div>
+        <NewOrgButton />
       </div>
 
       <AdminOrgsTable rows={rows} />

@@ -819,6 +819,14 @@
     "tutor_academic_email_label": "Academic tutor email",
     "tutor_company_label": "Company tutor",
     "tutor_company_email_label": "Company tutor email",
+    "internal_data": "Role details",
+    "internal_data_subtitle": "Employees in internal training don't have an academic tutor. Add their department and direct manager.",
+    "department_label": "Department",
+    "department_placeholder": "e.g. Product, Marketing, Sales",
+    "position_label": "Position / role",
+    "position_placeholder": "e.g. Junior Backend, Sales Assistant",
+    "manager_name_label": "Manager / direct supervisor",
+    "manager_email_label": "Manager email",
     "period_title": "Internship period",
     "start_date_label": "Start date",
     "end_date_label": "End date",
@@ -1260,6 +1268,10 @@
   },
   "StudentDetail": {
     "back": "Back to students",
+    "back_employees": "Back to employees",
+    "internal_context": "Role and manager",
+    "department": "Department",
+    "manager": "Manager / direct supervisor",
     "edit": "Edit",
     "generate_plan": "Generate plan",
     "missing_docs": "Required documents missing:",
@@ -1373,6 +1385,27 @@
     "due_tomorrow": "Due tomorrow",
     "due_in_days": "In {n} days",
     "overdue": "Overdue"
+  },
+  "Employees": {
+    "title": "Employees",
+    "count_zero": "No employees in training",
+    "count_one": "1 employee in training",
+    "count_other": "{n} employees in training",
+    "new_employee": "New employee",
+    "search_placeholder": "Search by name, department or role...",
+    "empty_title": "No employees in training yet",
+    "empty_subtitle": "Add the first team member starting internal training.",
+    "empty_button": "Add first employee",
+    "th_employee": "Employee",
+    "th_department": "Department",
+    "th_position": "Position",
+    "th_period": "Period",
+    "th_status": "Status"
+  },
+  "EmployeeNew": {
+    "back": "Back to employees",
+    "title": "New employee in training",
+    "subtitle": "Add a team member for internal training. No academic tutor required."
   },
   "Students": {
     "title": "Students",

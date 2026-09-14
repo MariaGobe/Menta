@@ -53,13 +53,7 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
       label: t("group_people"),
       items: [
         { href: "/alumnos", icon: Users, label: t("students") },
-        {
-          href: "#",
-          icon: UserCog,
-          label: t("employees"),
-          disabled: true,
-          badge: t("coming_soon"),
-        },
+        { href: "/empleados", icon: UserCog, label: t("employees") },
       ],
     },
     {

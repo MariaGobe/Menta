@@ -38,6 +38,10 @@ export interface StudentFormDefaults {
   tutor_academic_email?: string | null;
   tutor_company_name?: string | null;
   tutor_company_email?: string | null;
+  department?: string | null;
+  position?: string | null;
+  manager_name?: string | null;
+  manager_email?: string | null;
   start_date?: string | null;
   end_date?: string | null;
   total_hours?: number | null;
@@ -49,18 +53,28 @@ export interface StudentFormDefaults {
 interface Props {
   mode: "create" | "edit";
   initial?: StudentFormDefaults;
+  /** "external": solo permite fp/university. "internal": solo internal.
+   * Se usa en /alumnos/nuevo (external) y /empleados/nuevo (internal). */
+  scope?: "external" | "internal";
+  /** A dónde volver al cancelar/guardar. Por defecto /alumnos. */
+  returnTo?: "alumnos" | "empleados";
 }
 
-export function StudentForm({ mode, initial }: Props) {
+export function StudentForm({ mode, initial, scope, returnTo }: Props) {
   const router = useRouter();
   const supabase = createClient();
   const t = useTranslations("StudentForm");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [practiceType, setPracticeType] = useState<PracticeType>(
-    initial?.practice_type ?? "fp",
-  );
+  const defaultType: PracticeType =
+    initial?.practice_type ?? (scope === "internal" ? "internal" : "fp");
+  const [practiceType, setPracticeType] = useState<PracticeType>(defaultType);
   const [status, setStatus] = useState<StudentStatus>(initial?.status ?? "active");
+  const isInternal = practiceType === "internal";
+  // El listado sí es distinto (Alumnos/Empleados), pero el detalle está unificado en /alumnos/[id].
+  const listBase = returnTo ?? (isInternal ? "empleados" : "alumnos");
+  const backHref =
+    mode === "edit" && initial?.id ? `/alumnos/${initial.id}` : `/${listBase}`;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -75,12 +89,18 @@ export function StudentForm({ mode, initial }: Props) {
       email: (formData.get("email") as string) || null,
       phone: (formData.get("phone") as string) || null,
       practice_type: practiceType,
-      institution_name: (formData.get("institution_name") as string) || null,
-      program_name: (formData.get("program_name") as string) || null,
-      tutor_academic_name: (formData.get("tutor_academic_name") as string) || null,
-      tutor_academic_email: (formData.get("tutor_academic_email") as string) || null,
+      // Los campos que no aplican a este tipo se envían como null para no
+      // arrastrar datos viejos si se cambia el tipo en modo edición.
+      institution_name: isInternal ? null : (formData.get("institution_name") as string) || null,
+      program_name: isInternal ? null : (formData.get("program_name") as string) || null,
+      tutor_academic_name: isInternal ? null : (formData.get("tutor_academic_name") as string) || null,
+      tutor_academic_email: isInternal ? null : (formData.get("tutor_academic_email") as string) || null,
       tutor_company_name: (formData.get("tutor_company_name") as string) || null,
       tutor_company_email: (formData.get("tutor_company_email") as string) || null,
+      department: isInternal ? (formData.get("department") as string) || null : null,
+      position: isInternal ? (formData.get("position") as string) || null : null,
+      manager_name: isInternal ? (formData.get("manager_name") as string) || null : null,
+      manager_email: isInternal ? (formData.get("manager_email") as string) || null : null,
       start_date: (formData.get("start_date") as string) || null,
       end_date: (formData.get("end_date") as string) || null,
       total_hours: Number(formData.get("total_hours")) || 0,
@@ -118,6 +138,7 @@ export function StudentForm({ mode, initial }: Props) {
         setError(err?.message ?? t("error_create"));
         return;
       }
+      // Detalle unificado bajo /alumnos/[id]; el back link se adapta.
       router.push(`/alumnos/${data.id}`);
       router.refresh();
     } else {
@@ -166,16 +187,23 @@ export function StudentForm({ mode, initial }: Props) {
               name="practice_type"
               value={practiceType}
               onValueChange={(v) => setPracticeType(v as PracticeType)}
+              disabled={scope === "internal"}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(Object.keys(PRACTICE_TYPE_LABELS) as PracticeType[]).map((k) => (
-                  <SelectItem key={k} value={k}>
-                    {PRACTICE_TYPE_LABELS[k]}
-                  </SelectItem>
-                ))}
+                {(Object.keys(PRACTICE_TYPE_LABELS) as PracticeType[])
+                  .filter((k) => {
+                    if (scope === "internal") return k === "internal";
+                    if (scope === "external") return k !== "internal";
+                    return true;
+                  })
+                  .map((k) => (
+                    <SelectItem key={k} value={k}>
+                      {PRACTICE_TYPE_LABELS[k]}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
             {practiceType === "fp" && (
@@ -228,37 +256,83 @@ export function StudentForm({ mode, initial }: Props) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("academic_data")}</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="institution_name">{institutionLabel[practiceType]}</Label>
-            <Input id="institution_name" name="institution_name" defaultValue={initial?.institution_name ?? ""} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="program_name">{programLabel[practiceType]}</Label>
-            <Input id="program_name" name="program_name" defaultValue={initial?.program_name ?? ""} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="tutor_academic_name">{t("tutor_academic_label")}</Label>
-            <Input id="tutor_academic_name" name="tutor_academic_name" defaultValue={initial?.tutor_academic_name ?? ""} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="tutor_academic_email">{t("tutor_academic_email_label")}</Label>
-            <Input id="tutor_academic_email" type="email" name="tutor_academic_email" defaultValue={initial?.tutor_academic_email ?? ""} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="tutor_company_name">{t("tutor_company_label")}</Label>
-            <Input id="tutor_company_name" name="tutor_company_name" defaultValue={initial?.tutor_company_name ?? ""} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="tutor_company_email">{t("tutor_company_email_label")}</Label>
-            <Input id="tutor_company_email" type="email" name="tutor_company_email" defaultValue={initial?.tutor_company_email ?? ""} />
-          </div>
-        </CardContent>
-      </Card>
+      {isInternal ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("internal_data")}</CardTitle>
+            <CardDescription>{t("internal_data_subtitle")}</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="department">{t("department_label")}</Label>
+              <Input
+                id="department"
+                name="department"
+                defaultValue={initial?.department ?? ""}
+                placeholder={t("department_placeholder")}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="position">{t("position_label")}</Label>
+              <Input
+                id="position"
+                name="position"
+                defaultValue={initial?.position ?? ""}
+                placeholder={t("position_placeholder")}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="manager_name">{t("manager_name_label")}</Label>
+              <Input
+                id="manager_name"
+                name="manager_name"
+                defaultValue={initial?.manager_name ?? ""}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="manager_email">{t("manager_email_label")}</Label>
+              <Input
+                id="manager_email"
+                type="email"
+                name="manager_email"
+                defaultValue={initial?.manager_email ?? ""}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("academic_data")}</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="institution_name">{institutionLabel[practiceType]}</Label>
+              <Input id="institution_name" name="institution_name" defaultValue={initial?.institution_name ?? ""} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="program_name">{programLabel[practiceType]}</Label>
+              <Input id="program_name" name="program_name" defaultValue={initial?.program_name ?? ""} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tutor_academic_name">{t("tutor_academic_label")}</Label>
+              <Input id="tutor_academic_name" name="tutor_academic_name" defaultValue={initial?.tutor_academic_name ?? ""} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tutor_academic_email">{t("tutor_academic_email_label")}</Label>
+              <Input id="tutor_academic_email" type="email" name="tutor_academic_email" defaultValue={initial?.tutor_academic_email ?? ""} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tutor_company_name">{t("tutor_company_label")}</Label>
+              <Input id="tutor_company_name" name="tutor_company_name" defaultValue={initial?.tutor_company_name ?? ""} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tutor_company_email">{t("tutor_company_email_label")}</Label>
+              <Input id="tutor_company_email" type="email" name="tutor_company_email" defaultValue={initial?.tutor_company_email ?? ""} />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
@@ -306,9 +380,7 @@ export function StudentForm({ mode, initial }: Props) {
 
       <div className="flex justify-end gap-3">
         <Button variant="outline" type="button" asChild>
-          <Link href={mode === "edit" && initial?.id ? `/alumnos/${initial.id}` : "/alumnos"}>
-            {t("cancel")}
-          </Link>
+          <Link href={backHref}>{t("cancel")}</Link>
         </Button>
         <Button type="submit" disabled={loading}>
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ArrowLeft, FileText, ClipboardCheck, Clock, Mail, Phone, CalendarDays, GraduationCap } from "lucide-react";
+import { ArrowLeft, FileText, ClipboardCheck, Clock, Mail, Phone, CalendarDays, GraduationCap, Building2, Briefcase } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,14 +61,18 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
     .maybeSingle();
   const hasAccount = !!studentProfile;
 
+  const isInternal = student.practice_type === "internal";
   const requiredDocs = REQUIRED_DOCUMENTS[student.practice_type];
   const uploadedTypes = new Set((documents ?? []).map((d) => d.type));
   const missingDocs = requiredDocs.filter((t) => !uploadedTypes.has(t));
 
+  const backHref = isInternal ? "/empleados" : "/alumnos";
+  const backLabel = isInternal ? t("back_employees") : t("back");
+
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <Link href="/alumnos" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" /> {t("back")}
+      <Link href={backHref} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+        <ArrowLeft className="h-4 w-4" /> {backLabel}
       </Link>
 
       <div className="flex items-start justify-between gap-4">
@@ -80,8 +84,12 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
             </Badge>
           </div>
           <p className="mt-1 text-muted-foreground">
-            {PRACTICE_TYPE_LABELS[student.practice_type]} ·{" "}
-            {student.institution_name ?? t("no_institution")}
+            {PRACTICE_TYPE_LABELS[student.practice_type]}
+            {isInternal
+              ? student.department
+                ? ` · ${student.department}`
+                : ""
+              : ` · ${student.institution_name ?? t("no_institution")}`}
           </p>
         </div>
         <div className="flex flex-wrap items-start justify-end gap-2">
@@ -133,9 +141,15 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
             <div className="flex items-center gap-2 text-muted-foreground">
               <Phone className="h-4 w-4" /> {student.phone ?? "—"}
             </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <GraduationCap className="h-4 w-4" /> {student.program_name ?? "—"}
-            </div>
+            {isInternal ? (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Briefcase className="h-4 w-4" /> {student.position ?? "—"}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <GraduationCap className="h-4 w-4" /> {student.program_name ?? "—"}
+              </div>
+            )}
             <Separator />
             <p className="text-xs text-muted-foreground">{t("dni")}</p>
             <p>{student.dni ?? "—"}</p>
@@ -161,20 +175,42 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{t("tutors")}</CardTitle>
+            <CardTitle className="text-base">
+              {isInternal ? t("internal_context") : t("tutors")}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <div>
-              <p className="text-xs text-muted-foreground">{t("tutor_academic")}</p>
-              <p>{student.tutor_academic_name ?? "—"}</p>
-              <p className="text-xs text-muted-foreground">{student.tutor_academic_email ?? ""}</p>
-            </div>
-            <Separator />
-            <div>
-              <p className="text-xs text-muted-foreground">{t("tutor_company")}</p>
-              <p>{student.tutor_company_name ?? "—"}</p>
-              <p className="text-xs text-muted-foreground">{student.tutor_company_email ?? ""}</p>
-            </div>
+            {isInternal ? (
+              <>
+                <div>
+                  <p className="text-xs text-muted-foreground">{t("department")}</p>
+                  <p className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                    {student.department ?? "—"}
+                  </p>
+                </div>
+                <Separator />
+                <div>
+                  <p className="text-xs text-muted-foreground">{t("manager")}</p>
+                  <p>{student.manager_name ?? "—"}</p>
+                  <p className="text-xs text-muted-foreground">{student.manager_email ?? ""}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <p className="text-xs text-muted-foreground">{t("tutor_academic")}</p>
+                  <p>{student.tutor_academic_name ?? "—"}</p>
+                  <p className="text-xs text-muted-foreground">{student.tutor_academic_email ?? ""}</p>
+                </div>
+                <Separator />
+                <div>
+                  <p className="text-xs text-muted-foreground">{t("tutor_company")}</p>
+                  <p>{student.tutor_company_name ?? "—"}</p>
+                  <p className="text-xs text-muted-foreground">{student.tutor_company_email ?? ""}</p>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>

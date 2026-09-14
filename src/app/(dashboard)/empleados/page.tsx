@@ -1,27 +1,28 @@
 import Link from "next/link";
-import { Plus, Users, Search } from "lucide-react";
+import { Plus, UserCog, Search } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { PRACTICE_TYPE_LABELS, STATUS_LABELS } from "@/types/database";
+import { STATUS_LABELS } from "@/types/database";
 import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
-export default async function AlumnosPage() {
+export default async function EmpleadosPage() {
   const supabase = createClient();
-  const t = await getTranslations("Students");
-  const { data: students } = await supabase
+  const t = await getTranslations("Employees");
+  const { data: employees } = await supabase
     .from("students")
-    .select("id, full_name, practice_type, institution_name, status, start_date, end_date")
-    .neq("practice_type", "internal")
+    .select("id, full_name, department, position, status, start_date, end_date")
+    .eq("practice_type", "internal")
     .order("created_at", { ascending: false });
 
-  const n = students?.length ?? 0;
-  const countLabel = n === 0 ? t("count_zero") : n === 1 ? t("count_one") : t("count_other", { n });
+  const n = employees?.length ?? 0;
+  const countLabel =
+    n === 0 ? t("count_zero") : n === 1 ? t("count_one") : t("count_other", { n });
 
   return (
     <div className="space-y-6">
@@ -31,8 +32,8 @@ export default async function AlumnosPage() {
           <p className="text-muted-foreground">{countLabel}</p>
         </div>
         <Button asChild>
-          <Link href="/alumnos/nuevo">
-            <Plus className="h-4 w-4" /> {t("new_student")}
+          <Link href="/empleados/nuevo">
+            <Plus className="h-4 w-4" /> {t("new_employee")}
           </Link>
         </Button>
       </div>
@@ -46,14 +47,14 @@ export default async function AlumnosPage() {
         </CardContent>
       </Card>
 
-      {!students?.length ? (
+      {!employees?.length ? (
         <Card>
           <CardContent className="p-12 text-center">
-            <Users className="mx-auto h-12 w-12 text-muted-foreground" />
+            <UserCog className="mx-auto h-12 w-12 text-muted-foreground" />
             <h3 className="mt-4 text-lg font-semibold">{t("empty_title")}</h3>
             <p className="mt-2 text-sm text-muted-foreground">{t("empty_subtitle")}</p>
             <Button className="mt-6" asChild>
-              <Link href="/alumnos/nuevo">
+              <Link href="/empleados/nuevo">
                 <Plus className="h-4 w-4" /> {t("empty_button")}
               </Link>
             </Button>
@@ -65,33 +66,36 @@ export default async function AlumnosPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-left text-xs uppercase text-muted-foreground">
-                  <th className="px-6 py-3 font-medium">{t("th_student")}</th>
-                  <th className="px-6 py-3 font-medium">{t("th_type")}</th>
-                  <th className="px-6 py-3 font-medium">{t("th_institution")}</th>
+                  <th className="px-6 py-3 font-medium">{t("th_employee")}</th>
+                  <th className="px-6 py-3 font-medium">{t("th_department")}</th>
+                  <th className="px-6 py-3 font-medium">{t("th_position")}</th>
                   <th className="px-6 py-3 font-medium">{t("th_period")}</th>
                   <th className="px-6 py-3 font-medium">{t("th_status")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {students.map((s) => (
-                  <tr key={s.id} className="hover:bg-accent/30">
+                {employees.map((e) => (
+                  <tr key={e.id} className="hover:bg-accent/30">
                     <td className="px-6 py-4">
-                      <Link href={`/alumnos/${s.id}`} className="font-medium hover:text-primary">
-                        {s.full_name}
+                      <Link
+                        href={`/alumnos/${e.id}`}
+                        className="font-medium hover:text-primary"
+                      >
+                        {e.full_name}
                       </Link>
                     </td>
                     <td className="px-6 py-4 text-muted-foreground">
-                      {PRACTICE_TYPE_LABELS[s.practice_type]}
+                      {e.department ?? "—"}
                     </td>
                     <td className="px-6 py-4 text-muted-foreground">
-                      {s.institution_name ?? "—"}
+                      {e.position ?? "—"}
                     </td>
                     <td className="px-6 py-4 text-muted-foreground">
-                      {formatDate(s.start_date)} - {formatDate(s.end_date)}
+                      {formatDate(e.start_date)} - {formatDate(e.end_date)}
                     </td>
                     <td className="px-6 py-4">
-                      <Badge variant={s.status === "active" ? "success" : "secondary"}>
-                        {STATUS_LABELS[s.status]}
+                      <Badge variant={e.status === "active" ? "success" : "secondary"}>
+                        {STATUS_LABELS[e.status]}
                       </Badge>
                     </td>
                   </tr>

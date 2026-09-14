@@ -3,12 +3,12 @@ import { ArrowLeft } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { StudentForm } from "@/components/students/student-form";
 
-export default async function NuevoAlumnoPage() {
-  const t = await getTranslations("StudentNew");
+export default async function NuevoEmpleadoPage() {
+  const t = await getTranslations("EmployeeNew");
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <Link
-        href="/alumnos"
+        href="/empleados"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" /> {t("back")}
@@ -19,7 +19,7 @@ export default async function NuevoAlumnoPage() {
         <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
-      <StudentForm mode="create" scope="external" returnTo="alumnos" />
+      <StudentForm mode="create" scope="internal" returnTo="empleados" />
     </div>
   );
 }

@@ -819,6 +819,14 @@
     "tutor_academic_email_label": "Email tutor académico",
     "tutor_company_label": "Tutor de empresa",
     "tutor_company_email_label": "Email tutor de empresa",
+    "internal_data": "Datos del puesto",
+    "internal_data_subtitle": "Los empleados en formación interna no tienen tutor académico. Añade su departamento y responsable directo.",
+    "department_label": "Departamento",
+    "department_placeholder": "p.ej. Producto, Marketing, Ventas",
+    "position_label": "Puesto / rol",
+    "position_placeholder": "p.ej. Junior Backend, Asistente comercial",
+    "manager_name_label": "Manager / responsable directo",
+    "manager_email_label": "Email del manager",
     "period_title": "Período de prácticas",
     "start_date_label": "Fecha inicio",
     "end_date_label": "Fecha fin",
@@ -1260,6 +1268,10 @@
   },
   "StudentDetail": {
     "back": "Volver a alumnos",
+    "back_employees": "Volver a empleados",
+    "internal_context": "Puesto y responsable",
+    "department": "Departamento",
+    "manager": "Manager / responsable directo",
     "edit": "Editar",
     "generate_plan": "Generar plan",
     "missing_docs": "Faltan documentos obligatorios:",
@@ -1389,6 +1401,27 @@
     "th_institution": "Centro",
     "th_period": "Período",
     "th_status": "Estado"
+  },
+  "Employees": {
+    "title": "Empleados",
+    "count_zero": "Sin empleados en formación",
+    "count_one": "1 empleado en formación",
+    "count_other": "{n} empleados en formación",
+    "new_employee": "Nuevo empleado",
+    "search_placeholder": "Buscar por nombre, departamento o puesto...",
+    "empty_title": "Aún no hay empleados en formación",
+    "empty_subtitle": "Da de alta al primer empleado que va a hacer formación interna.",
+    "empty_button": "Añadir primer empleado",
+    "th_employee": "Empleado",
+    "th_department": "Departamento",
+    "th_position": "Puesto",
+    "th_period": "Período",
+    "th_status": "Estado"
+  },
+  "EmployeeNew": {
+    "back": "Volver a empleados",
+    "title": "Nuevo empleado en formación",
+    "subtitle": "Alta de un miembro del equipo que va a hacer formación interna. No lleva tutor académico."
   },
   "Templates": {
     "title": "Plantillas de planes",

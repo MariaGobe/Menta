@@ -388,6 +388,10 @@ export interface Student {
   tutor_academic_phone: string | null;
   tutor_company_name: string | null;
   tutor_company_email: string | null;
+  department: string | null;
+  position: string | null;
+  manager_name: string | null;
+  manager_email: string | null;
   start_date: string | null;
   end_date: string | null;
   total_hours: number;
@@ -395,6 +399,11 @@ export interface Student {
   status: StudentStatus;
   notes: string | null;
   created_at: string;
+}
+
+/** True cuando el "alumno" es en realidad un empleado en formación interna. */
+export function isEmployee(practiceType: PracticeType): boolean {
+  return practiceType === "internal";
 }
 
 export interface Document {

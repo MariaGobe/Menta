@@ -828,10 +828,13 @@
     "manager_name_label": "Manager / direct supervisor",
     "manager_email_label": "Manager email",
     "period_title": "Internship period",
+    "period_subtitle": "Overall dates and dedication. If dedication changes within the period, add it as separate segments.",
     "start_date_label": "Start date",
     "end_date_label": "End date",
     "total_hours_label": "Total hours",
-    "weekly_hours_label": "Hours/week",
+    "weekly_hours_label": "Hours/week (default)",
+    "weekly_hours_hint": "Used when no segments are defined below.",
+    "schedules_label": "Variable dedication segments",
     "notes_label": "Internal notes",
     "cancel": "Cancel",
     "create": "Create student",
@@ -1151,6 +1154,14 @@
     "members_title": "Current members",
     "you": "(you)"
   },
+  "HourSchedule": {
+    "hint": "Add a segment when the weekly dedication changes within the period. Without segments, the default \"Hours/week\" value above is used.",
+    "empty": "No segments defined. Using default dedication.",
+    "from_label": "From",
+    "to_label": "To",
+    "hours_label": "h/week",
+    "add_row": "Add segment"
+  },
   "AdminMembers": {
     "back": "Back to panel",
     "title": "Manage members",
@@ -1281,6 +1292,7 @@
     "total_hours": "Total hours",
     "hours_unit": "h",
     "hours_per_week": "h/week",
+    "schedules_title": "Dedication segments",
     "tutors": "Tutors",
     "tutor_academic": "Academic tutor",
     "tutor_company": "Company tutor",

@@ -53,6 +53,12 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
 
   const loggedHours = (hoursAgg ?? []).reduce((sum, l) => sum + Number(l.hours), 0);
 
+  const { data: hourSchedules } = await supabase
+    .from("student_hour_schedules")
+    .select("id, from_date, to_date, weekly_hours")
+    .eq("student_id", student.id)
+    .order("from_date", { ascending: true });
+
   // ¿El alumno ya tiene cuenta en Menta? (un profile vinculado a su student_id)
   const { data: studentProfile } = await supabase
     .from("profiles")
@@ -169,7 +175,33 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
             <p className="text-2xl font-bold">
               {loggedHours} <span className="text-sm font-normal text-muted-foreground">/ {student.total_hours} {t("hours_unit")}</span>
             </p>
-            <p className="text-xs text-muted-foreground">{student.weekly_hours ?? "—"} {t("hours_per_week")}</p>
+            {hourSchedules && hourSchedules.length > 0 ? (
+              <>
+                <Separator />
+                <p className="text-xs font-medium text-muted-foreground">
+                  {t("schedules_title")}
+                </p>
+                <ul className="space-y-1 text-xs">
+                  {hourSchedules.map((s) => (
+                    <li
+                      key={s.id}
+                      className="flex items-center justify-between rounded-md bg-muted/40 px-2 py-1"
+                    >
+                      <span className="text-muted-foreground">
+                        {formatDate(s.from_date)} → {formatDate(s.to_date)}
+                      </span>
+                      <span className="font-mono font-semibold">
+                        {Number(s.weekly_hours)} {t("hours_per_week")}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                {student.weekly_hours ?? "—"} {t("hours_per_week")}
+              </p>
+            )}
           </CardContent>
         </Card>
 

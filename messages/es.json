@@ -828,10 +828,13 @@
     "manager_name_label": "Manager / responsable directo",
     "manager_email_label": "Email del manager",
     "period_title": "Período de prácticas",
+    "period_subtitle": "Fechas globales y dedicación. Si la dedicación cambia dentro del período, añádela como tramos.",
     "start_date_label": "Fecha inicio",
     "end_date_label": "Fecha fin",
     "total_hours_label": "Total de horas",
-    "weekly_hours_label": "Horas/semana",
+    "weekly_hours_label": "Horas/semana (por defecto)",
+    "weekly_hours_hint": "Se usa cuando no hay tramos definidos abajo.",
+    "schedules_label": "Tramos de dedicación variable",
     "notes_label": "Notas internas",
     "cancel": "Cancelar",
     "create": "Crear alumno",
@@ -1151,6 +1154,14 @@
     "members_title": "Miembros actuales",
     "you": "(tú)"
   },
+  "HourSchedule": {
+    "hint": "Añade un tramo cuando la dedicación semanal cambie dentro del período. Sin tramos, se usa el valor \"Horas/semana\" de arriba.",
+    "empty": "Sin tramos definidos. Se usará la dedicación por defecto.",
+    "from_label": "Desde",
+    "to_label": "Hasta",
+    "hours_label": "h/semana",
+    "add_row": "Añadir tramo"
+  },
   "AdminMembers": {
     "back": "Volver al panel",
     "title": "Gestionar miembros",
@@ -1281,6 +1292,7 @@
     "total_hours": "Horas totales",
     "hours_unit": "h",
     "hours_per_week": "h/semana",
+    "schedules_title": "Tramos de dedicación",
     "tutors": "Tutores",
     "tutor_academic": "Tutor académico",
     "tutor_company": "Tutor de empresa",

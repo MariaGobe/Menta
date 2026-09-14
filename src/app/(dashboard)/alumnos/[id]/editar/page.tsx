@@ -21,6 +21,12 @@ export default async function EditAlumnoPage({
     .single();
   if (!student) notFound();
 
+  const { data: schedules } = await supabase
+    .from("student_hour_schedules")
+    .select("id, student_id, from_date, to_date, weekly_hours, notes, created_at")
+    .eq("student_id", params.id)
+    .order("from_date", { ascending: true });
+
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <Link
@@ -35,7 +41,7 @@ export default async function EditAlumnoPage({
         <p className="text-muted-foreground">{student.full_name}</p>
       </div>
 
-      <StudentForm mode="edit" initial={student} />
+      <StudentForm mode="edit" initial={student} initialSchedules={schedules ?? []} />
     </div>
   );
 }

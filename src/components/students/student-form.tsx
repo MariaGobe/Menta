@@ -23,7 +23,9 @@ import {
   STATUS_LABELS,
   type PracticeType,
   type StudentStatus,
+  type StudentHourSchedule,
 } from "@/types/database";
+import { HourScheduleEditor, type HourScheduleDraft } from "./hour-schedule-editor";
 
 export interface StudentFormDefaults {
   id?: string;
@@ -58,9 +60,17 @@ interface Props {
   scope?: "external" | "internal";
   /** A dónde volver al cancelar/guardar. Por defecto /alumnos. */
   returnTo?: "alumnos" | "empleados";
+  /** Tramos de dedicación variable persistidos (solo modo edit). */
+  initialSchedules?: StudentHourSchedule[];
 }
 
-export function StudentForm({ mode, initial, scope, returnTo }: Props) {
+export function StudentForm({
+  mode,
+  initial,
+  scope,
+  returnTo,
+  initialSchedules,
+}: Props) {
   const router = useRouter();
   const supabase = createClient();
   const t = useTranslations("StudentForm");
@@ -70,6 +80,18 @@ export function StudentForm({ mode, initial, scope, returnTo }: Props) {
     initial?.practice_type ?? (scope === "internal" ? "internal" : "fp");
   const [practiceType, setPracticeType] = useState<PracticeType>(defaultType);
   const [status, setStatus] = useState<StudentStatus>(initial?.status ?? "active");
+  const [startDate, setStartDate] = useState<string>(initial?.start_date ?? "");
+  const [endDate, setEndDate] = useState<string>(initial?.end_date ?? "");
+  const [schedules, setSchedules] = useState<HourScheduleDraft[]>(
+    (initialSchedules ?? []).map((s) => ({
+      id: s.id,
+      from_date: s.from_date,
+      to_date: s.to_date,
+      weekly_hours: Number(s.weekly_hours),
+      notes: s.notes,
+    })),
+  );
+  const initialIds = new Set((initialSchedules ?? []).map((s) => s.id));
   const isInternal = practiceType === "internal";
   // El listado sí es distinto (Alumnos/Empleados), pero el detalle está unificado en /alumnos/[id].
   const listBase = returnTo ?? (isInternal ? "empleados" : "alumnos");
@@ -133,11 +155,13 @@ export function StudentForm({ mode, initial, scope, returnTo }: Props) {
         .insert({ ...payload, organization_id: profile.organization_id })
         .select("id")
         .single();
-      setLoading(false);
       if (err || !data) {
+        setLoading(false);
         setError(err?.message ?? t("error_create"));
         return;
       }
+      await syncSchedules(data.id);
+      setLoading(false);
       // Detalle unificado bajo /alumnos/[id]; el back link se adapta.
       router.push(`/alumnos/${data.id}`);
       router.refresh();
@@ -151,13 +175,57 @@ export function StudentForm({ mode, initial, scope, returnTo }: Props) {
         .from("students")
         .update(payload)
         .eq("id", initial.id);
-      setLoading(false);
       if (err) {
+        setLoading(false);
         setError(err.message);
         return;
       }
+      await syncSchedules(initial.id);
+      setLoading(false);
       router.push(`/alumnos/${initial.id}`);
       router.refresh();
+    }
+  }
+
+  /**
+   * Sincroniza los tramos de dedicación con la tabla `student_hour_schedules`:
+   * - Los que empiezan por "new-" se insertan.
+   * - Los que ya existían y siguen en el estado se actualizan.
+   * - Los que estaban en `initialIds` pero ya no están en el estado se borran.
+   */
+  async function syncSchedules(studentId: string) {
+    const currentIds = new Set(schedules.map((s) => s.id));
+    const toDelete: string[] = [];
+    initialIds.forEach((id) => {
+      if (!currentIds.has(id)) toDelete.push(id);
+    });
+    if (toDelete.length > 0) {
+      await supabase.from("student_hour_schedules").delete().in("id", toDelete);
+    }
+    const toInsert = schedules
+      .filter((s) => s.id.startsWith("new-"))
+      .filter((s) => s.from_date && s.to_date && s.weekly_hours >= 0)
+      .map((s) => ({
+        student_id: studentId,
+        from_date: s.from_date,
+        to_date: s.to_date,
+        weekly_hours: s.weekly_hours,
+      }));
+    if (toInsert.length > 0) {
+      await supabase.from("student_hour_schedules").insert(toInsert);
+    }
+    const toUpdate = schedules.filter(
+      (s) => !s.id.startsWith("new-") && initialIds.has(s.id),
+    );
+    for (const s of toUpdate) {
+      await supabase
+        .from("student_hour_schedules")
+        .update({
+          from_date: s.from_date,
+          to_date: s.to_date,
+          weekly_hours: s.weekly_hours,
+        })
+        .eq("id", s.id);
     }
   }
 
@@ -337,37 +405,68 @@ export function StudentForm({ mode, initial, scope, returnTo }: Props) {
       <Card>
         <CardHeader>
           <CardTitle>{t("period_title")}</CardTitle>
+          <CardDescription>{t("period_subtitle")}</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="start_date">{t("start_date_label")}</Label>
-            <Input id="start_date" type="date" name="start_date" defaultValue={initial?.start_date ?? ""} />
+        <CardContent className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="start_date">{t("start_date_label")}</Label>
+              <Input
+                id="start_date"
+                type="date"
+                name="start_date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="end_date">{t("end_date_label")}</Label>
+              <Input
+                id="end_date"
+                type="date"
+                name="end_date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="total_hours">{t("total_hours_label")}</Label>
+              <Input
+                id="total_hours"
+                type="number"
+                min="0"
+                name="total_hours"
+                defaultValue={initial?.total_hours ?? 400}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="weekly_hours">{t("weekly_hours_label")}</Label>
+              <Input
+                id="weekly_hours"
+                type="number"
+                min="0"
+                step="0.5"
+                name="weekly_hours"
+                defaultValue={initial?.weekly_hours ?? 20}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t("weekly_hours_hint")}
+              </p>
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="end_date">{t("end_date_label")}</Label>
-            <Input id="end_date" type="date" name="end_date" defaultValue={initial?.end_date ?? ""} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="total_hours">{t("total_hours_label")}</Label>
-            <Input
-              id="total_hours"
-              type="number"
-              min="0"
-              name="total_hours"
-              defaultValue={initial?.total_hours ?? 400}
+
+          <div className="space-y-2 border-t pt-4">
+            <Label className="text-sm font-semibold">
+              {t("schedules_label")}
+            </Label>
+            <HourScheduleEditor
+              value={schedules}
+              onChange={setSchedules}
+              bounds={{ start_date: startDate, end_date: endDate }}
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="weekly_hours">{t("weekly_hours_label")}</Label>
-            <Input
-              id="weekly_hours"
-              type="number"
-              min="0"
-              name="weekly_hours"
-              defaultValue={initial?.weekly_hours ?? 20}
-            />
-          </div>
-          <div className="space-y-2 md:col-span-2">
             <Label htmlFor="notes">{t("notes_label")}</Label>
             <Textarea id="notes" name="notes" rows={3} defaultValue={initial?.notes ?? ""} />
           </div>

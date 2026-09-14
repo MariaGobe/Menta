@@ -42,6 +42,22 @@ export interface MentorConfig {
   updated_by: string | null;
 }
 
+export type MentorDocumentStatus = "pending" | "ready" | "failed" | "skipped";
+
+export interface MentorDocument {
+  id: string;
+  organization_id: string;
+  name: string;
+  storage_path: string;
+  mime_type: string | null;
+  size_bytes: number | null;
+  extracted_text: string | null;
+  extraction_status: MentorDocumentStatus;
+  extraction_error: string | null;
+  created_at: string;
+  created_by: string | null;
+}
+
 export const MENTOR_TONE_LABELS: Record<MentorTone, string> = {
   cercano: "Cercano",
   formal: "Formal",

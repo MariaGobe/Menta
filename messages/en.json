@@ -886,7 +886,22 @@
     "subtitle": "Feed the mentor with the information it needs to support your students.",
     "why_matters": "Why it matters: the virtual mentor helps the student day to day (questions, planning, unblocking). Everything you write here will be used as context so it answers in line with your company and way of working.",
     "config_title": "Mentor configuration",
-    "config_subtitle": "Everything you write here will be used as context in every mentor conversation with your students."
+    "config_subtitle": "Everything you write here will be used as context in every mentor conversation with your students.",
+    "docs_title": "Knowledge base",
+    "docs_subtitle": "Upload manuals, policies or guides. The mentor will use them to answer your students."
+  },
+  "MentorDocs": {
+    "drop_title": "Drag files here or click to choose",
+    "drop_hint": "PDF, TXT, MD or CSV · up to 20 MB per file",
+    "choose_file": "Choose file",
+    "uploading": "Uploading...",
+    "upload_error": "Error uploading the file",
+    "confirm_delete": "Delete this mentor document?",
+    "status_ready": "Ready",
+    "status_pending": "Processing",
+    "status_failed": "Error",
+    "status_skipped": "No text",
+    "empty": "No documents uploaded yet."
   },
   "MentorConfigForm": {
     "company_label": "About the company",

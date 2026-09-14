@@ -76,13 +76,25 @@ export async function POST(request: Request) {
   ]);
 
   let mentorConfig: MentorConfig | null = null;
+  let mentorDocs: { name: string; extracted_text: string }[] = [];
   if (student?.organization_id) {
-    const { data } = await supabase
-      .from("mentor_configs")
-      .select("*")
-      .eq("organization_id", student.organization_id)
-      .maybeSingle();
-    mentorConfig = data ?? null;
+    const [{ data: cfg }, { data: docs }] = await Promise.all([
+      supabase
+        .from("mentor_configs")
+        .select("*")
+        .eq("organization_id", student.organization_id)
+        .maybeSingle(),
+      supabase
+        .from("mentor_documents")
+        .select("name, extracted_text")
+        .eq("organization_id", student.organization_id)
+        .eq("extraction_status", "ready")
+        .not("extracted_text", "is", null),
+    ]);
+    mentorConfig = cfg ?? null;
+    mentorDocs = (docs ?? [])
+      .filter((d): d is { name: string; extracted_text: string } => !!d.extracted_text)
+      .map((d) => ({ name: d.name, extracted_text: d.extracted_text }));
   }
 
   // Solo primer nombre — minimización de PII enviada al LLM.
@@ -93,6 +105,7 @@ export async function POST(request: Request) {
     tasks: tasks ?? [],
     plan: plan ?? null,
     mentorConfig,
+    documents: mentorDocs,
   };
 
   // Historial: descartamos el mensaje recién insertado (es el `message` actual)
@@ -151,7 +164,12 @@ interface MentorContext {
     end_date: string | null;
   } | null;
   mentorConfig: MentorConfig | null;
+  documents: { name: string; extracted_text: string }[];
 }
+
+// Presupuesto máximo de caracteres para los documentos en el prompt.
+// Haiku 4.5 admite mucho contexto; limitamos por coste y ruido.
+const DOCS_BUDGET_CHARS = 60_000;
 
 /**
  * Descripción de las secciones del portal del alumno.
@@ -217,6 +235,22 @@ export function buildSystemPrompt(ctx: MentorContext): string {
   }
   if (c?.custom_instructions) {
     lines.push(`\nInstrucciones específicas de la empresa:\n${c.custom_instructions}`);
+  }
+
+  if (ctx.documents.length > 0) {
+    let remaining = DOCS_BUDGET_CHARS;
+    const included: string[] = [];
+    for (const doc of ctx.documents) {
+      if (remaining <= 500) break;
+      const text = doc.extracted_text.slice(0, Math.min(doc.extracted_text.length, remaining));
+      included.push(`### ${doc.name}\n${text}${doc.extracted_text.length > text.length ? "\n[…texto truncado por espacio…]" : ""}`);
+      remaining -= text.length + doc.name.length + 10;
+    }
+    lines.push(
+      "\n--- Documentos internos de la empresa (fuente autoritativa) ---",
+      "Estos documentos los ha subido la empresa como base de conocimiento. Cuando el alumno pregunte por procesos, políticas, información interna o cualquier tema que se toque en estos textos, apóyate en ellos y cita el documento entre paréntesis. Si el documento contradice tus suposiciones, gana el documento.",
+      included.join("\n\n"),
+    );
   }
 
   lines.push("\n--- Contexto del alumno ---");

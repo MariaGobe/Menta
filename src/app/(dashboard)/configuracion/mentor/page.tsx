@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles, BookOpen } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { MentorConfigForm } from "./mentor-config-form";
+import { MentorDocumentsPanel } from "./mentor-documents-panel";
+import type { MentorDocument } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +27,12 @@ export default async function MentorConfigPage() {
     .select("*")
     .eq("organization_id", orgId)
     .maybeSingle();
+
+  const { data: docs } = await supabase
+    .from("mentor_documents")
+    .select("id, organization_id, name, storage_path, mime_type, size_bytes, extraction_status, extraction_error, extracted_text, created_at, created_by")
+    .eq("organization_id", orgId)
+    .order("created_at", { ascending: false });
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -62,6 +70,23 @@ export default async function MentorConfigPage() {
           {orgId && (
             <MentorConfigForm organizationId={orgId} config={config ?? null} />
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-mint-100 text-mint-700">
+              <BookOpen className="h-4 w-4" />
+            </div>
+            <div>
+              <CardTitle className="text-base">{t("docs_title")}</CardTitle>
+              <CardDescription>{t("docs_subtitle")}</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <MentorDocumentsPanel documents={(docs ?? []) as MentorDocument[]} />
         </CardContent>
       </Card>
     </div>

@@ -20,8 +20,10 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import {
   PRACTICE_TYPE_LABELS,
+  INTERNAL_TRAINING_TYPE_LABELS,
   STATUS_LABELS,
   type PracticeType,
+  type InternalTrainingType,
   type StudentStatus,
   type StudentHourSchedule,
 } from "@/types/database";
@@ -44,6 +46,7 @@ export interface StudentFormDefaults {
   position?: string | null;
   manager_name?: string | null;
   manager_email?: string | null;
+  internal_training_type?: InternalTrainingType | null;
   start_date?: string | null;
   end_date?: string | null;
   total_hours?: number | null;
@@ -80,6 +83,9 @@ export function StudentForm({
     initial?.practice_type ?? (scope === "internal" ? "internal" : "fp");
   const [practiceType, setPracticeType] = useState<PracticeType>(defaultType);
   const [status, setStatus] = useState<StudentStatus>(initial?.status ?? "active");
+  const [internalTrainingType, setInternalTrainingType] = useState<
+    InternalTrainingType | ""
+  >(initial?.internal_training_type ?? "");
   const [startDate, setStartDate] = useState<string>(initial?.start_date ?? "");
   const [endDate, setEndDate] = useState<string>(initial?.end_date ?? "");
   const [schedules, setSchedules] = useState<HourScheduleDraft[]>(
@@ -123,6 +129,7 @@ export function StudentForm({
       position: isInternal ? (formData.get("position") as string) || null : null,
       manager_name: isInternal ? (formData.get("manager_name") as string) || null : null,
       manager_email: isInternal ? (formData.get("manager_email") as string) || null : null,
+      internal_training_type: isInternal ? (internalTrainingType || null) : null,
       start_date: (formData.get("start_date") as string) || null,
       end_date: (formData.get("end_date") as string) || null,
       total_hours: Number(formData.get("total_hours")) || 0,
@@ -331,6 +338,33 @@ export function StudentForm({
             <CardDescription>{t("internal_data_subtitle")}</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="internal_training_type">
+                {t("internal_training_type_label")}
+              </Label>
+              <Select
+                value={internalTrainingType || undefined}
+                onValueChange={(v) =>
+                  setInternalTrainingType(v as InternalTrainingType)
+                }
+              >
+                <SelectTrigger id="internal_training_type">
+                  <SelectValue placeholder={t("internal_training_type_placeholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(INTERNAL_TRAINING_TYPE_LABELS) as InternalTrainingType[]).map(
+                    (k) => (
+                      <SelectItem key={k} value={k}>
+                        {INTERNAL_TRAINING_TYPE_LABELS[k]}
+                      </SelectItem>
+                    ),
+                  )}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {t("internal_training_type_hint")}
+              </p>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="department">{t("department_label")}</Label>
               <Input
@@ -404,7 +438,7 @@ export function StudentForm({
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("period_title")}</CardTitle>
+          <CardTitle>{isInternal ? t("period_title_internal") : t("period_title")}</CardTitle>
           <CardDescription>{t("period_subtitle")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

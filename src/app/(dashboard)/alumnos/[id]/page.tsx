@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   PRACTICE_TYPE_LABELS,
+  INTERNAL_TRAINING_TYPE_LABELS,
   STATUS_LABELS,
   REQUIRED_DOCUMENTS,
   DOCUMENT_TYPE_LABELS,
@@ -91,11 +92,16 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
           </div>
           <p className="mt-1 text-muted-foreground">
             {PRACTICE_TYPE_LABELS[student.practice_type]}
-            {isInternal
-              ? student.department
-                ? ` · ${student.department}`
-                : ""
-              : ` · ${student.institution_name ?? t("no_institution")}`}
+            {isInternal ? (
+              <>
+                {student.internal_training_type
+                  ? ` · ${INTERNAL_TRAINING_TYPE_LABELS[student.internal_training_type as keyof typeof INTERNAL_TRAINING_TYPE_LABELS]}`
+                  : ""}
+                {student.department ? ` · ${student.department}` : ""}
+              </>
+            ) : (
+              ` · ${student.institution_name ?? t("no_institution")}`
+            )}
           </p>
         </div>
         <div className="flex flex-wrap items-start justify-end gap-2">
@@ -164,7 +170,9 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{t("period")}</CardTitle>
+            <CardTitle className="text-base">
+              {isInternal ? t("period_internal") : t("period")}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="flex items-center gap-2 text-muted-foreground">

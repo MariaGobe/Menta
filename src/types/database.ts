@@ -1,4 +1,24 @@
 export type PracticeType = "fp" | "university" | "internal";
+export type InternalTrainingType =
+  | "onboarding"
+  | "horizontal_mobility"
+  | "succession"
+  | "skills"
+  | "leadership"
+  | "reskilling"
+  | "other";
+/** Etiquetas legibles del tipo de formación interna. Sirve como fallback para
+ * sitios sin traducciones cargadas; la UI usa el namespace `InternalTrainingType`
+ * de next-intl. */
+export const INTERNAL_TRAINING_TYPE_LABELS: Record<InternalTrainingType, string> = {
+  onboarding: "Onboarding",
+  horizontal_mobility: "Movilidad horizontal",
+  succession: "Relevo / sucesión",
+  skills: "Skills / habilidades",
+  leadership: "Liderazgo",
+  reskilling: "Reskilling",
+  other: "Otro",
+};
 export type StudentStatus = "active" | "completed" | "paused" | "cancelled";
 export type SubscriptionStatus =
   | "trialing"
@@ -392,6 +412,7 @@ export interface Student {
   position: string | null;
   manager_name: string | null;
   manager_email: string | null;
+  internal_training_type: InternalTrainingType | null;
   start_date: string | null;
   end_date: string | null;
   total_hours: number;

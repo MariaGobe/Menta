@@ -14,6 +14,7 @@ import { PlanSuggestionsPanel } from "./suggestions-panel";
 import { PlanMetaEditor } from "./plan-meta-editor";
 import { AddPhaseButton } from "./add-phase";
 import { SaveTemplateButton } from "./save-template-button";
+import { PlanAiActions } from "./plan-ai-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -98,6 +99,9 @@ export default async function PlanDetailPage({
         </div>
         <div className="flex flex-wrap items-start gap-2">
           {!plan.is_template && <SaveTemplateButton planId={plan.id} />}
+          {!plan.is_template && (
+            <PlanAiActions planId={plan.id} planTitle={plan.title} />
+          )}
           {isDraft && <ApprovePlanButton planId={plan.id} />}
         </div>
       </div>

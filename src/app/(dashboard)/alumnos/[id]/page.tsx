@@ -60,6 +60,20 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
     .eq("student_id", student.id)
     .order("from_date", { ascending: true });
 
+  const { data: managersList } = await supabase
+    .from("student_managers")
+    .select("id, name, email, role, is_primary")
+    .eq("student_id", student.id)
+    .order("is_primary", { ascending: false })
+    .order("created_at", { ascending: true });
+
+  const { data: planHistory } = await supabase
+    .from("practice_plans")
+    .select("id, title, status, start_date, end_date, created_at")
+    .eq("student_id", student.id)
+    .eq("is_template", false)
+    .order("created_at", { ascending: false });
+
   // ¿El alumno ya tiene cuenta en Menta? (un profile vinculado a su student_id)
   const { data: studentProfile } = await supabase
     .from("profiles")
@@ -69,7 +83,9 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
   const hasAccount = !!studentProfile;
 
   const isInternal = student.practice_type === "internal";
-  const requiredDocs = REQUIRED_DOCUMENTS[student.practice_type];
+  // Los documentos obligatorios solo aplican a alumnos externos (FP/universidad).
+  // Para formación interna no hay convenio ni PFI que subir.
+  const requiredDocs = isInternal ? [] : REQUIRED_DOCUMENTS[student.practice_type];
   const uploadedTypes = new Set((documents ?? []).map((d) => d.type));
   const missingDocs = requiredDocs.filter((t) => !uploadedTypes.has(t));
 
@@ -231,9 +247,31 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
                 </div>
                 <Separator />
                 <div>
-                  <p className="text-xs text-muted-foreground">{t("manager")}</p>
-                  <p>{student.manager_name ?? "—"}</p>
-                  <p className="text-xs text-muted-foreground">{student.manager_email ?? ""}</p>
+                  <p className="text-xs text-muted-foreground">{t("managers")}</p>
+                  {managersList && managersList.length > 0 ? (
+                    <ul className="space-y-1.5">
+                      {managersList.map((m) => (
+                        <li key={m.id}>
+                          <p className="font-medium">
+                            {m.name}
+                            {m.is_primary && (
+                              <span className="ml-2 rounded bg-mint-100 px-1.5 py-0.5 text-[10px] font-semibold text-mint-800">
+                                {t("primary")}
+                              </span>
+                            )}
+                          </p>
+                          {m.role && (
+                            <p className="text-xs text-muted-foreground">{m.role}</p>
+                          )}
+                          {m.email && (
+                            <p className="text-xs text-muted-foreground">{m.email}</p>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-muted-foreground">—</p>
+                  )}
                 </div>
               </>
             ) : (
@@ -333,6 +371,59 @@ export default async function AlumnoDetailPage({ params }: { params: { id: strin
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <div>
+            <CardTitle className="text-base">{t("plans_history")}</CardTitle>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t("plans_history_subtitle")}
+            </p>
+          </div>
+          <Button size="sm" asChild>
+            <Link href={`/planes/nuevo?student=${student.id}`}>
+              <ClipboardCheck className="h-4 w-4" /> {t("new_plan")}
+            </Link>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {!planHistory?.length ? (
+            <p className="text-sm text-muted-foreground">{t("no_plans")}</p>
+          ) : (
+            <ul className="divide-y">
+              {planHistory.map((p) => (
+                <li key={p.id} className="flex items-center justify-between gap-3 py-3">
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/planes/${p.id}`}
+                      className="font-medium hover:text-primary"
+                    >
+                      {p.title}
+                    </Link>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDate(p.start_date)} → {formatDate(p.end_date)} ·{" "}
+                      {t("created_on", { date: formatDate(p.created_at) })}
+                    </p>
+                  </div>
+                  <Badge
+                    variant={
+                      p.status === "completed"
+                        ? "success"
+                        : p.status === "in_progress"
+                          ? "secondary"
+                          : p.status === "approved"
+                            ? "success"
+                            : "secondary"
+                    }
+                  >
+                    {p.status}
+                  </Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
 
       {student.notes && (
         <Card>

@@ -28,8 +28,10 @@ export async function POST(request: Request) {
 
   const { plan } = body;
 
-  // Si ya existe un plan para este alumno, lo borramos (cascade limpia fases/tareas)
-  await supabase.from("practice_plans").delete().eq("student_id", body.studentId);
+  // Nota: antes borrábamos los planes previos del alumno para forzar
+  // uno-por-uno. Ahora un mismo alumno/empleado puede tener varios planes
+  // (histórico, distintas etapas, distintos proyectos formativos), así que
+  // solo insertamos el nuevo y el resto se conservan.
 
   // Crear plan
   const { data: created, error: planErr } = await supabase

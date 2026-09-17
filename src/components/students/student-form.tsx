@@ -28,6 +28,8 @@ import {
   type StudentHourSchedule,
 } from "@/types/database";
 import { HourScheduleEditor, type HourScheduleDraft } from "./hour-schedule-editor";
+import { ManagersEditor, type ManagerDraft } from "./managers-editor";
+import type { StudentManager } from "@/types/database";
 
 export interface StudentFormDefaults {
   id?: string;
@@ -65,6 +67,8 @@ interface Props {
   returnTo?: "alumnos" | "empleados";
   /** Tramos de dedicación variable persistidos (solo modo edit). */
   initialSchedules?: StudentHourSchedule[];
+  /** Managers persistidos (solo modo edit). */
+  initialManagers?: StudentManager[];
 }
 
 export function StudentForm({
@@ -73,6 +77,7 @@ export function StudentForm({
   scope,
   returnTo,
   initialSchedules,
+  initialManagers,
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
@@ -98,6 +103,33 @@ export function StudentForm({
     })),
   );
   const initialIds = new Set((initialSchedules ?? []).map((s) => s.id));
+
+  const [managers, setManagers] = useState<ManagerDraft[]>(() => {
+    if (initialManagers && initialManagers.length > 0) {
+      return initialManagers.map((m) => ({
+        id: m.id,
+        name: m.name ?? "",
+        email: m.email ?? "",
+        role: m.role ?? "",
+        is_primary: m.is_primary,
+      }));
+    }
+    // Retrocompatibilidad: si venía el manager único en la fila del alumno,
+    // lo mostramos como fila editable para no perder la info.
+    if (initial?.manager_name || initial?.manager_email) {
+      return [
+        {
+          id: `new-${Date.now()}-0`,
+          name: initial.manager_name ?? "",
+          email: initial.manager_email ?? "",
+          role: "",
+          is_primary: true,
+        },
+      ];
+    }
+    return [];
+  });
+  const initialManagerIds = new Set((initialManagers ?? []).map((m) => m.id));
   const isInternal = practiceType === "internal";
   // El listado sí es distinto (Alumnos/Empleados), pero el detalle está unificado en /alumnos/[id].
   const listBase = returnTo ?? (isInternal ? "empleados" : "alumnos");
@@ -127,8 +159,10 @@ export function StudentForm({
       tutor_company_email: (formData.get("tutor_company_email") as string) || null,
       department: isInternal ? (formData.get("department") as string) || null : null,
       position: isInternal ? (formData.get("position") as string) || null : null,
-      manager_name: isInternal ? (formData.get("manager_name") as string) || null : null,
-      manager_email: isInternal ? (formData.get("manager_email") as string) || null : null,
+      // Los managers viven ahora en la tabla student_managers.
+      // Mantenemos las columnas por retrocompat pero las dejamos vacías.
+      manager_name: null,
+      manager_email: null,
       internal_training_type: isInternal ? (internalTrainingType || null) : null,
       start_date: (formData.get("start_date") as string) || null,
       end_date: (formData.get("end_date") as string) || null,
@@ -195,12 +229,11 @@ export function StudentForm({
   }
 
   /**
-   * Sincroniza los tramos de dedicación con la tabla `student_hour_schedules`:
-   * - Los que empiezan por "new-" se insertan.
-   * - Los que ya existían y siguen en el estado se actualizan.
-   * - Los que estaban en `initialIds` pero ya no están en el estado se borran.
+   * Sincroniza tramos y managers con sus tablas: inserta los "new-",
+   * actualiza los persistidos y borra los que ya no están en el estado.
    */
   async function syncSchedules(studentId: string) {
+    // ─── Tramos de dedicación ──────────────────────────────────────────
     const currentIds = new Set(schedules.map((s) => s.id));
     const toDelete: string[] = [];
     initialIds.forEach((id) => {
@@ -233,6 +266,44 @@ export function StudentForm({
           weekly_hours: s.weekly_hours,
         })
         .eq("id", s.id);
+    }
+
+    // ─── Managers ──────────────────────────────────────────────────────
+    if (isInternal) {
+      const currentMgrIds = new Set(managers.map((m) => m.id));
+      const mgrsToDelete: string[] = [];
+      initialManagerIds.forEach((id) => {
+        if (!currentMgrIds.has(id)) mgrsToDelete.push(id);
+      });
+      if (mgrsToDelete.length > 0) {
+        await supabase.from("student_managers").delete().in("id", mgrsToDelete);
+      }
+      const mgrsToInsert = managers
+        .filter((m) => m.id.startsWith("new-") && m.name.trim())
+        .map((m) => ({
+          student_id: studentId,
+          name: m.name.trim(),
+          email: m.email.trim() || null,
+          role: m.role.trim() || null,
+          is_primary: m.is_primary,
+        }));
+      if (mgrsToInsert.length > 0) {
+        await supabase.from("student_managers").insert(mgrsToInsert);
+      }
+      const mgrsToUpdate = managers.filter(
+        (m) => !m.id.startsWith("new-") && initialManagerIds.has(m.id),
+      );
+      for (const m of mgrsToUpdate) {
+        await supabase
+          .from("student_managers")
+          .update({
+            name: m.name.trim(),
+            email: m.email.trim() || null,
+            role: m.role.trim() || null,
+            is_primary: m.is_primary,
+          })
+          .eq("id", m.id);
+      }
     }
   }
 
@@ -383,22 +454,10 @@ export function StudentForm({
                 placeholder={t("position_placeholder")}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="manager_name">{t("manager_name_label")}</Label>
-              <Input
-                id="manager_name"
-                name="manager_name"
-                defaultValue={initial?.manager_name ?? ""}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="manager_email">{t("manager_email_label")}</Label>
-              <Input
-                id="manager_email"
-                type="email"
-                name="manager_email"
-                defaultValue={initial?.manager_email ?? ""}
-              />
+            <div className="space-y-2 md:col-span-2">
+              <Label className="text-sm font-semibold">{t("managers_label")}</Label>
+              <p className="text-xs text-muted-foreground">{t("managers_hint")}</p>
+              <ManagersEditor value={managers} onChange={setManagers} />
             </div>
           </CardContent>
         </Card>

@@ -427,6 +427,16 @@ export function isEmployee(practiceType: PracticeType): boolean {
   return practiceType === "internal";
 }
 
+export interface StudentManager {
+  id: string;
+  student_id: string;
+  name: string;
+  email: string | null;
+  role: string | null;
+  is_primary: boolean;
+  created_at: string;
+}
+
 /** Un tramo de dedicación semanal dentro del período de prácticas. */
 export interface StudentHourSchedule {
   id: string;
